@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: dntx
+      auto-index-creation: true
+
+dntx:
+  secret-key: sampleKey

@@ -1,0 +1,843 @@
+05 Assets vs Public
+
+src/assets
+ > files that needs to be bundled in some ways
+
+public
+ > contains the static assets
+
+
+
+
+
+
+06 Vite hot reloading and auto refresh
+
+
+Hot reloading and auto refresh 
+ > Vite includes a development server that automatically reloads the application when changes are made to the source code
+ > This is known as Hot-Module Reloading, or Hot-Reloading, allowing developers to see their changes in real time without needing to refresh the browser manually.
+ > Uses esbuild and rollup to create a fast and good Hot reloading
+
+
+
+
+
+
+07 Setup eslint
+
+Setting up eslint
+1. Install eslint as devDependency
+	> npm i -D eslint
+2. Run eslint to initialize configuration
+	> npx eslint --init
+	> answer the questions, and install the necessary dependencies eslint ask
+	> this should create a ".eslintrc.cjs" file in the src
+
+
+eslint configuration inputs
+1. How would you like to use ESLint? 
+	> Problems
+2. What type of modules does your project use? 
+	> esm (imports/exports )
+3. Which framework does your project use?
+	> React
+4. Does your project use TypeScript?
+	> Yes
+5. Where does your code run?
+	> browser
+6. What format do you want your config file to be in?
+	> JavaScript
+
+
+
+
+
+
+
+08 Airbnb Style Guide
+
+
+Airbnb Style Guide
+ > https://airbnb.io/javascript/react/
+ > refers to how the Airbnb write their React/JSX apps
+ > they also created an npm module that enforces this styles through eslint
+ > its name is "eslint-config-airbnb"
+
+
+
+
+
+
+
+09 Setup eslint airbnb config
+
+SOURCE:
+https://www.npmjs.com/package/eslint-config-airbnb
+
+Setup eslint airbnb config
+ > by default, eslint installs dependencies so that we can add plugins like "eslint-config-airbnb" to add more to the default eslint
+ > eslint-config-airbnb requires the ff. dependencies
+	- eslint
+	- eslint-plugin-import
+	- eslint-plugin-react
+	- eslint-plugin-react-hooks
+	- eslint-plugin-jsx-ally
+
+
+
+Installing eslint-config-airbnb
+ > use the command below
+	- npx install-peerdeps --dev eslint-config-airbnb	
+ > "install-peerdeps" is used to scan for the module dependencies and install them as well
+
+
+Edit .eslintrc.cjs file
+1. In the "extends" array, remove the "eslint:recommended"
+2. Add "airbnb" and "airbnb/hooks"
+	> airbnb overrides eslint:recommended
+
+
+
+
+
+
+
+
+
+10 Setup eslint airbnb typescript config
+
+Setup eslint-airbnb to support typescript1
+ > for this, we want to use "eslint-config-airbnb-typescript" npm module
+ > needs to have "eslint-plugin" and "parser" dependencies
+
+Adding typescript support for eslint-airbnb
+1. Install "eslint-config-airbnb-typescript" as devDependency
+2. Add "airbnb-typescript" in the .eslintrc.cjs file's "extends" array property
+
+
+
+
+
+
+
+
+11 eslint parserOptions: project - fix eslintrc + tsconfig.json
+
+
+Fixing error with regards to eslint parsing
+1. Specify the tsconfig.json file that eslint will use for parsing the project
+	- Set "parserOptions.project" value to './tsconfig.json'" in the .eslintrc.cjs file
+	> we need to point to eslint where our TypeScript config file is located
+2. Specify in tsconfig.json to include the ".eslintrc.cjs" file for TypeScript parsing
+	> Add the ".eslintrc.cjs" file in the "include" array
+
+
+
+
+
+
+
+12 Fixing code with eslint
+
+Prerequisite
+1. ESLint extension in VSCode installed and enabled
+
+
+Fixing code with eslint
+1. Use CMD+Shift+P, then search "ESLint: Fix all auto-fixable Problems" to automatically fix some Problems
+
+
+
+
+
+
+
+13 Disabling ESLint rules
+
+Example of rules to disable
+1. Needing to import 'React' in a .tsx or .jsx file
+	> in later versions of React, 'React' is automatically imported in every .tsx or .jsx files
+	> this rule is called "react/react-in-jsx-scope" in ESLint
+
+
+Methods of Disabling ESLint rule
+1. Line scoped
+	> ESLint will disable specific ESLint rule in the next line
+2. File scoped
+	> ESLint will disable specific ESLint rules within the file
+3. Project scoped
+	> ESLint will disable specific ESLint rules in the whole project
+	> to do this, we will add the rule in the "rules" property of the ".eslintrc.cjs" and give it a value of 0 to disable it
+
+
+SYNTAX:
+Line scoped - added before the line that gives warning
+// eslint-disable-next-line SPECIFIC_ESLINT_RULE
+File scoped - added at the top of the file
+/* eslint-disable SPECIFIC_ESLINT_RULE */
+
+Project scoped
+// inside .eslintrc.cjs
+rules: {
+  'react/react-in-jsx-scope': 0,
+}
+
+
+
+
+
+
+
+14 Setup prettier
+
+
+Install necessary dependencies as devDependencies
+npm i -D prettier eslint-config-prettier eslint-plugin-prettier
+
+prettier
+ > the prettier dependency
+eslint-config-prettier
+ > disables rules we have enabled in eslint that will conflict with prettier
+eslint-plugin-prettier
+ > will make sure that all the prettier rules will work with conjunction with our eslint-rules
+
+
+
+Create the configuration js  file
+1. Create ".prettierrc.cjs" file in root directory
+2. Copy the content below inside the file
+	> SOURCE:https://prettier.io/docs/en/configuration.html
+
+module.exports = {
+    trailingComma: "es5",
+    tabWidth: 2,
+    semi: true,
+    singleQuote: true,
+  };
+
+
+
+
+
+
+
+
+15 Setup eslint prettier config and plugin
+
+SOURCE:
+https://prettier.io/docs/en/integrating-with-linters.html
+https://github.com/prettier/eslint-config-prettier
+
+
+Setup eslint prettier config and plugin
+1. Add "prettier" in the "plugins" property array of ".eslintrc.cjs" file
+2. Add 'plugin:prettier/recommended' at the end of the 'extends' property array of '.eslintrc.cjs'
+3. Reload the VSCode window
+
+
+
+
+
+
+
+16 Vitest setup
+
+SOURCE:
+https://vitest.dev/guide/
+
+
+Vitest setup
+1. Install vitest as devDependency
+	> npm install -D vitest
+2. Scroll in the Guide page and look for an example 'vite.config.ts' config file for 'react-testing-lib-msw'
+	> copy the following lines to our own 'vite.config.ts'
+3. Configure tsconfig.json to add vite.config.ts to its files to watch
+	> add "vite.config.ts" in the "include" property array of tsconfig.json
+4. For errors related to project's dependencies, not devDependencies in "vite.config.ts" file, we can choose to disable the rule in this specific file
+	> only for this file, for our React source code file, we should not do this
+5. Specify the setupFiles, which are files to run in order to setup testing
+	> replace content of 'setupFiles' array content to only "./src/setupTests.ts"
+	> then create a file with the same name in src folder
+
+
+LINES TO COPY
+1. Reference types
+2. "test" property to the object input to defineConfig()
+
+
+
+Final vite.config.ts file
+/* eslint-disable import/no-extraneous-dependencies */
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
+
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/setupTest.ts'],
+  },
+});
+
+
+Inside tsconfig.json
+"include": ["vite.config.ts", ".eslintrc.cjs", "src"],
+
+
+
+
+
+
+
+
+17 testing-library setup
+
+Installing testing dependencies
+1. Install @testing-library/react and @testing-library/jest-dom as devDependencies
+	> npm i -D @testing-library/react @testing-library/jest-dom
+
+
+
+NOTES:
+1. JSDOM is a library that essentially allows you to do DOM-like things without a web-browser. We use this in order to test React components in isolation	
+	> we might need to install the jsdom as devDependency as well
+2. testing-library/jest-dom gives us several methods to be used specically for DOM when creating expectations
+
+
+
+
+
+
+
+
+18 jest-dom setup
+
+SOURCE:
+https://markus.oberlehner.net/blog/using-testing-library-jest-dom-with-vitest/
+
+
+Setting up jest-dom with vitest
+1. Add the code below in the setupTests.ts file (which we set as one of setupFiles in vite.config.ts)
+
+// setupTests.ts
+import matchers from '@testing-library/jest-dom/matchers';
+import { expect } from 'vitest';
+
+expect.extend(matchers);
+
+
+
+NOTES:
+1. expect.extend() is used to extend vitest in order to use jest-dom features, which are the JSDOM matchers
+2. For test files, we can have extraneous dependencies
+	> since these are test files, which are only run in dev environment, we can have these
+
+
+
+
+
+
+
+
+19 Our first unit test
+
+Imports to be used
+render
+ > from @testing-library/react
+ > used to render React components
+screen 
+ > from @testing-library/react
+ > used to inspect these Components and pull them out and test against them
+describe 
+ > from vitest
+ > used to describe a test suite (which might contain one or more test)
+ > takes a name and a callback (where we define test cases)
+ > for the name input, we typically pass the filename or the React component name that we are testing
+	- EX: describe('SampleComponent', () => {//tests})
+it
+ > from vitest
+ > used to define a specific tests to do in a test suite
+ > defined inside describe() callback argument
+ > takes a name and a callback (testcase)
+ > for name, we typically pass the test case name itself
+ 	- EX: it("should contain specific data", () => {})
+
+
+Scripts used
+"test": "vitest"
+ > vitest is used to run our test cases
+ > it checks for files whose filename ends with '.test'
+
+
+Creating our first test
+1. Create a file named App.test.tsx
+	> this should be in the same directory as App.tsx
+2. Copy the code below to the file
+3. Edit the package.json to add the script defined below
+4. Run 'npm test' in the console
+
+
+// App.test.tsx
+/* eslint-disable import/no-extraneous-dependencies */
+import { describe, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import App from './App';
+
+describe('App', () => {
+  it('should have H1 with Hello World', () => {
+    // ARRANGE
+    render(<App />);
+    // ACT
+    // ASSERT
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+      })
+    ).toHaveTextContent('Hello World');
+  });
+});
+
+
+// Inside package.json 'scripts'
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+
+
+// Log output
+ ✓ src/App.test.tsx (1)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:17:57
+   Duration  5.54s (transform 538ms, setup 832ms, collect 752ms, tests 81ms)
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+
+
+
+
+
+
+
+
+
+20 A note on testing/query methods
+
+SOURCES:
+https://testing-library.com/docs/queries/about#priority
+https://kentcdodds.com/blog/common-mistakes-with-react-testing-library
+
+
+NOTES:
+1. Use the Priority section of testing-library queries page on deciding which query to use when doing Component testing
+
+
+
+
+
+
+
+21 Setup react-router v6
+
+SOURCES:
+https://reactrouter.com/en/main/start/tutorial
+
+
+Setting up react-router v6
+1. Install react-router-dom@6
+	> npm install react-router-dom@6
+
+
+
+
+
+
+22 Export "wrapped" App component
+
+Imports used
+HashRouter
+ > https://reactrouter.com/en/main/router-components/hash-router
+ > HashRouter is for use in web browsers when the URL should not (or cannot) be sent to the server for some reason
+ 
+Use of HashRouter (or Routers in general)
+ > used to be able to test all 'Page' components
+ > with this, we can test Page by using URLs
+
+
+Wrapping App component
+1. Create another functional component inside App.tsx named WrappedApp
+2. Inside WrappedApp, return the App component, but wrapped with <HashRouter>
+3. Export the WrappedApp component instead of App component in App.tsx
+
+
+
+
+
+
+
+23 HashRouter vs BrowserRouter
+
+SOURCE:
+https://reactrouter.com/en/main/router-components/hash-router
+
+BrowserRouter
+ > uses History API and State in order manage the Components to display based on the URL
+ > if we use BrowserRouter, we will need to do some redirect configuration to the server (ex: nginx) which our application is hosted
+
+
+
+
+
+
+24 Setup Routes
+
+
+Setting up Routes
+1. Import Routes and Route in the App.tsx
+2. Inside the div of App component, create a Routes component
+3. Inisde the Routes component, create a Route
+	> we will configure this route later once we create a Page component
+
+
+NOTES:
+1. For top level components, we might want to add them in seperate directory inside "src" for easier management
+
+
+
+
+
+
+25 Home page
+
+Creating Home page component
+1. Create a directory in src named "pages"
+2. Create a file Home.tsx inside the pages
+3. Make a functional component with div, which contains h1 that says Hello World
+
+// src/pages/Home.tsx
+import React from 'react';
+
+function Home() {
+  return (
+    <div>
+      <h1>Hello World</h1>
+    </div>
+  );
+}
+
+export default Home;
+
+
+
+Configuring Route for Home page component
+1. In the Route, assign the "/" (root url) to the Home
+	> we do this by passing "/" to Route's path and Home component to Route's element
+
+
+// App component
+function App() {
+  return (
+    <div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </div>
+  );
+}
+
+
+
+Run the test
+1. Execute "npm test"
+2. We should still pass the test
+
+
+
+
+
+
+
+
+26 NotFound page
+
+Creating NotFound page component
+1. Create a NotFound.tsx file in pages
+2. Similar to Home.tsx, but instead of Hello World, it displays 'Not Found'
+
+Setup NotFound routing
+1. Create another Route instead Routes
+2. For Route's path, pass "*", and for element, pass NotFound component
+	> * make sure that it will catch the request that is not handled by the previous Routes above it
+
+
+
+
+
+
+27 HashRoutes
+
+HashRoutes
+ > URL link where we use '#' to add additional information in the URL
+
+Testing our App that uses HashRoute
+1. Execute "npm run dev"
+2. Navigate to the url printed in console
+	> this will navigate us to Home page
+3. Add "/#/randompath" at the end of base url
+	> this should display NotFound page
+
+
+
+
+
+
+
+28 Link component
+
+Link
+ > component of react-router-dom
+ > used to navigate the page to another URL
+
+
+Modify NotFound page component
+1. Make the top level element of NotFound page component a Fragment
+2, Inside the React Fragment, pass the h1 with Not Found text
+3. Below the h1, we will add <Link> from react-router-dom
+4. In the Link, 
+	> pass 'GO HOME' as text context
+	> pass "/" as the to property
+
+
+Testing the Link component
+1. Run the React app
+2. Navigate to Not Found page
+3. Click the 'GO TO HOME' link
+
+
+
+
+
+
+
+29 NotFound test setup
+
+SOURCE:
+https://testing-library.com/docs/example-react-router/
+
+Imports used
+MemoryRoute
+ > component found in react-router-dom	
+ > we can use this to simulate page navigation when we are testing components that is rendered only on specific urls
+ > we can feed this component with specific urls, in which it will try mo render the Component it is nesting on these different set of Urls
+
+EX:
+test('landing on a bad page', () => {
+  const badRoute = '/some/bad/route'
+
+  // use <MemoryRouter> when you want to manually control the history
+  render(
+    <MemoryRouter initialEntries={[badRoute]}>
+      <App />
+    </MemoryRouter>,
+  )
+
+  // verify navigation to "no match" route
+  expect(screen.getByText(/no match/i)).toBeInTheDocument()
+})
+
+
+
+NotFound test setup
+1. Create another it() call inside describe() of App
+	> specifies that NotFound page will be loaded when bad url
+2. Inside, we will use MemoryRouter, in which
+	> we will nest App component inside
+	> we will also pass a badURL ("/banana") to the MemoryRoute's initialEntries property
+
+EX: // in App.test.tsx
+  it('Renders Not Found if given invalid path', () => {
+    // ARRANGE
+    render(
+      <MemoryRouter initialEntries={['/this-path-does-nothing']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // ASSERT
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+      })
+    ).toHaveTextContent('Not Found');
+  });
+
+
+
+
+
+
+
+30 Fixing App exports
+
+Fixing App exports
+1. Make the App and WrappedApp component to be exported by not a default one
+2. In the App.test.tsx, change the import statement so that we specifically import the WrappedApp and App
+3. Change the App component in first it() of App.test.tsx to WrappedApp component
+
+CODES:
+// App.tsx
+export function App() {
+  return (
+    <div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
+}
+
+export function WrappedApp() {
+  return (
+    <HashRouter>
+      <App />
+    </HashRouter>
+  );
+}
+
+
+
+// App.test.tsx
+import { WrappedApp, App } from './App';
+
+describe('App', () => {
+  it('Render Hello World', () => {
+    // ARRANGE
+    render(<WrappedApp />);
+    // ACT
+    // ASSERT
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+      })
+    ).toHaveTextContent('Hello World');
+  });
+  it('Renders Not Found if given invalid path', () => {
+    // ARRANGE
+    render(
+      <MemoryRouter initialEntries={['/this-path-does-nothing']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // ASSERT
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+      })
+    ).toHaveTextContent('Not Found');
+  });
+});
+
+
+
+
+
+
+
+31 NotFound failing test
+
+NotFound failing test
+1. Edit the initialEntries so that it does not render the NotFound page inside the App
+2. Add an assertion to check if the h1 in DOM renders NotFound
+	> this should fail
+
+
+// NotFound page failing test
+  it('Renders Not Found if given invalid path', () => {
+    // ARRANGE
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // ASSERT
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+      })
+    ).toHaveTextContent('Not Found');
+  });
+
+
+Fixing the failing test
+1. Edit the initialEntries of MemoryRouter so that it renders NotFound
+
+// Fixed NotFound test
+  it('Renders Not Found if given invalid path', () => {
+    // ARRANGE
+    render(
+      <MemoryRouter initialEntries={['/this-path-does-nothing']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    // ASSERT
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+      })
+    ).toHaveTextContent('Not Found');
+  });
+
+
+
+
+
+
+
+32 Fix main.tsx WrappedApp import
+
+
+Fix main.tsx WrappedApp import
+1. Chnage the import in the main.tsx
+	> instead of default App, use the WrappedApp
+
+EX:
+// main.tsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { WrappedApp } from './App';
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <WrappedApp />
+  </React.StrictMode>
+);
+
+
+
+
+
+
+
+
+33 A note on Unit Tests vs Integration tests
+
+NOTES:
+1. Vitest is created for making Unit tests
+2. The test cases we have written so far is Integration test, where we are testing if the React Router library is working
+	> for Unit testing, we may test each of the Page components rendered for each Routes (Home, NotFound, etc)

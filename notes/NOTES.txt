@@ -1,0 +1,27 @@
+dn-transaction
+ > used for recording/keeping transaction information done in dn
+ 
+Transactions Types
+1. GOLD -> CC via GIFT
+2. GOLD -> CC via CODE
+3. GOLD -> PHP
+
+
+Transaction informations
+GOLD to CC via GIFT
+ > username
+ > cc amount
+ > gold given
+ > date finished
+ > files associated
+	> filename
+	> url, might be google drive
+
+GOLD to CC via CODE
+ > username
+ > cc amount
+ > gold given
+ > date finished
+ > files associated
+	> filename
+	> url, might be google drive
