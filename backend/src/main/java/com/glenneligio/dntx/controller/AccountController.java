@@ -1,10 +1,8 @@
 package com.glenneligio.dntx.controller;
 
-import com.glenneligio.dntx.dtos.DnTxUserDetails;
-import com.glenneligio.dntx.dtos.LoginRequestDto;
-import com.glenneligio.dntx.dtos.LoginResponseDto;
-import com.glenneligio.dntx.dtos.RegisterRequestDto;
+import com.glenneligio.dntx.dtos.*;
 import com.glenneligio.dntx.enums.AccountType;
+import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Account;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.AccountService;
@@ -12,6 +10,7 @@ import com.glenneligio.dntx.service.TransactionService;
 import com.glenneligio.dntx.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -86,14 +85,6 @@ public class AccountController {
         return ResponseEntity.ok(loginResponseDto);
     }
 
-    @GetMapping("/@self/transactions")
-    public ResponseEntity<List<Transaction>> getAccountTransactions(Authentication authentication) {
-        log.info("Fetching own transactions with principal {}", authentication);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-        return ResponseEntity.ok(transactionService.getTransactionsByCreatorUsername(username));
-    }
-
     @GetMapping("/@self")
     public ResponseEntity<Account> getOwnAccount(Authentication authentication) {
         log.info("Fetching own account details with principal {}", authentication.getPrincipal());
@@ -111,6 +102,41 @@ public class AccountController {
         account.setUsername(username);
         Account updatedAccount = accountService.updateAccount(username, account);
         return ResponseEntity.ok(updatedAccount);
+    }
+
+    @GetMapping("/@self/transactions")
+    public ResponseEntity<List<Transaction>> getAccountTransactions(Authentication authentication) {
+        log.info("Fetching own transactions with principal {}", authentication);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        return ResponseEntity.ok(transactionService.getTransactionsByCreatorUsername(username));
+    }
+
+    @PutMapping("/@self/transactions/{id}")
+    public ResponseEntity<Transaction> updateOwnTransaction(@PathVariable String id,
+                                                            @RequestBody CreateUpdateTransactionDto dto,
+                                                            Authentication authentication) {
+        log.info("Updating own transaction with id {}, and transaction info {}", id, dto);
+        checkIfOwnTransaction(authentication, id, "You can only update your own transactions");
+        Transaction transactionUpdated = transactionService.updateTransaction(id, dto.toTransaction());
+        return ResponseEntity.ok(transactionUpdated);
+    }
+
+    @DeleteMapping("/@self/transactions/{id}")
+    public ResponseEntity<Transaction> deleteOwnTransaction(@PathVariable String id,
+                                                            Authentication authentication) {
+        log.info("Delete own transaction with id {}", id);
+        checkIfOwnTransaction(authentication, id, "You can only delete your own transactions");
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.ok().build();
+    }
+
+    private void checkIfOwnTransaction(Authentication authentication, String id, String message) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Transaction transactionToBeUpdated = transactionService.getTransactionById(id);
+        if (!transactionToBeUpdated.getCreator().getUsername().equals(userDetails.getUsername())) {
+            throw new ApiException(message, HttpStatus.UNAUTHORIZED);
+        }
     }
 
 
