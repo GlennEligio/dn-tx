@@ -8,12 +8,14 @@ import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.AccountService;
 import com.glenneligio.dntx.service.TransactionService;
 import com.glenneligio.dntx.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -45,8 +47,8 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        Account accountCreated = accountService.createAccount(account);
+    public ResponseEntity<Account> createAccount(@RequestBody @Valid CreateAccountDto dto) {
+        Account accountCreated = accountService.createAccount(dto.toAccount());
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{username}")
                         .buildAndExpand(accountCreated.getUsername())
@@ -56,8 +58,8 @@ public class AccountController {
 
     @PutMapping("/{username}")
     public ResponseEntity<Account> updateAccount(@PathVariable String username,
-                                                 @RequestBody Account account) {
-        return ResponseEntity.ok(accountService.updateAccount(username, account));
+                                                 @RequestBody @Valid UpdateAccountDto dto) {
+        return ResponseEntity.ok(accountService.updateAccount(username, dto.toAccount()));
     }
 
     @DeleteMapping("/{username}")
@@ -67,14 +69,14 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
         var account = accountService.login(dto.getUsername(), dto.getPassword());
         LoginResponseDto loginResponseDto = getLoginResponseDto(account);
         return ResponseEntity.ok(loginResponseDto);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<LoginResponseDto> register(@RequestBody RegisterRequestDto dto) {
+    public ResponseEntity<LoginResponseDto> register(@RequestBody @Valid RegisterRequestDto dto) {
         Account account = new Account();
         account.setFullName(dto.getFullName());
         account.setUsername(dto.getUsername());
@@ -95,10 +97,11 @@ public class AccountController {
 
     @PutMapping("/@self")
     public ResponseEntity<Account> updateOwnAccount(Authentication authentication,
-                                                    @RequestBody Account account) {
+                                                    @RequestBody @Valid UpdateAccountDto dto) {
         log.info("Updating own account using principal {}", authentication.getPrincipal());
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
+        Account account = dto.toAccount();
         account.setUsername(username);
         Account updatedAccount = accountService.updateAccount(username, account);
         return ResponseEntity.ok(updatedAccount);
@@ -112,9 +115,25 @@ public class AccountController {
         return ResponseEntity.ok(transactionService.getTransactionsByCreatorUsername(username));
     }
 
+    @PostMapping("/@self/transactions")
+    public ResponseEntity<Transaction> createAccountTransaction(@RequestBody @Valid CreateUpdateTransactionDto dto,
+                                                                Authentication authentication) {
+        log.info("Creating own transaction with principal {}, and transaction {}", authentication.getPrincipal(), dto);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        Transaction transaction = dto.toTransaction();
+        transaction.getCreator().setUsername(username);
+        Transaction transactionCreated = transactionService.createTransaction(transaction);
+        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(transactionCreated.getId())
+                .toUri())
+                .body(transactionCreated);
+    }
+
     @PutMapping("/@self/transactions/{id}")
     public ResponseEntity<Transaction> updateOwnTransaction(@PathVariable String id,
-                                                            @RequestBody CreateUpdateTransactionDto dto,
+                                                            @RequestBody @Valid CreateUpdateTransactionDto dto,
                                                             Authentication authentication) {
         log.info("Updating own transaction with id {}, and transaction info {}", id, dto);
         checkIfOwnTransaction(authentication, id, "You can only update your own transactions");

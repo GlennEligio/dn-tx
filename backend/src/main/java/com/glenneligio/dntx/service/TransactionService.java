@@ -7,14 +7,15 @@ import com.glenneligio.dntx.model.CcToGoldTransaction;
 import com.glenneligio.dntx.model.GoldToPhpTransaction;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.repository.TransactionRepository;
+import jakarta.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -25,18 +26,24 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
+    private Validator validator;
+    @Autowired
     private AccountService accountService;
 
     public Transaction createTransaction(Transaction transaction) {
+        log.info("Creating transaction {}", transaction);
         Account account = accountService.getAccountByUsername(transaction.getCreator().getUsername());
         transaction.setCreator(account);
         transaction.setDateFinished(LocalDateTime.now());
+
         switch(transaction.getType()) {
             case GoldToPhp:
                 GoldToPhpTransaction goldToPhpTransaction = new GoldToPhpTransaction(transaction);
+                validateGoldToPhpTransaction(goldToPhpTransaction);
                 return transactionRepository.save(goldToPhpTransaction);
             case CcToGold:
                 CcToGoldTransaction ccToGoldTransaction = new CcToGoldTransaction(transaction);
+                validateCcToGoldTransaction(ccToGoldTransaction);
                 return transactionRepository.save(ccToGoldTransaction);
             default:
                 throw new ApiException("No transaction type specified", HttpStatus.BAD_REQUEST);
@@ -66,10 +73,12 @@ public class TransactionService {
         if(transactionToBeUpdated instanceof GoldToPhpTransaction goldToPhpTransaction) {
             log.info("Transaction is a Gold2Php tx");
             goldToPhpTransaction.updateGold2Php(new GoldToPhpTransaction(transaction));
+            validateGoldToPhpTransaction(goldToPhpTransaction);
             return transactionRepository.save(goldToPhpTransaction);
         } else if (transactionToBeUpdated instanceof CcToGoldTransaction ccToGoldTransaction) {
             log.info("Transaction is a Cc2Gold tx");
             ccToGoldTransaction.updateCcToGold(new CcToGoldTransaction(transaction));
+            validateCcToGoldTransaction(ccToGoldTransaction);
             return transactionRepository.save(ccToGoldTransaction);
         } else {
             transactionToBeUpdated.update(transaction);
@@ -86,5 +95,19 @@ public class TransactionService {
     public List<Transaction> getTransactionsByCreatorUsername(String username) {
         Account account = accountService.getAccountByUsername(username);
         return transactionRepository.findByCreatorId(account.getId());
+    }
+
+    private void validateCcToGoldTransaction(CcToGoldTransaction ccToGoldTransaction) {
+        Set<ConstraintViolation<CcToGoldTransaction>> violations = validator.validate(ccToGoldTransaction);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException("Invalid CcToGoldTransaction", violations);
+        }
+    }
+
+    private void validateGoldToPhpTransaction(GoldToPhpTransaction goldToPhpTransaction) {
+        Set<ConstraintViolation<GoldToPhpTransaction>> violations = validator.validate(goldToPhpTransaction);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException("Invalid GoldToPhpTransaction", violations);
+        }
     }
 }

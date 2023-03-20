@@ -4,6 +4,9 @@ package com.glenneligio.dntx.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +22,18 @@ import java.io.Serializable;
 @Slf4j
 public class GoldToPhpTransaction extends Transaction {
 
+    @NotBlank(message = "GoldToPhpTransaction's name must not be blank")
     private String name;
+
+    @Positive(message = "GoldToPhpTransaction's php paid must be positive")
+    @NotNull(message = "Php paid must not be null")
     private Double phpPaid;
+
+    @Positive(message = "GoldToPhpTransaction's gold per php ratio must be positive")
+    @NotNull(message = "Gold per php ratio must not be null")
     private Double goldPerPhp;
+
+    @NotBlank(message = "GoldToPhpTransaction's method of payment must not be blank")
     private String methodOfPayment;
 
     public GoldToPhpTransaction(Transaction t)  {

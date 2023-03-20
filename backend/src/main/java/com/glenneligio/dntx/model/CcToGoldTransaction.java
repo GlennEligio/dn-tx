@@ -3,6 +3,8 @@ package com.glenneligio.dntx.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,8 +18,16 @@ import java.math.BigDecimal;
 @Slf4j
 public class CcToGoldTransaction extends Transaction{
 
+    @Positive(message = "CcToGoldTransaction's cc amount must be positive")
+    @NotNull(message = "Cc amount must not be null")
     private BigDecimal ccAmount;
+
+    @Positive(message = "CcToGoldTransaction's gold per cc ratio must be positive")
+    @NotNull(message = "Cc amount must not be null")
     private Double goldPerCC;
+
+    @Positive(message = "CcToGoldTransaction's gold paid must be positive")
+    @NotNull(message = "Gold paid must not be null")
     private Double goldPaid;
 
     public CcToGoldTransaction(Transaction t)  {

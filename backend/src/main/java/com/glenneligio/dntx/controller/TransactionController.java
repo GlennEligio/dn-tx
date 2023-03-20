@@ -4,6 +4,7 @@ import com.glenneligio.dntx.dtos.CreateUpdateTransactionDto;
 import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody CreateUpdateTransactionDto transactionDto) {
+    public ResponseEntity<Transaction> createTransaction(@RequestBody @Valid CreateUpdateTransactionDto transactionDto) {
         Transaction transactionCreated = service.createTransaction(transactionDto.toTransaction());
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(transactionCreated.getId()).toUri())
                 .body(transactionCreated);
@@ -48,7 +49,7 @@ public class TransactionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Transaction> updateTransaction(@PathVariable String id,
-                                                         @RequestBody CreateUpdateTransactionDto dto) {
+                                                         @RequestBody @Valid CreateUpdateTransactionDto dto) {
         Transaction transactionUpdated = service.updateTransaction(id, dto.toTransaction());
         return ResponseEntity.ok(transactionUpdated);
     }

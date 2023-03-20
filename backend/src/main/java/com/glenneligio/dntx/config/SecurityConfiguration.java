@@ -41,16 +41,18 @@ public class SecurityConfiguration {
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST,"/api/*/accounts/login", "/api/*/accounts/register").permitAll()
-                .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/*/transactions/*").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/*/accounts/@self/**").hasAnyAuthority("ADMIN", "USER")
-                .requestMatchers(HttpMethod.PUT, "/api/*/accounts/@self", "/api/*/accounts/@self/transactions/*").hasAnyAuthority("ADMIN","USER")
-                .requestMatchers(HttpMethod.DELETE, "/api/*/accounts/@self/transactions/*").hasAnyAuthority("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/*/transactions").hasAnyAuthority("USER", "ADMIN")
+//                .requestMatchers(HttpMethod.POST,"/api/*/accounts/login", "/api/*/accounts/register").permitAll()
+//                .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll()
+//                .requestMatchers(HttpMethod.GET, "/api/*/transactions/*").permitAll()
+//                .requestMatchers(HttpMethod.GET, "/api/*/accounts/@self/**").hasAnyAuthority("ADMIN", "USER")
+//                .requestMatchers(HttpMethod.POST, "/api/*/accounts/@self/transactions").hasAnyAuthority("USER", "ADMIN")
+//                .requestMatchers(HttpMethod.PUT, "/api/*/accounts/@self", "/api/*/accounts/@self/transactions/*").hasAnyAuthority("ADMIN","USER")
+//                .requestMatchers(HttpMethod.DELETE, "/api/*/accounts/@self/transactions/*").hasAnyAuthority("USER", "ADMIN")
+//                .requestMatchers(HttpMethod.POST, "/api/*/transactions").hasAnyAuthority("USER", "ADMIN")
 //                .requestMatchers(HttpMethod.PUT, "/api/v1/accounts/**").authenticated()
 //                .requestMatchers(HttpMethod.GET, "/**").authenticated()
-                .anyRequest().hasAnyAuthority("ADMIN");
+//                .anyRequest().hasAnyAuthority("ADMIN");
+                .anyRequest().permitAll();
         return http.build();
     }
 

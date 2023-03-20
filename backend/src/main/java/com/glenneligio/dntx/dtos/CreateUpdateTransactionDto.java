@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glenneligio.dntx.enums.TransactionType;
 import com.glenneligio.dntx.model.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,13 +22,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateUpdateTransactionDto {
-    private String id;
+    @NotBlank(message = "Username can't be blank")
     private String username;
+    @NotNull(message = "Creator must be present, at least the username")
     private Account creator;
-    private LocalDateTime dateFinished;
     private List<FileAttachment> fileAttachments;
 
-    private TransactionType type;
+    @Pattern(regexp = "(CC2GOLD|GOLD2PHP)", message = "Transaction type can only be CcToGold or GoldToPhp")
+    @NotNull(message = "Transaction type must be present")
+    private String type;
+
+    @Positive
     private BigDecimal ccAmount;
     private Double goldPerCC;
     private Double goldPaid;
@@ -39,14 +44,13 @@ public class CreateUpdateTransactionDto {
 
     public Transaction toTransaction() {
         Transaction transaction = null;
-        switch(type) {
+        switch(TransactionType.getTransactionType(type)) {
             case CcToGold:
                 CcToGoldTransaction transaction1 = new CcToGoldTransaction();
-                transaction.setUsername(username);
-                transaction.setCreator(creator);
-                transaction.setDateFinished(dateFinished);
-                transaction.setFileAttachments(fileAttachments);
-                transaction.setType(type);
+                transaction1.setUsername(username);
+                transaction1.setCreator(creator);
+                transaction1.setFileAttachments(fileAttachments);
+                transaction1.setType(TransactionType.CcToGold);
                 transaction1.setCcAmount(ccAmount);
                 transaction1.setGoldPerCC(goldPerCC);
                 transaction1.setGoldPaid(goldPaid);
@@ -56,9 +60,8 @@ public class CreateUpdateTransactionDto {
                 GoldToPhpTransaction transaction2 = new GoldToPhpTransaction();
                 transaction2.setUsername(username);
                 transaction2.setCreator(creator);
-                transaction2.setDateFinished(dateFinished);
                 transaction2.setFileAttachments(fileAttachments);
-                transaction2.setType(type);
+                transaction2.setType(TransactionType.GoldToPhp);
 
                 transaction2.setName(name);
                 transaction2.setPhpPaid(phpPaid);
