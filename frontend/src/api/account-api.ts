@@ -1,0 +1,78 @@
+import { RequestConfig } from '../hooks/useHttp';
+
+export enum AccountType {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
+
+export interface LoginRequestDto {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequestDto {
+  username: string;
+  password: string;
+  email: string;
+  fullName: string;
+}
+
+export interface LoginResponseDto {
+  username: string;
+  fullName: string;
+  accountType: string;
+  accessToken: string;
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  profileUrl: string;
+  description: string;
+}
+
+const getBackendUri = () => {
+  if (import.meta.env.DEV && import.meta.env.VITE_BACKEND_SERVICE_URI_DEV) {
+    return import.meta.env.VITE_BACKEND_SERVICE_URI_DEV;
+  }
+  return '';
+};
+
+const BACKEND_URI = getBackendUri();
+
+const login = (loginInfo: LoginRequestDto): RequestConfig => {
+  return {
+    body: {
+      username: loginInfo.username,
+      password: loginInfo.password,
+    },
+    headers: {
+      'Content-type': 'application/json',
+    },
+    method: 'POST',
+    relativeUrl: `${BACKEND_URI}/api/v1/accounts/login`,
+  };
+};
+
+const register = (registerInfo: RegisterRequestDto): RequestConfig => {
+  return {
+    body: {
+      username: registerInfo.username,
+      password: registerInfo.password,
+      email: registerInfo.email,
+      fullName: registerInfo.fullName,
+    },
+    headers: {
+      'Content-type': 'application/json',
+    },
+    method: 'POST',
+    relativeUrl: `${BACKEND_URI}/api/v1/accounts/register`,
+  };
+};
+
+export default {
+  login,
+  register,
+};
