@@ -1,8 +1,5 @@
 package com.glenneligio.dntx.dtos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glenneligio.dntx.enums.TransactionType;
 import com.glenneligio.dntx.model.*;
 import jakarta.validation.constraints.*;
@@ -10,11 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -34,11 +28,15 @@ public class CreateUpdateTransactionDto {
 
     @Positive
     private BigDecimal ccAmount;
+    @Positive
     private Double goldPerCC;
+    @Positive
     private Double goldPaid;
 
     private String name;
+    @Positive
     private Double phpPaid;
+    @Positive
     private Double goldPerPhp;
     private String methodOfPayment;
 

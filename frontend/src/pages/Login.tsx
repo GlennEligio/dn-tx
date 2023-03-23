@@ -1,13 +1,18 @@
 import React, { FormEventHandler, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import AccountApi, {
   LoginRequestDto,
   LoginResponseDto,
 } from '../api/account-api';
 import useHttp from '../hooks/useHttp';
+import authSlice, { authActions } from '../store/authSlice';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     data: loginData,
@@ -23,8 +28,17 @@ function Login() {
       loginStatus === 'completed'
     ) {
       console.log(loginData);
+      dispatch(
+        authActions.saveAuth({
+          username: loginData.username,
+          accessToken: loginData.accessToken,
+          fullName: loginData.fullName,
+          accountType: loginData.accountType,
+        })
+      );
+      navigate('/');
     }
-  }, [loginData, loginError, loginStatus]);
+  }, [loginData, loginError, loginStatus, navigate, dispatch]);
 
   const loginSubmitHandler: FormEventHandler = (event) => {
     event.preventDefault();

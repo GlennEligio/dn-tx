@@ -29,12 +29,12 @@ interface RequestAction {
 }
 
 export interface RequestConfig {
-  body: { [props: string]: any };
-  headers: {
+  body?: { [props: string]: any };
+  headers?: {
     [header: string]: string;
   };
-  method: string;
-  relativeUrl: string;
+  method?: string;
+  relativeUrl?: string;
 }
 
 const createDataFetchReducer =
@@ -99,7 +99,7 @@ function useHttp<T>(startWithPending = false) {
     dispatch({ type: RequestActionKind.SEND });
     try {
       // const responseData = await requestFunction(requestConfig);
-      const responseObj: T = await fetch(requestConfig.relativeUrl, {
+      const responseObj: T = await fetch(requestConfig.relativeUrl || '', {
         method: requestConfig.method || 'GET',
         body:
           requestConfig.body != null
