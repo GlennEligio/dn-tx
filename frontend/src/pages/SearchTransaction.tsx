@@ -1,6 +1,6 @@
 import React, { FormEventHandler, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import TransactionApi, { Transaction } from '../api/transaction-api';
-import TransactionDetails from '../components/Transaction/TransactionDetails';
 import useHttp from '../hooks/useHttp';
 
 function SearchTransaction() {
@@ -62,10 +62,14 @@ function SearchTransaction() {
         </form>
       </div>
       {transactionData && (
-        <TransactionDetails
-          transaction={transactionData}
-          key={transactionData.id}
-        />
+        <div>
+          <Link
+            key={transactionData.id}
+            to={`/transactions/${transactionData.id}`}
+          >
+            {transactionData.id}
+          </Link>
+        </div>
       )}
       {transactionStatus === 'completed' && transactionError !== null && (
         <h1>No result found</h1>

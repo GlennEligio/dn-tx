@@ -1,8 +1,8 @@
 import { RequestConfig } from '../hooks/useHttp';
 
 export enum TransactionType {
-  CC2GOLD = 'CcToGold',
-  GOLD2PHP = 'GoldToPhp',
+  CC2GOLD = 'CC2GOLD',
+  GOLD2PHP = 'GOLD2PHP',
 }
 
 export interface FileAttachment {
@@ -11,16 +11,19 @@ export interface FileAttachment {
 }
 
 export interface Transaction {
-  id: string;
+  id?: string;
   username: string;
-  dateFinished: string;
+  creator?: {
+    username: string;
+  };
+  dateFinished?: string;
   fileAttachments: FileAttachment[];
   type: TransactionType;
 }
 
 export interface CcToGoldTransaction extends Transaction {
   ccAmount: number;
-  goldPerCc: number;
+  goldPerCC: number;
   goldPaid: number;
 }
 
@@ -29,6 +32,14 @@ export interface GoldToPhpTransaction extends Transaction {
   phpPaid: number;
   goldPerPhp: number;
   methodOfPayment: string;
+}
+
+export interface TransactionPageDto {
+  transactions: Transaction[];
+  totalPages: number;
+  totalTransactions: number;
+  pageNumber: number;
+  pageSize: number;
 }
 
 const getBackendUri = () => {
@@ -48,13 +59,28 @@ const getTransactionByUsernameAndId = (username: string, id: string) => {
   };
 };
 
-const getAccountOwnTransactions = (accessToken: string): RequestConfig => {
+const getTransactionById = (id: string): RequestConfig => {
+  return {
+    method: 'GET',
+    relativeUrl: `${BACKEND_URI}/api/v1/transactions/${id}`,
+  };
+};
+
+const getAccountOwnTransactions = (
+  accessToken: string,
+  pageNumber: number,
+  pageSize: number
+): RequestConfig => {
+  const searchParams = new URLSearchParams({
+    pageNumber: pageNumber.toString(),
+    pageSize: pageSize.toString(),
+  }).toString();
   return {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
     method: 'GET',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions`,
+    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions?${searchParams}`,
   };
 };
 
@@ -108,4 +134,5 @@ export default {
   updateAccountOwnTransaction,
   deleteAccountOwnTransaction,
   getTransactionByUsernameAndId,
+  getTransactionById,
 };

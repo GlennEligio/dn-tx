@@ -42,7 +42,6 @@ function Login() {
 
   const loginSubmitHandler: FormEventHandler = (event) => {
     event.preventDefault();
-
     const loginInfo: LoginRequestDto = {
       username,
       password,

@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useEffect } from 'react';
 
 enum RequestActionKind {
   SEND = 'SEND',
@@ -22,10 +22,10 @@ interface RequestState<T> {
   status: 'pending' | 'completed' | null;
 }
 
-interface RequestAction {
+interface RequestAction<T> {
   type: string;
-  responseData?: any;
-  errorMessage?: any;
+  responseData?: T;
+  errorMessage?: string;
 }
 
 export interface RequestConfig {
@@ -35,11 +35,12 @@ export interface RequestConfig {
   };
   method?: string;
   relativeUrl?: string;
+  errorMessage?: string;
 }
 
 const createDataFetchReducer =
   <T>() =>
-  (state: RequestState<T>, action: RequestAction): RequestState<T> => {
+  (state: RequestState<T>, action: RequestAction<T>): RequestState<T> => {
     switch (action.type) {
       case RequestActionKind.RESET:
         return {
@@ -75,7 +76,7 @@ const createDataFetchReducer =
   };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function useHttp<T>(startWithPending = false) {
+function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
   const [httpState, dispatch] = useReducer(createDataFetchReducer<T>(), {
     status: startWithPending ? 'pending' : null,
     data: null,
@@ -93,9 +94,7 @@ function useHttp<T>(startWithPending = false) {
     dispatch({ type: RequestActionKind.RESET });
   };
 
-  const sendRequest = useCallback(async function (
-    requestConfig: RequestConfig
-  ) {
+  const sendRequest = useCallback(async (requestConfig: RequestConfig) => {
     dispatch({ type: RequestActionKind.SEND });
     try {
       // const responseData = await requestFunction(requestConfig);
@@ -110,7 +109,9 @@ function useHttp<T>(startWithPending = false) {
         if (response.ok) {
           return response.json();
         }
-        throw new ApiError('Registration failed');
+        throw new ApiError(
+          requestConfig.errorMessage || 'Something went wrong'
+        );
       });
       dispatch({
         type: RequestActionKind.SUCCESS,
@@ -122,8 +123,13 @@ function useHttp<T>(startWithPending = false) {
         errorMessage: determineErrorMessage(error),
       });
     }
-  },
-  []);
+  }, []);
+
+  useEffect(() => {
+    if (startWithPending && initReqConf) {
+      sendRequest(initReqConf);
+    }
+  }, [startWithPending]);
 
   return {
     sendRequest,
