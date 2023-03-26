@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
 import transactionApi, {
   CcToGoldTransaction,
   GoldToPhpTransaction,
@@ -7,8 +8,10 @@ import transactionApi, {
   TransactionType,
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
+import { IRootState } from '../store';
 
 function TransactionDetails() {
+  const auth = useSelector((state: IRootState) => state.auth);
   const { transactionId } = useParams();
 
   const {
@@ -118,6 +121,11 @@ function TransactionDetails() {
                 </a>
               ))}
           </div>
+          {auth.accessToken && (
+            <div>
+              <Link to={`/transactions/${transactionId}/edit`}>Edit</Link>
+            </div>
+          )}
         </>
       )}
       {!validTransactionData && (

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CreateTransaction from './pages/CreateTransaction';
+import EditTransaction from './pages/EditTransaction';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -18,6 +19,10 @@ export function App() {
         <Route
           path="/transactions/:transactionId"
           element={<TransactionDetails />}
+        />
+        <Route
+          path="/transactions/:transactionId/edit"
+          element={<EditTransaction />}
         />
         <Route path="/create-transaction" element={<CreateTransaction />} />
         <Route path="*" element={<NotFound />} />
