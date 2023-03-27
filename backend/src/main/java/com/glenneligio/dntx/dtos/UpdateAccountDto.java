@@ -25,6 +25,7 @@ public class UpdateAccountDto {
         Account account = new Account();
         account.setEmail(email);
         account.setPassword(password);
+        account.setFullName(fullName);
         return account;
     }
 }
