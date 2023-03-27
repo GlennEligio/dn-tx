@@ -74,7 +74,7 @@ function Home() {
                   <div>
                     <Button
                       variant="outline-dark"
-                      onClick={() => navigate('/logout')}
+                      onClick={logoutHandler}
                       className="w-100"
                     >
                       Logout
