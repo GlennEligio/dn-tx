@@ -107,7 +107,11 @@ function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
         headers: requestConfig.headers != null ? requestConfig.headers : {},
       }).then((response) => {
         if (response.ok) {
-          return response.json();
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.indexOf('application/json') !== -1) {
+            return response.json();
+          }
+          return true;
         }
         throw new ApiError(
           requestConfig.errorMessage || 'Something went wrong'

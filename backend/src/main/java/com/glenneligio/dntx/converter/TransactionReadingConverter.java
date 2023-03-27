@@ -23,7 +23,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
             case "com.glenneligio.dntx.model.CcToGoldTransaction":
                 var ccToGoldTx = new CcToGoldTransaction();
                 ccToGoldTx.setId((String) source.get("_id"));
-                ccToGoldTx.setType(TransactionType.CcToGold);
+                ccToGoldTx.setType(TransactionType.CC2GOLD);
                 ccToGoldTx.setCreator((Account) source.get("creator"));
                 ccToGoldTx.setGoldPaid((Double) source.get("goldPaid"));
                 ccToGoldTx.setGoldPerCC((Double) source.get("goldPerCC"));
@@ -36,7 +36,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
             case "com.glenneligio.dntx.model.GoldToPhpTransaction":
                 var goldToPhpTx = new GoldToPhpTransaction();
                 goldToPhpTx.setId((String) source.get("_id"));
-                goldToPhpTx.setType(TransactionType.CcToGold);
+                goldToPhpTx.setType(TransactionType.CC2GOLD);
                 goldToPhpTx.setCreator((Account) source.get("creator"));
                 goldToPhpTx.setUsername((String) source.get("username"));
                 goldToPhpTx.setDateFinished((LocalDateTime) source.get("dateFinished"));
@@ -49,7 +49,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
             case "com.glenneligio.dntx.model.Transaction":
                 var tx = new Transaction();
                 tx.setId((String) source.get("_id"));
-                tx.setType(TransactionType.CcToGold);
+                tx.setType(TransactionType.CC2GOLD);
                 tx.setCreator((Account) source.get("creator"));
                 tx.setUsername((String) source.get("username"));
                 tx.setDateFinished((LocalDateTime) source.get("dateFinished"));

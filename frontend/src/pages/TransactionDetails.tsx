@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import transactionApi, {
@@ -7,13 +7,16 @@ import transactionApi, {
   Transaction,
   TransactionType,
 } from '../api/transaction-api';
+import DeleteTransactionModal from '../components/modals/DeleteTransactionModal';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 
 function TransactionDetails() {
   const auth = useSelector((state: IRootState) => state.auth);
   const { transactionId } = useParams();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // useHttp for fetching the transaction data of specific id
   const {
     data: transactionData,
     error: transactionError,
@@ -28,7 +31,7 @@ function TransactionDetails() {
         transactionApi.getTransactionById(transactionId);
       transactionRequest(getTransactionByIdReqConf);
     }
-  }, [transactionId]);
+  }, [transactionId, transactionRequest]);
 
   // Checks the transactionData
   useEffect(() => {
@@ -41,13 +44,21 @@ function TransactionDetails() {
     }
   }, [transactionData, transactionError, transactionStatus]);
 
+  const deleteTxModalShowHandler = () => {
+    setShowDeleteModal(true);
+  };
+
+  const deleteTxModalCloseHandler = () => {
+    setShowDeleteModal(false);
+  };
+
   const validTransactionData =
     transactionData &&
     transactionError === null &&
     transactionStatus === 'completed';
 
   return (
-    <div>
+    <>
       {validTransactionData && (
         <>
           <div>
@@ -116,22 +127,42 @@ function TransactionDetails() {
             {transactionData.fileAttachments &&
               transactionData.fileAttachments.length > 0 &&
               transactionData.fileAttachments.map((file) => (
-                <a href={file.fileUrl} key={file.fileUrl}>
-                  {file.fileName}
-                </a>
+                <div key={file.fileUrl}>
+                  <a href={file.fileUrl}>{file.fileName}</a>
+                </div>
               ))}
           </div>
           {auth.accessToken && (
-            <div>
-              <Link to={`/transactions/${transactionId}/edit`}>Edit</Link>
-            </div>
+            <>
+              <div>
+                <button type="button" onClick={deleteTxModalShowHandler}>
+                  Delete
+                </button>
+              </div>
+              <div>
+                <Link to={`/transactions/${transactionId}/edit`}>Edit</Link>
+              </div>
+            </>
           )}
         </>
       )}
-      {!validTransactionData && (
+      {!validTransactionData && transactionId && (
         <div>No transaction for id {transactionId} found</div>
       )}
-    </div>
+      {transactionId && (
+        <DeleteTransactionModal
+          handleClose={deleteTxModalCloseHandler}
+          transactionId={transactionId}
+          show={showDeleteModal}
+          key={transactionId}
+          redirectUrl="/transactions/delete/success"
+        />
+      )}
+      <br />
+      <div>
+        <Link to="/">Go back to Home</Link>
+      </div>
+    </>
   );
 }
 

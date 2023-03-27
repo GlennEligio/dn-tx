@@ -11,6 +11,7 @@ import com.glenneligio.dntx.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -108,11 +109,19 @@ public class AccountController {
     }
 
     @GetMapping("/@self/transactions")
-    public ResponseEntity<List<Transaction>> getAccountTransactions(Authentication authentication) {
+    public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "0") int pageNumber,
+                                                                    @RequestParam(defaultValue = "1") int pageSize,
+                                                                    Authentication authentication) {
         log.info("Fetching own transactions with principal {}", authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
-        return ResponseEntity.ok(transactionService.getTransactionsByCreatorUsername(username));
+        Page<Transaction> transactionPage = transactionService.getTransactionPageByCreatorUsername(username, pageNumber, pageSize);
+        TransactionPageDto transactionPageDto = new TransactionPageDto(transactionPage.getContent(),
+                transactionPage.getTotalPages(),
+                transactionPage.getTotalElements(),
+                transactionPage.getNumber(),
+                transactionPage.getSize());
+        return ResponseEntity.ok(transactionPageDto);
     }
 
     @PostMapping("/@self/transactions")
@@ -122,6 +131,7 @@ public class AccountController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
         Transaction transaction = dto.toTransaction();
+        transaction.setCreator(new Account());
         transaction.getCreator().setUsername(username);
         Transaction transactionCreated = transactionService.createTransaction(transaction);
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()

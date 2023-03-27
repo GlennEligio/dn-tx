@@ -1,22 +1,13 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import TransactionApi, { TransactionPageDto } from '../api/transaction-api';
-import useHttp from '../hooks/useHttp';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { IRootState } from '../store';
+import { authActions } from '../store/authSlice';
 
 function Home() {
   const auth = useSelector((state: IRootState) => state.auth);
   const navigate = useNavigate();
-
-  const getAccountOwnTransactionsReqConf =
-    TransactionApi.getAccountOwnTransactions(auth.accessToken, 0, 10);
-
-  const {
-    data: latestTxData,
-    error: latestTxError,
-    status: latestTxStatus,
-  } = useHttp<TransactionPageDto>(true, getAccountOwnTransactionsReqConf);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (auth.accessToken === null || auth.accessToken === '') {
@@ -24,31 +15,41 @@ function Home() {
     }
   }, [auth.accessToken, navigate]);
 
-  useEffect(() => {
-    if (
-      latestTxData !== null &&
-      latestTxError === null &&
-      latestTxStatus === 'completed'
-    ) {
-      console.log(latestTxData);
-    }
-  }, [latestTxData, latestTxError, latestTxStatus]);
+  const logoutHandler = () => {
+    dispatch(authActions.removeAuth());
+    navigate('/login');
+  };
 
   return (
     <div>
+      <img src="/dn-tx-logo.png" alt="DN-TX logo" style={{ width: '200px' }} />
       <div>
         <h1>Hello {auth.fullName}</h1>
       </div>
-      <h1>Latest transactions</h1>
       <div>
-        {latestTxData &&
-          latestTxError === null &&
-          latestTxStatus === 'completed' &&
-          latestTxData.transactions.map((tx) => (
-            <div key={tx.id!}>
-              <Link to={`/transactions/${tx.id}`}>{tx.id!}</Link>
-            </div>
-          ))}
+        <button type="button" onClick={() => navigate('/search')}>
+          Search
+        </button>
+      </div>
+      <div>
+        <button type="button" onClick={() => navigate('/create-transaction')}>
+          Create log
+        </button>
+      </div>
+      <div>
+        <button type="button" onClick={() => navigate('/transactions')}>
+          Show logs
+        </button>
+      </div>
+      <div>
+        <button type="button" onClick={() => navigate('/account')}>
+          Account
+        </button>
+      </div>
+      <div>
+        <button type="button" onClick={logoutHandler}>
+          Logout
+        </button>
       </div>
     </div>
   );

@@ -6,8 +6,8 @@ import java.util.stream.Stream;
 
 @Slf4j
 public enum TransactionType {
-    CcToGold("CC2GOLD"),
-    GoldToPhp("GOLD2PHP");
+    CC2GOLD("CC2GOLD"),
+    GOLD2PHP("GOLD2PHP");
 
     private final String code;
 

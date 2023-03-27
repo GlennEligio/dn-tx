@@ -1,6 +1,8 @@
 package com.glenneligio.dntx.repository;
 
 import com.glenneligio.dntx.model.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -12,4 +14,6 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     Optional<Transaction> findByUsernameAndId(String username, String id);
 
     List<Transaction> findByCreatorId(String id);
+
+    Page<Transaction> findByCreatorId(String id, Pageable pageable);
 }

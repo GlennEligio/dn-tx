@@ -43,23 +43,23 @@ public class CreateUpdateTransactionDto {
     public Transaction toTransaction() {
         Transaction transaction = null;
         switch(TransactionType.getTransactionType(type)) {
-            case CcToGold:
+            case CC2GOLD:
                 CcToGoldTransaction transaction1 = new CcToGoldTransaction();
                 transaction1.setUsername(username);
                 transaction1.setCreator(creator);
                 transaction1.setFileAttachments(fileAttachments);
-                transaction1.setType(TransactionType.CcToGold);
+                transaction1.setType(TransactionType.CC2GOLD);
                 transaction1.setCcAmount(ccAmount);
                 transaction1.setGoldPerCC(goldPerCC);
                 transaction1.setGoldPaid(goldPaid);
                 transaction = transaction1;
                 break;
-            case GoldToPhp:
+            case GOLD2PHP:
                 GoldToPhpTransaction transaction2 = new GoldToPhpTransaction();
                 transaction2.setUsername(username);
                 transaction2.setCreator(creator);
                 transaction2.setFileAttachments(fileAttachments);
-                transaction2.setType(TransactionType.GoldToPhp);
+                transaction2.setType(TransactionType.GOLD2PHP);
 
                 transaction2.setName(name);
                 transaction2.setPhpPaid(phpPaid);

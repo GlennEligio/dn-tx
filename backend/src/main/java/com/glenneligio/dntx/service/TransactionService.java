@@ -10,6 +10,9 @@ import com.glenneligio.dntx.repository.TransactionRepository;
 import jakarta.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -37,11 +40,11 @@ public class TransactionService {
         transaction.setDateFinished(LocalDateTime.now());
 
         switch(transaction.getType()) {
-            case GoldToPhp:
+            case GOLD2PHP:
                 GoldToPhpTransaction goldToPhpTransaction = new GoldToPhpTransaction(transaction);
                 validateGoldToPhpTransaction(goldToPhpTransaction);
                 return transactionRepository.save(goldToPhpTransaction);
-            case CcToGold:
+            case CC2GOLD:
                 CcToGoldTransaction ccToGoldTransaction = new CcToGoldTransaction(transaction);
                 validateCcToGoldTransaction(ccToGoldTransaction);
                 return transactionRepository.save(ccToGoldTransaction);
@@ -95,6 +98,11 @@ public class TransactionService {
     public List<Transaction> getTransactionsByCreatorUsername(String username) {
         Account account = accountService.getAccountByUsername(username);
         return transactionRepository.findByCreatorId(account.getId());
+    }
+
+    public Page<Transaction> getTransactionPageByCreatorUsername(String username, int pageNumber, int pageSize) {
+        Account account = accountService.getAccountByUsername(username);
+        return transactionRepository.findByCreatorId(account.getId(), PageRequest.of(pageNumber, pageSize).withSort(Sort.by("dateFinished").descending()));
     }
 
     private void validateCcToGoldTransaction(CcToGoldTransaction ccToGoldTransaction) {

@@ -64,7 +64,6 @@ function EditTransaction() {
       currentTxError === null &&
       currentTxStatus === 'completed'
     ) {
-      console.log(currentTxData);
       setUsername(currentTxData.username);
       setType(currentTxData.type);
       setFileAttachment(currentTxData.fileAttachments);
@@ -89,7 +88,7 @@ function EditTransaction() {
   // Checking the result of edit transaction request
   useEffect(() => {
     if (editTxData && editTxError === null && editTxStatus === 'completed') {
-      console.log(editTxData);
+      alert('Update successful');
     }
   }, [editTxData, editTxError, editTxStatus]);
 

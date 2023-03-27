@@ -1,5 +1,6 @@
 import { FormEventHandler, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import TransactionApi, {
   CcToGoldTransaction,
   FileAttachment,
@@ -37,7 +38,7 @@ function CreateTransaction() {
       createTxError === null &&
       createTxStatus === 'completed'
     ) {
-      console.log(createTxData);
+      alert('Transaction successfully saved');
     }
   }, [createTxData, createTxError, createTxStatus]);
 
@@ -186,7 +187,7 @@ function CreateTransaction() {
             fileAttachments.length > 0 &&
             fileAttachments.map((fileInput, index) => {
               return (
-                <div key={'File input ' + index}>
+                <div key={`File input ${index}`}>
                   <div>
                     <span>File #{index + 1}</span>
                   </div>
@@ -238,6 +239,7 @@ function CreateTransaction() {
           </div>
         </form>
       </div>
+      <Link to="/">Back to Home</Link>
     </div>
   );
 }
