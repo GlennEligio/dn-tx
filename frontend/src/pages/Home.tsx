@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Col, Container, Image, Row, Button, Stack } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IRootState } from '../store';
@@ -22,63 +23,104 @@ function Home() {
   };
 
   return (
-    <div>
-      <img src="/dn-tx-logo.png" alt="DN-TX logo" style={{ width: '200px' }} />
-      {loggedIn && (
-        <>
+    <Container>
+      <Row>
+        <Col />
+        <Col>
           <div>
-            <h1>Hello {auth.fullName}</h1>
+            <Image fluid src="/dn-tx-logo.png" alt="DN-TX Logo" />
+            {loggedIn && (
+              <div className="d-flex flex-column">
+                <Stack gap={3}>
+                  <div>
+                    <h3 className="text-center">Hello, {auth.fullName}</h3>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/search')}
+                      className="w-100"
+                    >
+                      Search
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/create-transaction')}
+                      className="w-100"
+                    >
+                      Create log
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/transactions')}
+                      className="w-100"
+                    >
+                      Show logs
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/account')}
+                      className="w-100"
+                    >
+                      Account
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/logout')}
+                      className="w-100"
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                </Stack>
+              </div>
+            )}
+            {!loggedIn && (
+              <div className="d-flex flex-column align-items-stretch">
+                <Stack gap={3}>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/search')}
+                      className="w-100"
+                    >
+                      Search
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/login')}
+                      className="w-100"
+                    >
+                      Login
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/register')}
+                      className="w-100"
+                    >
+                      Register
+                    </Button>
+                  </div>
+                </Stack>
+              </div>
+            )}
           </div>
-          <div>
-            <button type="button" onClick={() => navigate('/search')}>
-              Search
-            </button>
-          </div>
-          <div>
-            <button
-              type="button"
-              onClick={() => navigate('/create-transaction')}
-            >
-              Create log
-            </button>
-          </div>
-          <div>
-            <button type="button" onClick={() => navigate('/transactions')}>
-              Show logs
-            </button>
-          </div>
-          <div>
-            <button type="button" onClick={() => navigate('/account')}>
-              Account
-            </button>
-          </div>
-          <div>
-            <button type="button" onClick={logoutHandler}>
-              Logout
-            </button>
-          </div>
-        </>
-      )}
-      {!loggedIn && (
-        <>
-          <div>
-            <button type="button" onClick={() => navigate('/search')}>
-              Search
-            </button>
-          </div>
-          <div>
-            <button type="button" onClick={() => navigate('/login')}>
-              Login
-            </button>
-          </div>
-          <div>
-            <button type="button" onClick={() => navigate('/register')}>
-              Register
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+        </Col>
+        <Col />
+      </Row>
+    </Container>
   );
 }
 

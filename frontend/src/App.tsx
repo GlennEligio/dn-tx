@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import CreateTransaction from './pages/CreateTransaction';
 import EditTransaction from './pages/EditTransaction';
 import Home from './pages/Home';
@@ -11,8 +12,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import DeleteTransactionSuccess from './pages/DeleteTransactionSuccess';
 import Transactions from './pages/Transactions';
 import AccountDetails from './pages/AccountDetails';
+import { IRootState } from './store';
 
 export function App() {
+  const auth = useSelector((state: IRootState) => state.auth);
+  const loggedIn: boolean =
+    !!auth.accessToken && !!auth.username && !!auth.fullName;
+
   return (
     <div>
       <Routes>
@@ -20,21 +26,25 @@ export function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<SearchTransaction />} />
-        <Route path="/account" element={<AccountDetails />} />
-        <Route path="/transactions" element={<Transactions />} />
-        <Route
-          path="/transactions/:transactionId"
-          element={<TransactionDetails />}
-        />
-        <Route
-          path="/transactions/delete/success"
-          element={<DeleteTransactionSuccess />}
-        />
-        <Route
-          path="/transactions/:transactionId/edit"
-          element={<EditTransaction />}
-        />
-        <Route path="/create-transaction" element={<CreateTransaction />} />
+        {loggedIn && (
+          <>
+            <Route path="/transactions" element={<Transactions />} />
+            <Route
+              path="/transactions/:transactionId"
+              element={<TransactionDetails />}
+            />
+            <Route
+              path="/transactions/delete/success"
+              element={<DeleteTransactionSuccess />}
+            />
+            <Route
+              path="/transactions/:transactionId/edit"
+              element={<EditTransaction />}
+            />
+            <Route path="/create-transaction" element={<CreateTransaction />} />
+            <Route path="/account" element={<AccountDetails />} />
+          </>
+        )}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
