@@ -33,8 +33,9 @@ function DeleteTransactionModal({
   useEffect(() => {
     if (deleteTxError === null && deleteTxStatus === 'completed') {
       console.log('Transaction deleted');
+      navigate(redirectUrl);
     }
-  }, [deleteTxError, deleteTxStatus]);
+  }, [deleteTxError, deleteTxStatus, navigate, redirectUrl]);
 
   const deleteTxHandler: MouseEventHandler = (e) => {
     if (transactionId) {

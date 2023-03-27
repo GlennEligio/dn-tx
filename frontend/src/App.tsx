@@ -10,7 +10,7 @@ import TransactionDetails from './pages/TransactionDetails';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import DeleteTransactionSuccess from './pages/DeleteTransactionSuccess';
 import Transactions from './pages/Transactions';
-import Account from './pages/Account';
+import AccountDetails from './pages/AccountDetails';
 
 export function App() {
   return (
@@ -20,7 +20,7 @@ export function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<SearchTransaction />} />
-        <Route path="/account" element={<Account />} />
+        <Route path="/account" element={<AccountDetails />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route
           path="/transactions/:transactionId"

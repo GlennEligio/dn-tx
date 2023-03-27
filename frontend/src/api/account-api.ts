@@ -25,12 +25,11 @@ export interface LoginResponseDto {
 }
 
 export interface Account {
-  id: string;
-  name: string;
+  id?: string;
+  fullName: string;
   username: string;
+  password?: string;
   email: string;
-  profileUrl: string;
-  description: string;
 }
 
 const getBackendUri = () => {
@@ -41,6 +40,33 @@ const getBackendUri = () => {
 };
 
 const BACKEND_URI = getBackendUri();
+
+const getOwnAccountDetails = (accessToken: string): RequestConfig => {
+  return {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    errorMessage: "Can't find account details",
+    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self`,
+  };
+};
+
+const updateOwnAccountDetails = (
+  account: Account,
+  accessToken: string
+): RequestConfig => {
+  return {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-type': `application/json`,
+    },
+    errorMessage: "Can't update own account details",
+    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self`,
+    body: account,
+  };
+};
 
 const login = (loginInfo: LoginRequestDto): RequestConfig => {
   return {
@@ -75,4 +101,6 @@ const register = (registerInfo: RegisterRequestDto): RequestConfig => {
 export default {
   login,
   register,
+  getOwnAccountDetails,
+  updateOwnAccountDetails,
 };

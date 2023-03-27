@@ -50,6 +50,9 @@ function Transactions() {
             </div>
           ))}
       </div>
+      <div>
+        <Link to="/">Back to home</Link>
+      </div>
     </div>
   );
 }

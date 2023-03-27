@@ -1,6 +1,6 @@
 import React, { FormEventHandler, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AccountApi, {
   LoginRequestDto,
   LoginResponseDto,
@@ -27,7 +27,6 @@ function Login() {
       loginError === null &&
       loginStatus === 'completed'
     ) {
-      console.log(loginData);
       dispatch(
         authActions.saveAuth({
           username: loginData.username,
@@ -76,6 +75,9 @@ function Login() {
           <input type="submit" value="Login" />
         </div>
       </form>
+      <div>
+        <Link to="/">Back to home</Link>
+      </div>
     </div>
   );
 }

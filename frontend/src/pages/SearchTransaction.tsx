@@ -74,6 +74,9 @@ function SearchTransaction() {
       {transactionStatus === 'completed' && transactionError !== null && (
         <h1>No result found</h1>
       )}
+      <div>
+        <Link to="/">Back to home</Link>
+      </div>
     </div>
   );
 }

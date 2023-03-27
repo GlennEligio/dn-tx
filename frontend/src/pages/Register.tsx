@@ -1,5 +1,5 @@
 import { FormEventHandler, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import accountApi, { RegisterRequestDto } from '../api/account-api';
 import useHttp from '../hooks/useHttp';
 
@@ -86,6 +86,9 @@ function Register() {
             <input type="submit" value="Register" />
           </div>
         </form>
+      </div>
+      <div>
+        <Link to="/">Back to home</Link>
       </div>
     </div>
   );
