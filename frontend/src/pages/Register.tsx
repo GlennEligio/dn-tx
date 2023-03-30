@@ -1,4 +1,5 @@
 import { FormEventHandler, useEffect, useState } from 'react';
+import { Col, Container, Row, Image, Form, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import accountApi, { RegisterRequestDto } from '../api/account-api';
 import useHttp from '../hooks/useHttp';
@@ -44,53 +45,66 @@ function Register() {
   };
 
   return (
-    <div>
-      <div>
-        <h1>Register</h1>
-      </div>
-      <div>
-        <form onSubmit={registerSubmitHandler}>
-          <div>
-            <span>Username</span>
-            <input
-              type="text"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            />
+    <Container>
+      <Row>
+        <Col />
+        <Col className="vh-100">
+          <div className="d-flex flex-column h-100 py-5">
+            <Image src="/dn-tx-logo.png" alt="DN-TX logo" fluid />
+            <div>
+              <h3 className="text-center">Register</h3>
+            </div>
+            <Form onSubmit={registerSubmitHandler}>
+              <Form.Group className="mb-3" controlId="registerFormUsername">
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="registerFormPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="registerFormFullName">
+                <Form.Label>Full name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="registerFormEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Enter email"
+                  value={fullName}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
+              <div className="d-flex justify-content-end">
+                <Button variant="primary" type="submit">
+                  Register
+                </Button>
+              </div>
+            </Form>
+            <div className="mt-auto text-center">
+              <Link to="/">Back to home</Link>
+            </div>
           </div>
-          <div>
-            <span>Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </div>
-          <div>
-            <span>Full name</span>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-            />
-          </div>
-          <div>
-            <span>Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-          </div>
-          <div>
-            <input type="submit" value="Register" />
-          </div>
-        </form>
-      </div>
-      <div>
-        <Link to="/">Back to home</Link>
-      </div>
-    </div>
+        </Col>
+        <Col />
+      </Row>
+    </Container>
   );
 }
 
