@@ -102,7 +102,7 @@ public class TransactionService {
 
     public Page<Transaction> getTransactionPageByCreatorUsername(String username, int pageNumber, int pageSize) {
         Account account = accountService.getAccountByUsername(username);
-        return transactionRepository.findByCreatorId(account.getId(), PageRequest.of(pageNumber, pageSize).withSort(Sort.by("dateFinished").descending()));
+        return transactionRepository.findByCreatorId(account.getId(), PageRequest.of(pageNumber-1, pageSize).withSort(Sort.by("dateFinished").descending()));
     }
 
     private void validateCcToGoldTransaction(CcToGoldTransaction ccToGoldTransaction) {

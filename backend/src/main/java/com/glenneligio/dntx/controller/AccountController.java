@@ -109,7 +109,7 @@ public class AccountController {
     }
 
     @GetMapping("/@self/transactions")
-    public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "0") int pageNumber,
+    public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "1") int pageNumber,
                                                                     @RequestParam(defaultValue = "1") int pageSize,
                                                                     Authentication authentication) {
         log.info("Fetching own transactions with principal {}", authentication);
