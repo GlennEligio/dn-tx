@@ -66,6 +66,7 @@ const getTransactionById = (id: string): RequestConfig => {
   };
 };
 
+// pageNumber starts at index 1
 const getAccountOwnTransactions = (
   accessToken: string,
   pageNumber: number,

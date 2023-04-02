@@ -7,7 +7,7 @@ import AccountApi, {
   LoginResponseDto,
 } from '../api/account-api';
 import useHttp from '../hooks/useHttp';
-import authSlice, { authActions } from '../store/authSlice';
+import { authActions } from '../store/authSlice';
 
 function Login() {
   const [username, setUsername] = useState('');

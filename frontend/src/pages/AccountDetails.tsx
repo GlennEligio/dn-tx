@@ -1,4 +1,5 @@
 import { FormEventHandler, useEffect, useState } from 'react';
+import { Container, Col, Row, Form, Button, Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IRootState } from '../store';
@@ -88,67 +89,90 @@ function AccountDetails() {
   };
 
   return (
-    <div>
-      <div>
-        <h1>Account Information</h1>
-      </div>
-      <div>
-        <form onSubmit={saveAccountHandler}>
-          <div>
-            <span>Username: </span>
-            <input
-              type="text"
-              value={username}
-              readOnly
-              onChange={(e) => setUsername(e.target.value)}
-            />
+    <Container>
+      <Row>
+        <Col />
+        <Col className="vh-100">
+          <div className="d-flex flex-column h-100 py-5">
+            <div className="text-center mb-3">
+              <h3>Account Information</h3>
+            </div>
+            <Form onSubmit={saveAccountHandler}>
+              <Form.Group className="mb-3" controlId="accountFormUsername">
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter username"
+                  value={username}
+                  readOnly
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3" controlId="accountFormPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  readOnly={!isEditing}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="accountFormEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  readOnly={!isEditing}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="accountFormFullName">
+                <Form.Label>Full name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter full name"
+                  value={fullName}
+                  readOnly={!isEditing}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </Form.Group>
+              <div className="d-flex justify-content-end">
+                {!isEditing && (
+                  <Button
+                    variant="primary"
+                    type="button"
+                    onClick={updateClickHandler}
+                  >
+                    Update
+                  </Button>
+                )}
+                {isEditing && (
+                  <Stack direction="horizontal" gap={2}>
+                    <Button variant="success" type="submit">
+                      Save
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={cancelClickHandler}
+                    >
+                      Cancel
+                    </Button>
+                  </Stack>
+                )}
+              </div>
+            </Form>
+            <div className="mt-auto text-center">
+              <Link to="/">Back to Home</Link>
+            </div>
           </div>
-          <div>
-            <span>Password: </span>
-            <input
-              type="password"
-              value={password}
-              readOnly={!isEditing}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div>
-            <span>Email: </span>
-            <input
-              type="text"
-              value={email}
-              readOnly={!isEditing}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <span>Full name:</span>
-            <input
-              type="text"
-              value={fullName}
-              readOnly={!isEditing}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-          </div>
-          {!isEditing && (
-            <button type="button" onClick={updateClickHandler}>
-              Update
-            </button>
-          )}
-          {isEditing && (
-            <>
-              <button type="submit">Save </button>
-              <button type="button" onClick={cancelClickHandler}>
-                Cancel
-              </button>
-            </>
-          )}
-        </form>
-      </div>
-      <div>
-        <Link to="/">Back to Home</Link>
-      </div>
-    </div>
+        </Col>
+        <Col />
+      </Row>
+    </Container>
   );
 }
 
