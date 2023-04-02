@@ -66,7 +66,6 @@ function AccountDetails() {
 
   const saveAccountHandler: FormEventHandler = (e) => {
     e.preventDefault();
-    console.log('Saving the account');
     const updatedAccount: Account = {
       username,
       email,
@@ -92,7 +91,7 @@ function AccountDetails() {
     <Container>
       <Row>
         <Col />
-        <Col className="vh-100">
+        <Col xs={8} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
             <div className="text-center mb-3">
               <h3>Account Information</h3>

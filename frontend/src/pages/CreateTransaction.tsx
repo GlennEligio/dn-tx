@@ -91,7 +91,7 @@ function CreateTransaction() {
     <Container>
       <Row>
         <Col />
-        <Col>
+        <Col xs={8}>
           <div className="d-flex flex-column py-3">
             <div className="text-center mb-3">
               <h3>Create Transaction</h3>

@@ -1,8 +1,7 @@
 import { FormEventHandler, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import transactionApi from '../api/transaction-api';
-import TransactionApi, {
+import transactionApi, {
   CcToGoldTransaction,
   FileAttachment,
   GoldToPhpTransaction,
@@ -130,7 +129,7 @@ function EditTransaction() {
           finalTransaction = transaction;
       }
 
-      const editTxReqConf = TransactionApi.updateAccountOwnTransaction(
+      const editTxReqConf = transactionApi.updateAccountOwnTransaction(
         transactionId,
         finalTransaction,
         auth.accessToken

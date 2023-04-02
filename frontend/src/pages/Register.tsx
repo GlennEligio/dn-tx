@@ -48,7 +48,7 @@ function Register() {
     <Container>
       <Row>
         <Col />
-        <Col className="vh-100">
+        <Col xs={8} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
             <Image src="/dn-tx-logo.png" alt="DN-TX logo" fluid />
             <div>
