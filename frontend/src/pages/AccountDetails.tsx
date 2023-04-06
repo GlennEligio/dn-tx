@@ -91,7 +91,7 @@ function AccountDetails() {
     <Container>
       <Row>
         <Col />
-        <Col xs={8} className="vh-100">
+        <Col xs={8} md={6} lg={4} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
             <div className="text-center mb-3">
               <h3>Account Information</h3>
