@@ -11,6 +11,7 @@ import TransactionApi, {
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
+import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
 
 function CreateTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -39,7 +40,7 @@ function CreateTransaction() {
       createTxError === null &&
       createTxStatus === 'completed'
     ) {
-      alert('Transaction successfully saved');
+      console.log(createTxData);
     }
   }, [createTxData, createTxError, createTxStatus]);
 
@@ -98,6 +99,14 @@ function CreateTransaction() {
             </div>
             <Form onSubmit={createTransactionSubmitHandler}>
               <div className="mb-5">
+                <RequestStatusMessage
+                  className="mb-2"
+                  data={createTxData}
+                  error={createTxError}
+                  loadingMessage="Saving Transaction..."
+                  status={createTxStatus}
+                  successMessage="Transaction saved!"
+                />
                 <h5 className="mb-3">Transaction info</h5>
                 <Form.Group className="mb-3" controlId="createTxFormUsername">
                   <Form.Label>Username</Form.Label>

@@ -1,14 +1,21 @@
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Col, Container, Row, Image, Form, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import accountApi, { RegisterRequestDto } from '../api/account-api';
+import { useDispatch } from 'react-redux';
+import accountApi, {
+  LoginResponseDto,
+  RegisterRequestDto,
+} from '../api/account-api';
 import useHttp from '../hooks/useHttp';
+import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
+import { authActions } from '../store/authSlice';
 
 function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const {
@@ -16,18 +23,26 @@ function Register() {
     error: registerError,
     sendRequest: registerRequest,
     status: registerStatus,
-  } = useHttp(false);
+  } = useHttp<LoginResponseDto>(false);
 
   useEffect(() => {
     if (
-      registerData !== null &&
+      registerData &&
       registerError === null &&
       registerStatus === 'completed'
     ) {
-      console.log(registerData);
+      dispatch(
+        authActions.saveAuth({
+          username: registerData.username,
+          accessToken: registerData.accessToken,
+          fullName: registerData.fullName,
+          accountType: registerData.accountType,
+        })
+      );
+      navigate('/');
       navigate('/');
     }
-  }, [registerData, registerError, registerStatus, navigate]);
+  }, [registerData, registerError, registerStatus, navigate, dispatch]);
 
   const registerSubmitHandler: FormEventHandler = (event) => {
     event.preventDefault();
@@ -55,6 +70,13 @@ function Register() {
               <h3 className="text-center">Register</h3>
             </div>
             <Form onSubmit={registerSubmitHandler}>
+              <RequestStatusMessage
+                data={registerData}
+                error={registerError}
+                loadingMessage="Registering..."
+                status={registerStatus}
+                successMessage="Register successful!"
+              />
               <Form.Group className="mb-3" controlId="registerFormUsername">
                 <Form.Label>Username</Form.Label>
                 <Form.Control
@@ -87,7 +109,7 @@ function Register() {
                 <Form.Control
                   type="email"
                   placeholder="Enter email"
-                  value={fullName}
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </Form.Group>

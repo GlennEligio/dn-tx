@@ -11,6 +11,7 @@ import transactionApi, {
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
+import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
 
 function EditTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -88,7 +89,7 @@ function EditTransaction() {
   // Checking the result of edit transaction request
   useEffect(() => {
     if (editTxData && editTxError === null && editTxStatus === 'completed') {
-      alert('Update successful');
+      console.log(editTxData);
     }
   }, [editTxData, editTxError, editTxStatus]);
 
@@ -155,6 +156,14 @@ function EditTransaction() {
                   <h3>Edit Transaction</h3>
                 </div>
                 <div className="mb-5">
+                  <RequestStatusMessage
+                    className="mb-2"
+                    data={editTxData}
+                    error={editTxError}
+                    loadingMessage="Updating Transaction..."
+                    status={editTxStatus}
+                    successMessage="Transaction updated!"
+                  />
                   <h5 className="mb-3">Transaction info</h5>
                   <Form.Group className="mb-3" controlId="editTxFormUsername">
                     <Form.Label>Username</Form.Label>

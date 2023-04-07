@@ -8,6 +8,7 @@ import AccountApi, {
 } from '../api/account-api';
 import useHttp from '../hooks/useHttp';
 import { authActions } from '../store/authSlice';
+import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -63,6 +64,13 @@ function Login() {
               <h3 className="text-center">Login</h3>
             </div>
             <Form onSubmit={loginSubmitHandler}>
+              <RequestStatusMessage
+                data={loginData}
+                error={loginError}
+                loadingMessage="Logging in..."
+                status={loginStatus}
+                successMessage="Login successful!"
+              />
               <Form.Group className="mb-3" controlId="loginFormUsername">
                 <Form.Label>Username</Form.Label>
                 <Form.Control

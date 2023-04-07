@@ -79,6 +79,7 @@ const login = (loginInfo: LoginRequestDto): RequestConfig => {
     },
     method: 'POST',
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/login`,
+    errorMessage: 'Invalid credentials',
   };
 };
 
@@ -95,6 +96,7 @@ const register = (registerInfo: RegisterRequestDto): RequestConfig => {
     },
     method: 'POST',
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/register`,
+    errorMessage: 'Register failed. Please try again next time',
   };
 };
 
