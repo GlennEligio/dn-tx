@@ -2,6 +2,8 @@ import { FormEventHandler, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, Stack } from 'react-bootstrap';
+import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
+import * as yup from 'yup';
 import transactionApi, {
   CcToGoldTransaction,
   FileAttachment,
@@ -12,6 +14,75 @@ import transactionApi, {
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
+
+interface EditTxFormInput {
+  username: string;
+  type: TransactionType;
+  fileAttachments: FileAttachment[];
+  ccAmount: number;
+  goldPerCC: number;
+  goldPaid: number;
+  name: string;
+  phpPaid: number;
+  goldPerPhp: number;
+  methodOfPayment: string;
+}
+
+const editTxFormInputSchema = yup.object().shape({
+  username: yup.string().required('Username is required.'),
+  type: yup
+    .mixed()
+    .oneOf(
+      [TransactionType.CC2GOLD, TransactionType.GOLD2PHP],
+      'Type can only be CC to GOLD or GOLD to PHP'
+    ),
+  fileAttachments: yup.array().of(
+    yup.object().shape({
+      fileName: yup.string().required('Required.'),
+      fileUrl: yup.string().url('Must be a url').required('Required'),
+    })
+  ),
+  ccAmount: yup.number().when('type', {
+    is: TransactionType.CC2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  goldPerCC: yup.number().when('type', {
+    is: TransactionType.CC2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  goldPaid: yup.number().when('type', {
+    is: TransactionType.CC2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  name: yup.string().when('type', {
+    is: TransactionType.GOLD2PHP,
+    then: (schema) => schema.required('Name is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  phpPaid: yup.number().when('type', {
+    is: TransactionType.GOLD2PHP,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  goldPerPhp: yup.number().when('type', {
+    is: TransactionType.GOLD2PHP,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  methodOfPayment: yup.string().when('type', {
+    is: TransactionType.GOLD2PHP,
+    then: (schema) => schema.required('Method of payment is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+});
 
 function EditTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -32,6 +103,20 @@ function EditTransaction() {
   const [phpPaid, setPhpPaid] = useState(1);
   const [goldPerPhp, setGoldPerPhp] = useState(1);
   const [methodOfPayment, setMethodOfPayment] = useState('');
+
+  // initial form input values
+  const editTxFormInitialValues: EditTxFormInput = {
+    username,
+    type,
+    fileAttachments,
+    ccAmount,
+    goldPaid,
+    goldPerCC,
+    name,
+    phpPaid,
+    goldPerPhp,
+    methodOfPayment,
+  };
 
   // For fetching the current Transaction data
   const {
@@ -94,17 +179,18 @@ function EditTransaction() {
   }, [editTxData, editTxError, editTxStatus]);
 
   // Edit Transcation form submit handler
-  const editTransactionSubmitHandler: FormEventHandler = (e) => {
-    e.preventDefault();
-
+  const editTransactionSubmitHandler = (
+    values: EditTxFormInput,
+    actions: FormikHelpers<EditTxFormInput>
+  ) => {
     if (transactionId) {
       const transaction: Transaction = {
-        username,
-        fileAttachments,
+        username: values.username,
+        fileAttachments: values.fileAttachments,
         creator: {
           username: auth.username,
         },
-        type,
+        type: values.type,
       };
 
       let finalTransaction = null;
@@ -113,18 +199,18 @@ function EditTransaction() {
         case TransactionType.CC2GOLD:
           finalTransaction = {
             ...transaction,
-            ccAmount,
-            goldPaid,
-            goldPerCC,
+            ccAmount: values.ccAmount,
+            goldPaid: values.goldPaid,
+            goldPerCC: values.goldPerCC,
           } as CcToGoldTransaction;
           break;
         case TransactionType.GOLD2PHP:
           finalTransaction = {
             ...transaction,
-            goldPerPhp,
-            methodOfPayment,
-            name,
-            phpPaid,
+            goldPerPhp: values.goldPerPhp,
+            methodOfPayment: values.methodOfPayment,
+            name: values.name,
+            phpPaid: values.phpPaid,
           } as GoldToPhpTransaction;
           break;
         default:
@@ -138,6 +224,7 @@ function EditTransaction() {
       );
 
       editTxRequest(editTxReqConf);
+      actions.setSubmitting(false);
     }
   };
 
@@ -148,243 +235,355 @@ function EditTransaction() {
     <Container>
       <Row>
         <Col />
-        <Col xs={8} md={6} lg={4}>
+        <Col xs={10} md={8} lg={6}>
           <div className="d-flex flex-column py-3">
+            <div className="text-center mb-3">
+              <h3>Edit Transaction</h3>
+            </div>
             {validCurrentTx && (
-              <Form onSubmit={editTransactionSubmitHandler} className="mb-4">
-                <div className="text-center mb-3">
-                  <h3>Edit Transaction</h3>
-                </div>
-                <div className="mb-5">
-                  <RequestStatusMessage
-                    className="mb-2"
-                    data={editTxData}
-                    error={editTxError}
-                    loadingMessage="Updating Transaction..."
-                    status={editTxStatus}
-                    successMessage="Transaction updated!"
-                  />
-                  <h5 className="mb-3">Transaction info</h5>
-                  <Form.Group className="mb-3" controlId="editTxFormUsername">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="editTxFormUsername">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter username"
-                      value={currentTxData.type}
-                      readOnly
-                    />
-                  </Form.Group>
-                  {type === TransactionType.GOLD2PHP && (
-                    <>
-                      <Form.Group className="mb-3" controlId="editTxFormName">
-                        <Form.Label>Name</Form.Label>
+              <Formik
+                validationSchema={editTxFormInputSchema}
+                onSubmit={editTransactionSubmitHandler}
+                initialValues={editTxFormInitialValues}
+                enableReinitialize
+              >
+                {({
+                  handleSubmit,
+                  handleChange,
+                  handleBlur,
+                  values,
+                  touched,
+                  errors,
+                }) => (
+                  <Form onSubmit={handleSubmit}>
+                    <div className="mb-5">
+                      <RequestStatusMessage
+                        className="mb-2"
+                        data={editTxData}
+                        error={editTxError}
+                        loadingMessage="Updating Transaction..."
+                        status={editTxStatus}
+                        successMessage="Transaction updated!"
+                      />
+                      <h5 className="mb-3">Transaction info</h5>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="editTxFormUsername"
+                      >
+                        <Form.Label>Username</Form.Label>
                         <Form.Control
                           type="text"
-                          placeholder="Enter name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Enter username"
+                          name="username"
+                          value={values.username}
+                          isValid={touched.username && !errors.username}
+                          isInvalid={touched.username && !!errors.username}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.username}
+                        </Form.Control.Feedback>
                       </Form.Group>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="editTxFormPhpPaid"
-                      >
-                        <Form.Label>PHP paid</Form.Label>
-                        <Form.Control
-                          type="number"
-                          min={1}
-                          placeholder="Enter php amount"
-                          value={phpPaid}
-                          onChange={(e) =>
-                            setPhpPaid(parseFloat(e.target.value || '1'))
-                          }
-                        />
-                      </Form.Group>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="editTxFormGoldPerPhp"
-                      >
-                        <Form.Label>Gold per PHP</Form.Label>
-                        <Form.Control
-                          type="number"
-                          min={1}
-                          placeholder="Enter gold to php ratio"
-                          value={goldPerPhp}
-                          onChange={(e) =>
-                            setGoldPerPhp(parseFloat(e.target.value || '1'))
-                          }
-                        />
-                      </Form.Group>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="editTxFormMethodOfPayment"
-                      >
-                        <Form.Label>Method of payment</Form.Label>
-                        <Form.Control
-                          type="text"
-                          placeholder="Enter method of payment"
-                          value={methodOfPayment}
-                          onChange={(e) => setMethodOfPayment(e.target.value)}
-                        />
-                      </Form.Group>
-                    </>
-                  )}
-                  {type === TransactionType.CC2GOLD && (
-                    <>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="editTxFormCcAmount"
-                      >
-                        <Form.Label>CC Amount</Form.Label>
-                        <Form.Control
-                          type="number"
-                          min={1}
-                          placeholder="Enter CC amount"
-                          value={ccAmount}
-                          onChange={(e) =>
-                            setCcAmount(parseFloat(e.target.value || '1'))
-                          }
-                        />
-                      </Form.Group>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="editTxFormGoldPerCc"
-                      >
-                        <Form.Label>Gold per CC</Form.Label>
-                        <Form.Control
-                          type="number"
-                          min={1}
-                          placeholder="Enter gold to cc ratio"
-                          value={goldPerCC}
-                          onChange={(e) =>
-                            setGoldPerCC(parseFloat(e.target.value || '1'))
-                          }
-                        />
-                      </Form.Group>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="editTxFormGoldPaid"
-                      >
-                        <Form.Label>Gold paid</Form.Label>
-                        <Form.Control
-                          type="number"
-                          min={1}
-                          placeholder="Enter gold paid"
-                          value={goldPaid}
-                          onChange={(e) =>
-                            setGoldPaid(parseFloat(e.target.value || '1'))
-                          }
-                        />
-                      </Form.Group>
-                    </>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <h5>File attachments</h5>
-                  <div>
-                    {fileAttachments &&
-                      fileAttachments.length > 0 &&
-                      fileAttachments.map((fileInput, index) => {
-                        return (
-                          <div key={`File input ${index}`}>
-                            <div>
-                              <b>File #{index + 1}</b>
-                            </div>
-                            <Row>
-                              <Col>
-                                <Form.Group
-                                  className="mb-3"
-                                  controlId={`editTxFormFile${index}Name`}
-                                >
-                                  <Form.Control
-                                    type="text"
-                                    value={fileInput.fileName}
-                                    placeholder={`File #${index + 1} name`}
-                                    onChange={(e) => {
-                                      setFileAttachment((prevState) => {
-                                        const newState = [...prevState];
-                                        newState[index].fileName =
-                                          e.target.value;
-                                        return newState;
-                                      });
-                                    }}
-                                  />
-                                </Form.Group>
-                              </Col>
-                              <Col>
-                                <Form.Group
-                                  className="mb-3"
-                                  controlId={`editTxFormFile${index}Url`}
-                                >
-                                  <Form.Control
-                                    type="text"
-                                    placeholder={`File #${index + 1} url`}
-                                    value={fileInput.fileUrl}
-                                    onChange={(e) => {
-                                      setFileAttachment((prevState) => {
-                                        const newState = [...prevState];
-                                        newState[index].fileUrl =
-                                          e.target.value;
-                                        return newState;
-                                      });
-                                    }}
-                                  />
-                                </Form.Group>
-                              </Col>
-                            </Row>
-                          </div>
-                        );
-                      })}
-                    <div className="d-flex justify-content-center">
-                      <Stack gap={2} className="w-100">
-                        <Button
-                          variant="secondary"
-                          type="button"
-                          onClick={() =>
-                            setFileAttachment((prevState) => {
-                              return [
-                                ...prevState,
-                                { fileName: '', fileUrl: '' },
-                              ];
-                            })
-                          }
+                      <Form.Group className="mb-3" controlId="editTxFormType">
+                        <Form.Label>Type</Form.Label>
+                        <Form.Select
+                          aria-label="Transaction type"
+                          name="type"
+                          value={values.type}
+                          isValid={touched.type && !errors.type}
+                          isInvalid={touched.type && !!errors.type}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
                         >
-                          Add
-                        </Button>
-                        {fileAttachments.length > 0 && (
-                          <Button
-                            variant="secondary"
-                            type="button"
-                            onClick={() =>
-                              setFileAttachment((prevState) => {
-                                const newFiles = [...prevState];
-                                newFiles.pop();
-                                return newFiles;
-                              })
-                            }
+                          <option value={TransactionType.CC2GOLD}>
+                            CC to Gold
+                          </option>
+                          <option value={TransactionType.GOLD2PHP}>
+                            Gold to PHP
+                          </option>
+                        </Form.Select>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.type}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                      {values.type === TransactionType.GOLD2PHP && (
+                        <>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormName"
                           >
-                            Remove
-                          </Button>
-                        )}
-                      </Stack>
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter name"
+                              name="name"
+                              value={values.name}
+                              isValid={touched.name && !errors.name}
+                              isInvalid={touched.name && !!errors.name}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.name}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormPhpPaid"
+                          >
+                            <Form.Label>PHP paid</Form.Label>
+                            <Form.Control
+                              type="number"
+                              name="phpPaid"
+                              value={values.phpPaid}
+                              isValid={touched.phpPaid && !errors.phpPaid}
+                              isInvalid={touched.phpPaid && !!errors.phpPaid}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.phpPaid}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormGoldPerPhp"
+                          >
+                            <Form.Label>Gold per PHP</Form.Label>
+                            <Form.Control
+                              type="number"
+                              min={1}
+                              placeholder="Enter gold to php ratio"
+                              name="goldPerPhp"
+                              value={values.goldPerPhp}
+                              isValid={touched.goldPerPhp && !errors.goldPerPhp}
+                              isInvalid={
+                                touched.goldPerPhp && !!errors.goldPerPhp
+                              }
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.goldPerPhp}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormMethodOfPayment"
+                          >
+                            <Form.Label>Method of payment</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter method of payment"
+                              name="methodOfPayment"
+                              value={values.methodOfPayment}
+                              isValid={
+                                touched.methodOfPayment &&
+                                !errors.methodOfPayment
+                              }
+                              isInvalid={
+                                touched.methodOfPayment &&
+                                !!errors.methodOfPayment
+                              }
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.methodOfPayment}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </>
+                      )}
+                      {values.type === TransactionType.CC2GOLD && (
+                        <>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormCcAmount"
+                          >
+                            <Form.Label>CC Amount</Form.Label>
+                            <Form.Control
+                              type="number"
+                              min={1}
+                              placeholder="Enter CC amount"
+                              name="ccAmount"
+                              value={values.ccAmount}
+                              isValid={touched.ccAmount && !errors.ccAmount}
+                              isInvalid={touched.ccAmount && !!errors.ccAmount}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.ccAmount}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormGoldPerCc"
+                          >
+                            <Form.Label>Gold per CC</Form.Label>
+                            <Form.Control
+                              type="number"
+                              min={1}
+                              placeholder="Enter gold to cc ratio"
+                              name="goldPerCC"
+                              value={values.goldPerCC}
+                              isValid={touched.goldPerCC && !errors.goldPerCC}
+                              isInvalid={
+                                touched.goldPerCC && !!errors.goldPerCC
+                              }
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.goldPerCC}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormGoldPaid"
+                          >
+                            <Form.Label>Gold paid</Form.Label>
+                            <Form.Control
+                              type="number"
+                              min={1}
+                              placeholder="Enter gold paid"
+                              name="goldPaid"
+                              value={values.goldPaid}
+                              isValid={touched.goldPaid && !errors.goldPaid}
+                              isInvalid={touched.goldPaid && !!errors.goldPaid}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.goldPaid}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </>
+                      )}
                     </div>
-                  </div>
-                </div>
-                <div className="d-flex justify-content-end">
-                  <Button className="w-100" variant="primary" type="submit">
-                    Save
-                  </Button>
-                </div>
-              </Form>
+                    <div className="mb-3">
+                      <h5>File attachments</h5>
+                      <div>
+                        <FieldArray
+                          name="fileAttachments"
+                          render={(arrayHelpers) => (
+                            <>
+                              {values.fileAttachments &&
+                                values.fileAttachments.length > 0 &&
+                                values.fileAttachments.map(
+                                  (fileInput, index) => {
+                                    const nameInput = `fileAttachments[${index}].fileName`;
+                                    const urlInput = `fileAttachments[${index}].fileUrl`;
+                                    const nameError = getIn(errors, nameInput);
+                                    const nameTouch = getIn(touched, nameInput);
+                                    const urlError = getIn(errors, urlInput);
+                                    const urlTouch = getIn(touched, urlInput);
+
+                                    return (
+                                      <div key={`File input ${index}`}>
+                                        <div>
+                                          <b>File #{index + 1}</b>
+                                        </div>
+                                        <Row>
+                                          <Col>
+                                            <Form.Group
+                                              className="mb-3"
+                                              controlId={`editTxFormFile${index}Name`}
+                                            >
+                                              <Form.Control
+                                                type="text"
+                                                placeholder={`File #${
+                                                  index + 1
+                                                } name`}
+                                                name={nameInput}
+                                                value={fileInput.fileName}
+                                                isValid={
+                                                  nameTouch && !nameError
+                                                }
+                                                isInvalid={
+                                                  nameTouch && !!nameError
+                                                }
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                              />
+                                              <Form.Control.Feedback type="invalid">
+                                                {nameError}
+                                              </Form.Control.Feedback>
+                                            </Form.Group>
+                                          </Col>
+                                          <Col>
+                                            <Form.Group
+                                              className="mb-3"
+                                              controlId={`editTxFormFile${index}Url`}
+                                            >
+                                              <Form.Control
+                                                type="text"
+                                                placeholder={`File #${
+                                                  index + 1
+                                                } url`}
+                                                name={urlInput}
+                                                value={fileInput.fileUrl}
+                                                isValid={urlTouch && !urlError}
+                                                isInvalid={
+                                                  urlTouch && !!urlError
+                                                }
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                              />
+                                              <Form.Control.Feedback type="invalid">
+                                                {urlError}
+                                              </Form.Control.Feedback>
+                                            </Form.Group>
+                                          </Col>
+                                        </Row>
+                                      </div>
+                                    );
+                                  }
+                                )}
+                              <div className="d-flex justify-content-center">
+                                <Stack direction="horizontal" gap={2}>
+                                  <Button
+                                    variant="secondary"
+                                    type="button"
+                                    onClick={() => {
+                                      arrayHelpers.push({
+                                        fileName: '',
+                                        fileUrl: '',
+                                      });
+                                    }}
+                                  >
+                                    Add
+                                  </Button>
+                                  {values.fileAttachments.length > 0 && (
+                                    <>
+                                      <div className="vr" />
+                                      <Button
+                                        variant="secondary"
+                                        type="button"
+                                        onClick={() => {
+                                          arrayHelpers.pop();
+                                        }}
+                                      >
+                                        Remove
+                                      </Button>
+                                    </>
+                                  )}
+                                </Stack>
+                              </div>
+                            </>
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <div className="d-flex justify-content-end">
+                      <Button variant="primary" type="submit">
+                        Save
+                      </Button>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
             )}
             <div className="text-center mt-auto">
               <Link to="/">Back to Home</Link>

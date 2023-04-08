@@ -7,9 +7,9 @@ function DeleteTransactionSuccess() {
       <Row className="vh-100">
         <Col />
         <Col
-          xs={8}
-          md={6}
-          lg={4}
+          xs={10}
+          md={8}
+          lg={6}
           className="d-flex flex-column justify-content-center"
         >
           <div className="text-center">

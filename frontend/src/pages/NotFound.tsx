@@ -7,7 +7,7 @@ function NotFound() {
     <Container>
       <Row>
         <Col />
-        <Col xs={8} md={6} lg={4} className="vh-100 ">
+        <Col xs={10} md={8} lg={6} className="vh-100 ">
           <div className="d-flex align-items-center justify-content-center flex-column py-5 h-100">
             <h1>404</h1>
             <h3>Oops... page not found</h3>

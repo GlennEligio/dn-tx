@@ -2,14 +2,23 @@ import { FormEventHandler, useEffect, useState } from 'react';
 import { Container, Col, Row, Form, Button, Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Formik, FormikHelpers } from 'formik';
+import * as yup from 'yup';
 import { IRootState } from '../store';
 import useHttp from '../hooks/useHttp';
 import accountApi, { Account } from '../api/account-api';
+import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
+
+interface UpdateAccountFormInput {
+  username: string;
+  password: string;
+  email: string;
+  fullName: string;
+}
 
 function AccountDetails() {
   const auth = useSelector((state: IRootState) => state.auth);
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -26,6 +35,7 @@ function AccountDetails() {
     error: updateAccountError,
     status: updateAccountStatus,
     sendRequest: updateAccountSendRequest,
+    resetHttpState: updateAccountResetStatus,
   } = useHttp<Account>(false);
 
   // Fetch own account details on mount
@@ -47,10 +57,23 @@ function AccountDetails() {
       setUsername(updateAccountData.username || '');
       setEmail(updateAccountData.email || '');
       setFullName(updateAccountData.fullName || '');
-      setIsEditing(false);
     }
-  }, [updateAccountData, updateAccountError, updateAccountStatus]);
+  }, [
+    updateAccountData,
+    updateAccountError,
+    updateAccountStatus,
+    updateAccountResetStatus,
+  ]);
 
+  const updateAccountFormInputSchema = yup.object().shape({
+    username: yup.string().required('Username is required'),
+    password: yup.string().required('Password is required'),
+    email: yup
+      .string()
+      .email('Email must be valid')
+      .required('Email is required'),
+    fullName: yup.string().required('Full name is required'),
+  });
   // Update the account info states based on getOwnAccount request
   useEffect(() => {
     if (accountData && accountError === null && accountStatus === 'completed') {
@@ -64,13 +87,23 @@ function AccountDetails() {
     setIsEditing(true);
   };
 
-  const saveAccountHandler: FormEventHandler = (e) => {
-    e.preventDefault();
+  const initialUpdateAccountFormValues: UpdateAccountFormInput = {
+    username,
+    password: '',
+    fullName,
+    email,
+  };
+
+  const updateAccountSubmitHandler = (
+    values: UpdateAccountFormInput,
+    actions: FormikHelpers<UpdateAccountFormInput>
+  ) => {
+    actions.setSubmitting(false);
     const updatedAccount: Account = {
-      username,
-      email,
-      fullName,
-      password,
+      username: values.username,
+      email: values.email,
+      fullName: values.fullName,
+      password: values.password,
     };
     const updateOwnAccountReqConf = accountApi.updateOwnAccountDetails(
       updatedAccount,
@@ -85,85 +118,137 @@ function AccountDetails() {
     );
     accountSendRequest(accountOwnDetailsReqConf);
     setIsEditing(false);
+    updateAccountResetStatus();
   };
 
   return (
     <Container>
       <Row>
         <Col />
-        <Col xs={8} md={6} lg={4} className="vh-100">
+        <Col xs={10} md={8} lg={6} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
             <div className="text-center mb-3">
               <h3>Account Information</h3>
             </div>
-            <Form onSubmit={saveAccountHandler}>
-              <Form.Group className="mb-3" controlId="accountFormUsername">
-                <Form.Label>Username</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter username"
-                  value={username}
-                  readOnly
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </Form.Group>
+            <Formik
+              validationSchema={updateAccountFormInputSchema}
+              onSubmit={updateAccountSubmitHandler}
+              initialValues={initialUpdateAccountFormValues}
+              enableReinitialize
+            >
+              {({
+                handleSubmit,
+                handleChange,
+                handleBlur,
+                values,
+                touched,
+                errors,
+                resetForm,
+              }) => (
+                <Form onSubmit={handleSubmit}>
+                  <RequestStatusMessage
+                    data={updateAccountData}
+                    error={updateAccountError}
+                    loadingMessage="Updating account..."
+                    status={updateAccountStatus}
+                    successMessage="Update success!"
+                  />
+                  <Form.Group className="mb-3" controlId="accountFormUsername">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter username"
+                      name="username"
+                      value={values.username}
+                      isValid={touched.username && !errors.username}
+                      isInvalid={!!errors.username}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.username}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="accountFormPassword">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Password"
+                      name="password"
+                      value={values.password}
+                      isValid={touched.password && !errors.password}
+                      isInvalid={!!errors.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="accountFormEmail">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter email"
+                      name="email"
+                      value={values.email}
+                      isValid={touched.email && !errors.email}
+                      isInvalid={!!errors.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="accountFormFullName">
+                    <Form.Label>Full name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter full name"
+                      name="fullName"
+                      value={values.fullName}
+                      isValid={touched.fullName && !errors.fullName}
+                      isInvalid={!!errors.fullName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.fullName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <div className="d-flex justify-content-end">
+                    {!isEditing && (
+                      <Button
+                        variant="primary"
+                        type="button"
+                        onClick={updateClickHandler}
+                      >
+                        Update
+                      </Button>
+                    )}
+                    {isEditing && (
+                      <Stack direction="horizontal" gap={2}>
+                        <Button variant="success" type="submit">
+                          Save
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          type="button"
+                          onClick={() => {
+                            cancelClickHandler();
+                            resetForm();
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </Stack>
+                    )}
+                  </div>
+                </Form>
+              )}
+            </Formik>
 
-              <Form.Group className="mb-3" controlId="accountFormPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  readOnly={!isEditing}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="accountFormEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  readOnly={!isEditing}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="accountFormFullName">
-                <Form.Label>Full name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter full name"
-                  value={fullName}
-                  readOnly={!isEditing}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-              </Form.Group>
-              <div className="d-flex justify-content-end">
-                {!isEditing && (
-                  <Button
-                    variant="primary"
-                    type="button"
-                    onClick={updateClickHandler}
-                  >
-                    Update
-                  </Button>
-                )}
-                {isEditing && (
-                  <Stack direction="horizontal" gap={2}>
-                    <Button variant="success" type="submit">
-                      Save
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      type="button"
-                      onClick={cancelClickHandler}
-                    >
-                      Cancel
-                    </Button>
-                  </Stack>
-                )}
-              </div>
-            </Form>
             <div className="mt-auto text-center">
               <Link to="/">Back to Home</Link>
             </div>
