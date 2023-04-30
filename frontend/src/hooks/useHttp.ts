@@ -8,24 +8,34 @@ enum RequestActionKind {
 }
 
 export class ApiError extends Error {
-  message: string;
+  messages: string[];
 
-  constructor(m: string) {
+  constructor(m: string[]) {
     super();
-    this.message = m;
+    this.messages = m;
   }
 }
 
 interface RequestState<T> {
   data: T | null;
-  error: string | null;
+  error: string | string[] | null;
   status: 'pending' | 'completed' | null;
 }
 
 interface RequestAction<T> {
   type: string;
   responseData?: T;
-  errorMessage?: string;
+  errorMessage?: string | string[];
+}
+
+interface ExceptionResponse {
+  errors: string[];
+  timestamp: string;
+  details: string;
+}
+
+function isExceptionResponse(object: any): object is ExceptionResponse {
+  return 'errors' in object && 'timestamp' in object && 'details' in object;
 }
 
 export interface RequestConfig {
@@ -35,7 +45,7 @@ export interface RequestConfig {
   };
   method?: string;
   relativeUrl?: string;
-  errorMessage?: string;
+  defaultErrorMessage?: string;
 }
 
 const createDataFetchReducer =
@@ -98,14 +108,17 @@ function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
     dispatch({ type: RequestActionKind.SEND });
     try {
       // const responseData = await requestFunction(requestConfig);
-      const responseObj: T = await fetch(requestConfig.relativeUrl || '', {
-        method: requestConfig.method || 'GET',
-        body:
-          requestConfig.body != null
-            ? JSON.stringify(requestConfig.body)
-            : null,
-        headers: requestConfig.headers != null ? requestConfig.headers : {},
-      }).then((response) => {
+      const responseObj: T | ExceptionResponse = await fetch(
+        requestConfig.relativeUrl || '',
+        {
+          method: requestConfig.method || 'GET',
+          body:
+            requestConfig.body != null
+              ? JSON.stringify(requestConfig.body)
+              : null,
+          headers: requestConfig.headers != null ? requestConfig.headers : {},
+        }
+      ).then((response) => {
         if (response.ok) {
           const contentType = response.headers.get('content-type');
           if (contentType && contentType.indexOf('application/json') !== -1) {
@@ -113,10 +126,24 @@ function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
           }
           return true;
         }
+        if (response.status >= 400 && response.status < 500) {
+          return response.json() as Promise<ExceptionResponse>;
+        }
         throw new ApiError(
-          requestConfig.errorMessage || 'Something went wrong'
+          requestConfig.defaultErrorMessage
+            ? [requestConfig.defaultErrorMessage]
+            : ['Something went wrong']
         );
       });
+
+      if (isExceptionResponse(responseObj)) {
+        dispatch({
+          type: RequestActionKind.ERROR,
+          errorMessage: responseObj.errors,
+        });
+        return;
+      }
+
       dispatch({
         type: RequestActionKind.SUCCESS,
         responseData: responseObj,

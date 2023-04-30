@@ -9,7 +9,7 @@ import accountApi, {
   RegisterRequestDto,
 } from '../api/account-api';
 import useHttp from '../hooks/useHttp';
-import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
+import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 import { authActions } from '../store/authSlice';
 
 function Register() {
@@ -87,7 +87,7 @@ function Register() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6} className="vh-100">
+        <Col xs={10} md={8} lg={6} xl={4} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
             <Image src="/dn-tx-logo.png" alt="DN-TX logo" fluid />
             <div>

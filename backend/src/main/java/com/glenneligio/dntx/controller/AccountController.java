@@ -60,6 +60,7 @@ public class AccountController {
     @PutMapping("/{username}")
     public ResponseEntity<Account> updateAccount(@PathVariable String username,
                                                  @RequestBody @Valid UpdateAccountDto dto) {
+        log.info("Updating account with username {} and info {}", username, dto);
         return ResponseEntity.ok(accountService.updateAccount(username, dto.toAccount()));
     }
 

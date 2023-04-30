@@ -50,7 +50,13 @@ function Transactions() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6} className="d-flex flex-column py-3 vh-100">
+        <Col
+          xs={10}
+          md={8}
+          lg={6}
+          xl={4}
+          className="d-flex flex-column py-3 vh-100"
+        >
           <div className="text-center mb-3">
             <h3>Latest transactions</h3>
           </div>

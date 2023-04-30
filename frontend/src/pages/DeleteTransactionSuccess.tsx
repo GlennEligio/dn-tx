@@ -10,6 +10,7 @@ function DeleteTransactionSuccess() {
           xs={10}
           md={8}
           lg={6}
+          xl={4}
           className="d-flex flex-column justify-content-center"
         >
           <div className="text-center">

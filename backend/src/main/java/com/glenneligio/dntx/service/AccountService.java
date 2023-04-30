@@ -52,6 +52,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public Account updateAccount(String username, Account account) {
+        account.setUsername(username);
         Account accountToUpdate = getAccountByUsername(username);
         account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
         accountToUpdate.update(account);
@@ -80,7 +81,7 @@ public class AccountService implements UserDetailsService {
 
     public Account register (Account account) {
         Optional<Account> existingAccount = accountRepository.findByUsername(account.getUsername());
-        if(existingAccount.isPresent()) throw new ApiException("Account with same username", HttpStatus.BAD_REQUEST);
+        if(existingAccount.isPresent()) throw new ApiException("Account with same username already exist", HttpStatus.BAD_REQUEST);
         account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
         account.setDateRegistered(LocalDateTime.now());
         account.setAccountType(AccountType.USER);

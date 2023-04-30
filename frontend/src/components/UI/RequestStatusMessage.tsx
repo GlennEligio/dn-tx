@@ -8,7 +8,7 @@ import {
 
 interface RequestStatusMessageProps {
   data: any;
-  error: string | null;
+  error: string | string[] | null;
   status: 'pending' | 'completed' | null;
   loadingMessage: string;
   successMessage: string;
@@ -47,14 +47,32 @@ function RequestStatusMessage({
     );
   } else if (status === 'completed') {
     if (error !== null || data === null) {
-      MessageDisplay = (
-        <div className="d-flex justify-content-center text-danger">
-          <Stack direction="horizontal" gap={1}>
-            <ExclamationCircleFill />
-            <span>{error}</span>
-          </Stack>
-        </div>
-      );
+      if (!Array.isArray(error)) {
+        MessageDisplay = (
+          <div className="d-flex justify-content-center text-danger">
+            <Stack direction="horizontal" gap={1}>
+              <ExclamationCircleFill />
+              <span>{error}</span>
+            </Stack>
+          </div>
+        );
+      } else {
+        MessageDisplay = (
+          <>
+            {error.map((err) => (
+              <div
+                className="d-flex justify-content-center text-danger"
+                key={err}
+              >
+                <Stack direction="horizontal" gap={1}>
+                  <ExclamationCircleFill />
+                  <span>{err}</span>
+                </Stack>
+              </div>
+            ))}
+          </>
+        );
+      }
     } else if (error === null || data !== null) {
       MessageDisplay = (
         <div className="d-flex justify-content-center text-success">

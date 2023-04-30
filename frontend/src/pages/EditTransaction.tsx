@@ -13,7 +13,7 @@ import transactionApi, {
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
-import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
+import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 
 interface EditTxFormInput {
   username: string;
@@ -235,7 +235,7 @@ function EditTransaction() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6}>
+        <Col xs={10} md={8} lg={6} xl={4}>
           <div className="d-flex flex-column py-3">
             <div className="text-center mb-3">
               <h3>Edit Transaction</h3>

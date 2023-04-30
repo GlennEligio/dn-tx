@@ -97,7 +97,7 @@ const createAccountOwnTransactions = <T extends Transaction>(
     },
     method: 'POST',
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions`,
-    errorMessage: `Can't create transaction right now. Please try again later`,
+    defaultErrorMessage: `Can't create transaction right now. Please try again later`,
   };
 };
 

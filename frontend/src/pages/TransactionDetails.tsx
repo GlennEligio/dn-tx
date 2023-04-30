@@ -63,7 +63,7 @@ function TransactionDetails() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6}>
+        <Col xs={10} md={8} lg={6} xl={4}>
           <div className="d-flex flex-column py-3">
             <div className="text-center mb-3">
               <h3>Transaction Details</h3>

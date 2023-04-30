@@ -1,4 +1,4 @@
-import { FormEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Col, Row, Form, Button, Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { IRootState } from '../store';
 import useHttp from '../hooks/useHttp';
 import accountApi, { Account } from '../api/account-api';
-import RequestStatusMessage from '../components/Transactions/RequestStatusMessage';
+import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 
 interface UpdateAccountFormInput {
   username: string;
@@ -125,7 +125,7 @@ function AccountDetails() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6} className="vh-100">
+        <Col xs={10} md={8} lg={6} xl={4} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
             <div className="text-center mb-3">
               <h3>Account Information</h3>

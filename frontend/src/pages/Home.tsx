@@ -26,7 +26,7 @@ function Home() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6}>
+        <Col xs={10} md={8} lg={6} xl={4}>
           <div>
             <Image fluid src="/dn-tx-logo.png" alt="DN-TX Logo" />
             {loggedIn && (

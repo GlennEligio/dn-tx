@@ -47,7 +47,7 @@ const getOwnAccountDetails = (accessToken: string): RequestConfig => {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
-    errorMessage: "Can't find account details",
+    defaultErrorMessage: "Can't find account details",
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self`,
   };
 };
@@ -62,7 +62,7 @@ const updateOwnAccountDetails = (
       Authorization: `Bearer ${accessToken}`,
       'Content-type': `application/json`,
     },
-    errorMessage: "Can't update own account details",
+    defaultErrorMessage: "Can't update own account details",
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self`,
     body: account,
   };
@@ -79,7 +79,7 @@ const login = (loginInfo: LoginRequestDto): RequestConfig => {
     },
     method: 'POST',
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/login`,
-    errorMessage: 'Invalid credentials',
+    defaultErrorMessage: 'Invalid credentials',
   };
 };
 
@@ -96,7 +96,7 @@ const register = (registerInfo: RegisterRequestDto): RequestConfig => {
     },
     method: 'POST',
     relativeUrl: `${BACKEND_URI}/api/v1/accounts/register`,
-    errorMessage: 'Register failed. Please try again next time',
+    defaultErrorMessage: 'Register failed. Please try again next time',
   };
 };
 

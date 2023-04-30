@@ -57,7 +57,7 @@ function SearchTransaction() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6} className="vh-100 py-5">
+        <Col xs={10} md={8} lg={6} xl={4} className="vh-100 py-5">
           <div className="d-flex flex-column h-100">
             <div className="mb-3 text-center">
               <h3>Search for Transaction</h3>
