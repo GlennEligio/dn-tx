@@ -72,7 +72,8 @@ public class AccountService implements UserDetailsService {
     }
 
     public Account login(String username, String password) {
-        Account account = getAccountByUsername(username);
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new ApiException("Invalid credentials", HttpStatus.UNAUTHORIZED));
         // Check if the password in login and the encrypted password in database matches
         boolean match = bCryptPasswordEncoder.matches(password, account.getPassword());
         if(!match) throw new ApiException("Invalid credentials", HttpStatus.UNAUTHORIZED);

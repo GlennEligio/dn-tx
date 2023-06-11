@@ -1,0 +1,27 @@
+# build environment
+FROM node:16.13.2 as build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --silent
+RUN npm install react-scripts@5.0.1 -g --silent
+COPY . ./
+RUN npm run build:prod
+
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+# override the default configuration of nginx
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+# Add bash
+RUN apk add --no-cache bash
+# Set the ENV
+ENV DNTX_BE_SERVICE_NAME $DNTX_BE_SERVICE_NAME
+ENV DNTX_BE_PORT $DNTX_BE_PORT
+# copy the bash script file to be used to point to correct be service
+COPY nginx/edit-upstream-be.sh /etc/nginx/conf.d/edit-upstream-be.sh
+# Execute edit-upstream-be.sh to populate default.conf of nginx to point to correct BE
+# Start Nginx server
+CMD ["/bin/bash", "-c", "/etc/nginx/conf.d/edit-upstream-be.sh && nginx -g \"daemon off;\""]

@@ -1,0 +1,76 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: dntx-frontend-react
+  name: dntx-frontend-react
+  namespace: glenneligio
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: dntx-frontend-react
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: dntx-frontend-react
+    spec:
+      containers:
+        - image: "shuntjg/dntx-frontend:0.0.1-PROD"
+          name: dntx-frontend-react
+          envFrom:
+            - configMapRef:
+                name: dntx-frontend-react-configmap
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "[ -f /var/run/nginx.pid ] && ps -A | grep nginx"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      restartPolicy: Always
+
+---
+# Configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dntx-frontend-react-configmap
+  namespace: glenneligio
+data:
+  DNTX_BE_SERVICE_NAME: dntx-backend-spring-service #must match the service name that exposes backend
+  DNTX_BE_PORT: "8080"
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dntx-frontend-react
+  name: dntx-frontend-react-service
+  namespace: glenneligio
+spec:
+  ports:
+    - port: 50
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: dntx-frontend-react
+  sessionAffinity: None
+  type: ClusterIP
