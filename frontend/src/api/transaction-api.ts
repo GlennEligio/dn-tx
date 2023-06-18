@@ -3,6 +3,7 @@ import { RequestConfig } from '../hooks/useHttp';
 export enum TransactionType {
   CC2GOLD = 'CC2GOLD',
   GOLD2PHP = 'GOLD2PHP',
+  ITEM2GOLD = 'ITEM2GOLD',
 }
 
 export interface FileAttachment {
@@ -27,6 +28,12 @@ export interface CcToGoldTransaction extends Transaction {
   goldPaid: number;
 }
 
+export interface ItemToGoldTransaction extends Transaction {
+  itemName: string;
+  itemQuantity: number;
+  itemPriceInGold: number;
+}
+
 export interface GoldToPhpTransaction extends Transaction {
   name: string;
   phpPaid: number;
@@ -49,20 +56,28 @@ const getBackendUri = () => {
   return '';
 };
 
+const getBackendVersion = () => {
+  if (import.meta.env.DEV && import.meta.env.VITE_BACKEND_VERSION) {
+    return import.meta.env.VITE_BACKEND_VERSION;
+  }
+  return 'v1';
+};
+
 const BACKEND_URI = getBackendUri();
+const BACKEND_VERSION = getBackendVersion();
 
 const getTransactionByUsernameAndId = (username: string, id: string) => {
   const searchParams = new URLSearchParams({ username, id }).toString();
   return {
     method: 'GET',
-    relativeUrl: `${BACKEND_URI}/api/v1/transactions/search?${searchParams}`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/transactions/search?${searchParams}`,
   };
 };
 
 const getTransactionById = (id: string): RequestConfig => {
   return {
     method: 'GET',
-    relativeUrl: `${BACKEND_URI}/api/v1/transactions/${id}`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/transactions/${id}`,
   };
 };
 
@@ -81,7 +96,7 @@ const getAccountOwnTransactions = (
       Authorization: `Bearer ${accessToken}`,
     },
     method: 'GET',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions?${searchParams}`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self/transactions?${searchParams}`,
   };
 };
 
@@ -96,7 +111,7 @@ const createAccountOwnTransactions = <T extends Transaction>(
       Authorization: `Bearer ${accessToken}`,
     },
     method: 'POST',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self/transactions`,
     defaultErrorMessage: `Can't create transaction right now. Please try again later`,
   };
 };
@@ -113,7 +128,7 @@ const updateAccountOwnTransaction = <T extends Transaction>(
       Authorization: `Bearer ${accessToken}`,
     },
     method: 'PUT',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions/${id}`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self/transactions/${id}`,
   };
 };
 
@@ -126,7 +141,7 @@ const deleteAccountOwnTransaction = (
       Authorization: `Bearer ${accessToken}`,
     },
     method: 'DELETE',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self/transactions/${id}`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self/transactions/${id}`,
   };
 };
 

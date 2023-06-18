@@ -39,7 +39,15 @@ const getBackendUri = () => {
   return '';
 };
 
+const getBackendVersion = () => {
+  if (import.meta.env.DEV && import.meta.env.VITE_BACKEND_VERSION) {
+    return import.meta.env.VITE_BACKEND_VERSION;
+  }
+  return 'v1';
+};
+
 const BACKEND_URI = getBackendUri();
+const BACKEND_VERSION = getBackendVersion();
 
 const getOwnAccountDetails = (accessToken: string): RequestConfig => {
   return {
@@ -48,7 +56,7 @@ const getOwnAccountDetails = (accessToken: string): RequestConfig => {
       Authorization: `Bearer ${accessToken}`,
     },
     defaultErrorMessage: "Can't find account details",
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self`,
   };
 };
 
@@ -63,7 +71,7 @@ const updateOwnAccountDetails = (
       'Content-type': `application/json`,
     },
     defaultErrorMessage: "Can't update own account details",
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/@self`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self`,
     body: account,
   };
 };
@@ -78,7 +86,7 @@ const login = (loginInfo: LoginRequestDto): RequestConfig => {
       'Content-type': 'application/json',
     },
     method: 'POST',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/login`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/login`,
     defaultErrorMessage: 'Invalid credentials',
   };
 };
@@ -95,7 +103,7 @@ const register = (registerInfo: RegisterRequestDto): RequestConfig => {
       'Content-type': 'application/json',
     },
     method: 'POST',
-    relativeUrl: `${BACKEND_URI}/api/v1/accounts/register`,
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/register`,
     defaultErrorMessage: 'Register failed. Please try again next time',
   };
 };

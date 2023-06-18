@@ -26,6 +26,9 @@ interface CreateTxFormInput {
   phpPaid: number;
   goldPerPhp: number;
   methodOfPayment: string;
+  itemName: string;
+  itemQuantity: number;
+  itemPriceInGold: number;
 }
 
 const createTxFormInputSchema = yup.object().shape({
@@ -33,8 +36,12 @@ const createTxFormInputSchema = yup.object().shape({
   type: yup
     .mixed()
     .oneOf(
-      [TransactionType.CC2GOLD, TransactionType.GOLD2PHP],
-      'Type can only be CC to GOLD or GOLD to PHP'
+      [
+        TransactionType.CC2GOLD,
+        TransactionType.GOLD2PHP,
+        TransactionType.ITEM2GOLD,
+      ],
+      'Type can only be CC2GOLD, GOLD2PHP, or ITEM2GOLD'
     ),
   fileAttachments: yup.array().of(
     yup.object().shape({
@@ -82,6 +89,23 @@ const createTxFormInputSchema = yup.object().shape({
     then: (schema) => schema.required('Method of payment is required'),
     otherwise: (schema) => schema.notRequired(),
   }),
+  itemName: yup.string().when('type', {
+    is: TransactionType.ITEM2GOLD,
+    then: (schema) => schema.required('Item name is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  itemQuantity: yup.number().when('type', {
+    is: TransactionType.ITEM2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  itemPriceInGold: yup.number().when('type', {
+    is: TransactionType.ITEM2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 function CreateTransaction() {
@@ -98,6 +122,9 @@ function CreateTransaction() {
     phpPaid: 1,
     goldPerPhp: 1,
     methodOfPayment: '',
+    itemName: '',
+    itemQuantity: 1,
+    itemPriceInGold: 1,
   };
 
   const {
@@ -151,6 +178,14 @@ function CreateTransaction() {
           name: values.name,
           phpPaid: values.phpPaid,
         } as GoldToPhpTransaction;
+        break;
+      case TransactionType.ITEM2GOLD:
+        finalTransaction = {
+          ...transaction,
+          itemName: values.itemName,
+          itemQuantity: values.itemQuantity,
+          itemPriceInGold: values.itemPriceInGold,
+        };
         break;
       default:
         finalTransaction = transaction;
@@ -232,6 +267,9 @@ function CreateTransaction() {
                         </option>
                         <option value={TransactionType.GOLD2PHP}>
                           Gold to PHP
+                        </option>
+                        <option value={TransactionType.ITEM2GOLD}>
+                          Item to Gold
                         </option>
                       </Form.Select>
                       <Form.Control.Feedback type="invalid">
@@ -385,6 +423,78 @@ function CreateTransaction() {
                           />
                           <Form.Control.Feedback type="invalid">
                             {errors.goldPaid}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                      </>
+                    )}
+                    {values.type === TransactionType.ITEM2GOLD && (
+                      <>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="createTxFormItemName"
+                        >
+                          <Form.Label>Item name</Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder="Enter item name"
+                            name="itemName"
+                            value={values.itemName}
+                            isValid={touched.itemName && !errors.itemName}
+                            isInvalid={touched.itemName && !!errors.itemName}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.itemName}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="createTxFormItemQuantity"
+                        >
+                          <Form.Label>Item quantity</Form.Label>
+                          <Form.Control
+                            type="number"
+                            min={1}
+                            placeholder="Enter item quantity"
+                            name="itemQuantity"
+                            value={values.itemQuantity}
+                            isValid={
+                              touched.itemQuantity && !errors.itemQuantity
+                            }
+                            isInvalid={
+                              touched.itemQuantity && !!errors.itemQuantity
+                            }
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.itemQuantity}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="createTxFormItemPriceInGold"
+                        >
+                          <Form.Label>Item price in gold</Form.Label>
+                          <Form.Control
+                            type="number"
+                            min={1}
+                            placeholder="Enter item price in gold"
+                            name="itemPriceInGold"
+                            value={values.itemPriceInGold}
+                            isValid={
+                              touched.itemPriceInGold && !errors.itemPriceInGold
+                            }
+                            isInvalid={
+                              touched.itemPriceInGold &&
+                              !!errors.itemPriceInGold
+                            }
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.itemPriceInGold}
                           </Form.Control.Feedback>
                         </Form.Group>
                       </>

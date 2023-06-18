@@ -8,6 +8,7 @@ import transactionApi, {
   CcToGoldTransaction,
   FileAttachment,
   GoldToPhpTransaction,
+  ItemToGoldTransaction,
   Transaction,
   TransactionType,
 } from '../api/transaction-api';
@@ -26,6 +27,9 @@ interface EditTxFormInput {
   phpPaid: number;
   goldPerPhp: number;
   methodOfPayment: string;
+  itemName: string;
+  itemQuantity: number;
+  itemPriceInGold: number;
 }
 
 const editTxFormInputSchema = yup.object().shape({
@@ -33,8 +37,12 @@ const editTxFormInputSchema = yup.object().shape({
   type: yup
     .mixed()
     .oneOf(
-      [TransactionType.CC2GOLD, TransactionType.GOLD2PHP],
-      'Type can only be CC to GOLD or GOLD to PHP'
+      [
+        TransactionType.CC2GOLD,
+        TransactionType.GOLD2PHP,
+        TransactionType.ITEM2GOLD,
+      ],
+      'Type can only be CC to GOLD, GOLD to PHP, ITEM to GOLD'
     ),
   fileAttachments: yup.array().of(
     yup.object().shape({
@@ -82,6 +90,23 @@ const editTxFormInputSchema = yup.object().shape({
     then: (schema) => schema.required('Method of payment is required'),
     otherwise: (schema) => schema.notRequired(),
   }),
+  itemName: yup.string().when('type', {
+    is: TransactionType.ITEM2GOLD,
+    then: (schema) => schema.required('Item name is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  itemQuantity: yup.number().when('type', {
+    is: TransactionType.ITEM2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  itemPriceInGold: yup.number().when('type', {
+    is: TransactionType.ITEM2GOLD,
+    then: (schema) =>
+      schema.min(1, 'Must be greater than 1').required('Required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 function EditTransaction() {
@@ -104,6 +129,11 @@ function EditTransaction() {
   const [goldPerPhp, setGoldPerPhp] = useState(1);
   const [methodOfPayment, setMethodOfPayment] = useState('');
 
+  // For ItemToGoldTransactions
+  const [itemName, setItemName] = useState('');
+  const [itemQuantity, setItemQuantity] = useState(1);
+  const [itemPriceInGold, setItemPriceInGold] = useState(1);
+
   // initial form input values
   const editTxFormInitialValues: EditTxFormInput = {
     username,
@@ -116,6 +146,9 @@ function EditTransaction() {
     phpPaid,
     goldPerPhp,
     methodOfPayment,
+    itemName,
+    itemQuantity,
+    itemPriceInGold,
   };
 
   // For fetching the current Transaction data
@@ -140,7 +173,7 @@ function EditTransaction() {
         transactionApi.getTransactionById(transactionId);
       currentTxRequest(getTransactionByIdReqConf);
     }
-  }, [transactionId]);
+  }, [transactionId, currentTxRequest]);
 
   // Checking the result of current transaction request
   // If present, use the data to populate the inputs
@@ -167,6 +200,13 @@ function EditTransaction() {
         setPhpPaid(goldToPhpTx.phpPaid);
         setGoldPerPhp(goldToPhpTx.goldPerPhp);
         setMethodOfPayment(goldToPhpTx.methodOfPayment);
+      }
+
+      if (currentTxData.type === TransactionType.ITEM2GOLD) {
+        const itemToGoldTx = currentTxData as ItemToGoldTransaction;
+        setItemName(itemToGoldTx.itemName);
+        setItemQuantity(itemToGoldTx.itemQuantity);
+        setItemPriceInGold(itemToGoldTx.itemPriceInGold);
       }
     }
   }, [currentTxData, currentTxError, currentTxStatus]);
@@ -212,6 +252,14 @@ function EditTransaction() {
             name: values.name,
             phpPaid: values.phpPaid,
           } as GoldToPhpTransaction;
+          break;
+        case TransactionType.ITEM2GOLD:
+          finalTransaction = {
+            ...transaction,
+            itemName: values.itemName,
+            itemQuantity: values.itemQuantity,
+            itemPriceInGold: values.itemPriceInGold,
+          } as ItemToGoldTransaction;
           break;
         default:
           finalTransaction = transaction;
@@ -301,6 +349,9 @@ function EditTransaction() {
                           </option>
                           <option value={TransactionType.GOLD2PHP}>
                             Gold to PHP
+                          </option>
+                          <option value={TransactionType.ITEM2GOLD}>
+                            Item to Gold
                           </option>
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
@@ -457,6 +508,77 @@ function EditTransaction() {
                             />
                             <Form.Control.Feedback type="invalid">
                               {errors.goldPaid}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </>
+                      )}
+                      {values.type === TransactionType.ITEM2GOLD && (
+                        <>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormItemName"
+                          >
+                            <Form.Label>Item name</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter text name"
+                              name="itemName"
+                              value={values.itemName}
+                              isValid={touched.itemName && !errors.itemName}
+                              isInvalid={touched.itemName && !!errors.itemName}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.itemName}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormItemQuantity"
+                          >
+                            <Form.Label>Item quantity</Form.Label>
+                            <Form.Control
+                              type="number"
+                              placeholder="Enter item quantity"
+                              name="itemQuantity"
+                              value={values.itemQuantity}
+                              isValid={
+                                touched.itemQuantity && !errors.itemQuantity
+                              }
+                              isInvalid={
+                                touched.goldPerCC && !!errors.goldPerCC
+                              }
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.itemQuantity}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="editTxFormGoldPaid"
+                          >
+                            <Form.Label>Item price in gold</Form.Label>
+                            <Form.Control
+                              type="number"
+                              placeholder="Enter item price in gold"
+                              name="itemPriceInGold"
+                              value={values.itemPriceInGold}
+                              isValid={
+                                touched.itemPriceInGold &&
+                                !errors.itemPriceInGold
+                              }
+                              isInvalid={
+                                touched.itemPriceInGold &&
+                                !!errors.itemPriceInGold
+                              }
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.itemPriceInGold}
                             </Form.Control.Feedback>
                           </Form.Group>
                         </>

@@ -5,6 +5,7 @@ import { Col, Row, Container, Form, Stack, Button } from 'react-bootstrap';
 import transactionApi, {
   CcToGoldTransaction,
   GoldToPhpTransaction,
+  ItemToGoldTransaction,
   Transaction,
   TransactionType,
 } from '../api/transaction-api';
@@ -199,6 +200,57 @@ function TransactionDetails() {
                             readOnly
                             value={
                               (transactionData as CcToGoldTransaction).goldPaid
+                            }
+                          />
+                        </Form.Group>
+                      </>
+                    )}
+                    {transactionData.type === TransactionType.ITEM2GOLD && (
+                      <>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="createTxFormItemName"
+                        >
+                          <Form.Label>Item name</Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder="Enter item name"
+                            readOnly
+                            value={
+                              (transactionData as ItemToGoldTransaction)
+                                .itemName
+                            }
+                          />
+                        </Form.Group>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="createTxFormItemQuantity"
+                        >
+                          <Form.Label>Item quantity</Form.Label>
+                          <Form.Control
+                            type="number"
+                            min={1}
+                            placeholder="Enter item quantity"
+                            readOnly
+                            value={
+                              (transactionData as ItemToGoldTransaction)
+                                .itemQuantity
+                            }
+                          />
+                        </Form.Group>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="createTxFormItemPriceInGold"
+                        >
+                          <Form.Label>Item price in gold</Form.Label>
+                          <Form.Control
+                            type="number"
+                            min={1}
+                            placeholder="Enter item price in gold"
+                            readOnly
+                            value={
+                              (transactionData as ItemToGoldTransaction)
+                                .itemPriceInGold
                             }
                           />
                         </Form.Group>
