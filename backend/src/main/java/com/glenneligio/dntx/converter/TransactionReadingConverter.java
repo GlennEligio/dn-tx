@@ -1,5 +1,6 @@
 package com.glenneligio.dntx.converter;
 
+import com.glenneligio.dntx.enums.TransactionFQN;
 import com.glenneligio.dntx.enums.TransactionType;
 import com.glenneligio.dntx.model.*;
 import com.mongodb.DBObject;
@@ -15,12 +16,14 @@ import java.util.List;
 @Slf4j
 public class TransactionReadingConverter implements Converter<DBObject, Transaction> {
 
+    private static final String CLASS_FIELD = "_class";
+
     @Override
     public Transaction convert(DBObject source) {
         log.info("Inside TransactionReadingConverter");
         Transaction transaction = null;
-        switch((String) source.get("_class")) {
-            case "com.glenneligio.dntx.model.CcToGoldTransaction":
+        switch((TransactionFQN) source.get(CLASS_FIELD)) {
+            case CC2GOLD:
                 var ccToGoldTx = new CcToGoldTransaction();
                 ccToGoldTx.setId((String) source.get("_id"));
                 ccToGoldTx.setType(TransactionType.CC2GOLD);
@@ -33,7 +36,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
                 ccToGoldTx.setFileAttachments((List<FileAttachment>) source.get("fileAttachments"));
                 transaction = ccToGoldTx;
                 break;
-            case "com.glenneligio.dntx.model.GoldToPhpTransaction":
+            case GOLD2PHP:
                 var goldToPhpTx = new GoldToPhpTransaction();
                 goldToPhpTx.setId((String) source.get("_id"));
                 goldToPhpTx.setType(TransactionType.CC2GOLD);
@@ -46,7 +49,20 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
                 goldToPhpTx.setPhpPaid((Double) source.get("phpPaid"));
                 transaction = goldToPhpTx;
                 break;
-            case "com.glenneligio.dntx.model.Transaction":
+            case ITEM2GOLD:
+                var itemToGoldTx = new ItemToGoldTransaction();
+                itemToGoldTx.setId((String) source.get("_id"));
+                itemToGoldTx.setType(TransactionType.CC2GOLD);
+                itemToGoldTx.setCreator((Account) source.get("creator"));
+                itemToGoldTx.setUsername((String) source.get("username"));
+                itemToGoldTx.setDateFinished((LocalDateTime) source.get("dateFinished"));
+                itemToGoldTx.setFileAttachments((List<FileAttachment>) source.get("fileAttachments"));
+                itemToGoldTx.setItemQuantity((Long) source.get("itemQuantity"));
+                itemToGoldTx.setItemName((String) source.get("itemName"));
+                itemToGoldTx.setItemPriceInGold((Double) source.get("itemPriceInGold"));
+                transaction = itemToGoldTx;
+                break;
+            default:
                 var tx = new Transaction();
                 tx.setId((String) source.get("_id"));
                 tx.setType(TransactionType.CC2GOLD);

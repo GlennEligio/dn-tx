@@ -42,7 +42,7 @@ public class SecurityConfiguration {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,"/api/*/accounts/login", "/api/*/accounts/register").permitAll()
-                .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll() // For Spring Actuator
                 .requestMatchers(HttpMethod.GET, "/api/*/transactions/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/*/accounts/@self/**").hasAnyAuthority("ADMIN", "USER")
                 .requestMatchers(HttpMethod.POST, "/api/*/accounts/@self/transactions").hasAnyAuthority("USER", "ADMIN")

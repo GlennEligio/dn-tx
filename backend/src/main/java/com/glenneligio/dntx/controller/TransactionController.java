@@ -1,10 +1,10 @@
 package com.glenneligio.dntx.controller;
 
 import com.glenneligio.dntx.dtos.CreateUpdateTransactionDto;
-import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.TransactionService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
+@Slf4j
 public class TransactionController {
 
     @Autowired

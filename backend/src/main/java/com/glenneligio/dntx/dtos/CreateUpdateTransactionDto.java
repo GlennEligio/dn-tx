@@ -22,7 +22,7 @@ public class CreateUpdateTransactionDto {
     private Account creator;
     private List<FileAttachment> fileAttachments;
 
-    @Pattern(regexp = "(CC2GOLD|GOLD2PHP)", message = "Transaction type can only be CcToGold or GoldToPhp")
+    @Pattern(regexp = "(CC2GOLD|GOLD2PHP|ITEM2GOLD)", message = "Transaction type can only be CC2GOLD, GOLD2PHP, or ITEM2GOLD")
     @NotNull(message = "Transaction type must be present")
     private String type;
 
@@ -30,15 +30,23 @@ public class CreateUpdateTransactionDto {
     private BigDecimal ccAmount;
     @Positive
     private Double goldPerCC;
-    @Positive
+    @Positive(message = "goldPaid must be positive")
     private Double goldPaid;
 
     private String name;
-    @Positive
+    @Positive(message = "phpPaid must be positive")
     private Double phpPaid;
-    @Positive
+    @Positive(message = "goldPerPhp must be positive")
     private Double goldPerPhp;
     private String methodOfPayment;
+
+    private String itemName;
+
+    @Positive(message = "itemQuantity must be positive")
+    private Long itemQuantity;
+
+    @Positive(message = "itemPriceInGold must be positive")
+    private Double itemPriceInGold;
 
     public Transaction toTransaction() {
         Transaction transaction = null;
@@ -66,6 +74,18 @@ public class CreateUpdateTransactionDto {
                 transaction2.setGoldPerPhp(goldPerPhp);
                 transaction2.setMethodOfPayment(methodOfPayment);
                 transaction = transaction2;
+                break;
+            case ITEM2GOLD:
+                ItemToGoldTransaction transaction3 = new ItemToGoldTransaction();
+                transaction3.setUsername(username);
+                transaction3.setCreator(creator);
+                transaction3.setFileAttachments(fileAttachments);
+                transaction3.setType(TransactionType.ITEM2GOLD);
+
+                transaction3.setItemName(itemName);
+                transaction3.setItemQuantity(itemQuantity);
+                transaction3.setItemPriceInGold(itemPriceInGold);
+                transaction = transaction3;
                 break;
         }
         return transaction;

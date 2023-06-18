@@ -2,10 +2,7 @@ package com.glenneligio.dntx.service;
 
 
 import com.glenneligio.dntx.exception.ApiException;
-import com.glenneligio.dntx.model.Account;
-import com.glenneligio.dntx.model.CcToGoldTransaction;
-import com.glenneligio.dntx.model.GoldToPhpTransaction;
-import com.glenneligio.dntx.model.Transaction;
+import com.glenneligio.dntx.model.*;
 import com.glenneligio.dntx.repository.TransactionRepository;
 import jakarta.validation.*;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +45,10 @@ public class TransactionService {
                 CcToGoldTransaction ccToGoldTransaction = new CcToGoldTransaction(transaction);
                 validateCcToGoldTransaction(ccToGoldTransaction);
                 return transactionRepository.save(ccToGoldTransaction);
+            case ITEM2GOLD:
+                ItemToGoldTransaction itemToGoldTransaction = new ItemToGoldTransaction(transaction);
+                validateItemToGoldTransaction(itemToGoldTransaction);
+                return transactionRepository.save(itemToGoldTransaction);
             default:
                 throw new ApiException("No transaction type specified", HttpStatus.BAD_REQUEST);
         }
@@ -83,6 +84,11 @@ public class TransactionService {
             ccToGoldTransaction.updateCcToGold(new CcToGoldTransaction(transaction));
             validateCcToGoldTransaction(ccToGoldTransaction);
             return transactionRepository.save(ccToGoldTransaction);
+        } else if (transactionToBeUpdated instanceof ItemToGoldTransaction itemToGoldTransaction) {
+            log.info("Transaction is a ITEM2GOLD tx");
+            itemToGoldTransaction.updateItemToGold(new ItemToGoldTransaction(transaction));
+            validateItemToGoldTransaction(itemToGoldTransaction);
+            return itemToGoldTransaction;
         } else {
             transactionToBeUpdated.update(transaction);
             log.info("Transaction type is not defined");
@@ -116,6 +122,13 @@ public class TransactionService {
         Set<ConstraintViolation<GoldToPhpTransaction>> violations = validator.validate(goldToPhpTransaction);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Invalid GoldToPhpTransaction", violations);
+        }
+    }
+
+    private void validateItemToGoldTransaction(ItemToGoldTransaction itemToGoldTransaction) {
+        Set<ConstraintViolation<ItemToGoldTransaction>> violations = validator.validate(itemToGoldTransaction);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException("Invalid ItemToGoldTransaction", violations);
         }
     }
 }
