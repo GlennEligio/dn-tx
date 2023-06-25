@@ -4,10 +4,10 @@ import com.glenneligio.dntx.model.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
 
@@ -16,4 +16,7 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     List<Transaction> findByCreatorId(String id);
 
     Page<Transaction> findByCreatorId(String id, Pageable pageable);
+
+    List<Transaction> findByCreatorIdAndDateFinishedBetween(String id, LocalDateTime afterDate, LocalDateTime beforeDate);
+
 }

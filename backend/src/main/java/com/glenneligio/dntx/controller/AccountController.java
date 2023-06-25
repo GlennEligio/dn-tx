@@ -1,26 +1,29 @@
 package com.glenneligio.dntx.controller;
 
 import com.glenneligio.dntx.dtos.*;
-import com.glenneligio.dntx.enums.AccountType;
 import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Account;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.AccountService;
 import com.glenneligio.dntx.service.TransactionService;
 import com.glenneligio.dntx.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.security.Principal;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -123,6 +126,30 @@ public class AccountController {
                 transactionPage.getNumber(),
                 transactionPage.getSize());
         return ResponseEntity.ok(transactionPageDto);
+    }
+
+    @GetMapping("/@self/transactions/download")
+    public void downloadAccountTransactions(HttpServletResponse response,
+                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beforeDate,
+                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime afterDate,
+                                            Authentication authentication) throws IOException {
+
+        log.info("Preparing Transactions list for Download");
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=transactions.xlsx");
+
+        // get username from the Authentication from SecurityContext
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        // if fromDate and toDate is present, filter the transactions again
+        LocalDateTime afterDatePlaceHolder = afterDate != null ? afterDate : LocalDateTime.MIN.withYear(-9999);
+        LocalDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : LocalDateTime.MAX.withYear(9999);
+        List<Transaction> transactions = transactionService.getTransactionByCreatorUsernameAndDateBetween(username, afterDatePlaceHolder, beforeDatePlaceHolder);
+        log.info("Transaction count: {}", transactions.size());
+
+        ByteArrayInputStream stream = transactionService.listToExcel(transactions);
+        IOUtils.copy(stream, response.getOutputStream());
     }
 
     @PostMapping("/@self/transactions")
