@@ -47,7 +47,6 @@ public class GoldToPhpTransaction extends Transaction {
         mapper.findAndRegisterModules();
         try {
             String txString = mapper.writeValueAsString(t);
-            log.info(txString);
             JsonNode jsonNode = mapper.readTree(txString);
             this.setName(jsonNode.get("name").asText());
             this.setPhpPaid(jsonNode.get("phpPaid").asDouble());
@@ -60,6 +59,7 @@ public class GoldToPhpTransaction extends Transaction {
 
 
     public void updateGold2Php(GoldToPhpTransaction t) {
+        log.info("Updating gold to php transaction: {}", t);
         super.update(t);
         this.name = t.getName();
         this.phpPaid = t.getPhpPaid();

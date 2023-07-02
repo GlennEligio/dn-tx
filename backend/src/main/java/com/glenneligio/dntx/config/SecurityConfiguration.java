@@ -45,7 +45,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll() // For Spring Actuator
                 .requestMatchers(HttpMethod.GET, "/api/*/transactions/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/*/accounts/@self/**").hasAnyAuthority("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/api/*/accounts/@self/transactions").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/*/accounts/@self/transactions/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/*/accounts/@self", "/api/*/accounts/@self/transactions/*").hasAnyAuthority("ADMIN","USER")
                 .requestMatchers(HttpMethod.DELETE, "/api/*/accounts/@self/transactions/*").hasAnyAuthority("USER", "ADMIN")
 //                .requestMatchers(HttpMethod.POST, "/api/*/transactions").hasAnyAuthority("USER", "ADMIN")

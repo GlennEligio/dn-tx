@@ -1,5 +1,7 @@
 package com.glenneligio.dntx.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.glenneligio.dntx.dtos.*;
 import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Account;
@@ -19,17 +21,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
 @Slf4j
 public class AccountController {
+
+    private static String EXCEL_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     @Autowired
     private AccountService accountService;
@@ -150,6 +156,35 @@ public class AccountController {
 
         ByteArrayInputStream stream = transactionService.listToExcel(transactions);
         IOUtils.copy(stream, response.getOutputStream());
+    }
+
+    @PostMapping("/@self/transactions/upload")
+    public ResponseEntity<Object> upload(@RequestParam(required = false, defaultValue = "false") Boolean overwrite,
+                                         @RequestParam MultipartFile file,
+                                         Authentication authentication) {
+        log.info("Preparing Excel for Transaction Database update");
+        if (!Objects.equals(file.getContentType(), EXCEL_CONTENT_TYPE)) {
+            throw new ApiException("Can only upload .xlsx files", HttpStatus.BAD_REQUEST);
+        }
+
+        // get username from the Authentication from SecurityContext
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        List<Transaction> transactions = transactionService.excelToList(file);
+        log.info("Got the transactions from excel");
+
+        // check if all transactions are owned by the creator
+        boolean allTxOwned = transactions.stream().allMatch(tx -> tx.getCreator().getUsername().equals(username));
+        if(!allTxOwned) throw new ApiException("You can upload transactions from other creators", HttpStatus.FORBIDDEN);
+
+        int itemsAffected = transactionService.addOrUpdate(transactions, overwrite);
+        log.info("Successfully updated {} transactions database using the excel file", itemsAffected);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("Transactions Affected", itemsAffected);
+        return ResponseEntity.ok(objectNode);
     }
 
     @PostMapping("/@self/transactions")

@@ -31,6 +31,7 @@ public class CcToGoldTransaction extends Transaction{
     private Double goldPaid;
 
     public CcToGoldTransaction(Transaction t)  {
+        log.info("Updating cc to gold transaction: {}", t);
         this.setUsername(t.getUsername());
         this.setCreator(t.getCreator());
         this.setDateFinished(t.getDateFinished());
@@ -42,7 +43,6 @@ public class CcToGoldTransaction extends Transaction{
         try {
             String txString = mapper.writeValueAsString(t);
             JsonNode jsonNode = mapper.readTree(txString);
-            log.info(txString);
             this.setCcAmount(jsonNode.get("ccAmount").decimalValue());
             this.setGoldPerCC(jsonNode.get("goldPerCC").asDouble());
             this.setGoldPaid(jsonNode.get("goldPaid").asDouble());

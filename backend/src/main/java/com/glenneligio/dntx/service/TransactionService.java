@@ -17,15 +17,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Service
@@ -33,6 +33,11 @@ import java.util.stream.IntStream;
 public class TransactionService implements IExcelService<Transaction> {
 
     private static final String CLASS_NAME = TransactionService.class.getName();
+    private static final List<String> baseTxColumnNames = List.of("Transaction id", "Username", "Creator Username", "Date finished", "Type");
+    private static final List<String> ccToGoldTxColumnNames = List.of("CC Amount", "Gold per CC", "Gold paid");
+    private static final List<String> goldToPhpTxColumnNames = List.of("Name", "Php paid", "Gold per php", "Method of payment");
+    private static final List<String> itemToGoldColumnNames = List.of("Item name", "Item quantity", "Item price in gold");
+    private static final List<TransactionType> txTypes = List.of(TransactionType.CC2GOLD, TransactionType.GOLD2PHP, TransactionType.ITEM2GOLD);
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -79,29 +84,29 @@ public class TransactionService implements IExcelService<Transaction> {
                 .orElseThrow(() -> new ApiException("Not transaction exist with specified username and id", HttpStatus.NOT_FOUND));
     }
 
-    public Transaction updateTransaction(String id, Transaction transaction) {
+    public Transaction updateTransaction(String id, Transaction updatedTx) {
         final String METHOD_NAME = "updateTransaction";
-        log.info("Inside {} of {} with inputs {} and {}", METHOD_NAME, CLASS_NAME, id, transaction);
+        log.info("Inside {} of {} with inputs {} and {}", METHOD_NAME, CLASS_NAME, id, updatedTx);
         var transactionToBeUpdated = getTransactionById(id);
 
         // Check specified instance type of transaction, since each have different fields to update
         if (transactionToBeUpdated instanceof GoldToPhpTransaction goldToPhpTransaction) {
             log.info("Transaction is a Gold2Php tx");
-            goldToPhpTransaction.updateGold2Php(new GoldToPhpTransaction(transaction));
+            goldToPhpTransaction.updateGold2Php(new GoldToPhpTransaction(updatedTx));
             validateGoldToPhpTransaction(goldToPhpTransaction);
             return transactionRepository.save(goldToPhpTransaction);
         } else if (transactionToBeUpdated instanceof CcToGoldTransaction ccToGoldTransaction) {
             log.info("Transaction is a Cc2Gold tx");
-            ccToGoldTransaction.updateCcToGold(new CcToGoldTransaction(transaction));
+            ccToGoldTransaction.updateCcToGold(new CcToGoldTransaction(updatedTx));
             validateCcToGoldTransaction(ccToGoldTransaction);
             return transactionRepository.save(ccToGoldTransaction);
         } else if (transactionToBeUpdated instanceof ItemToGoldTransaction itemToGoldTransaction) {
             log.info("Transaction is a ITEM2GOLD tx");
-            itemToGoldTransaction.updateItemToGold(new ItemToGoldTransaction(transaction));
+            itemToGoldTransaction.updateItemToGold(new ItemToGoldTransaction(updatedTx));
             validateItemToGoldTransaction(itemToGoldTransaction);
-            return itemToGoldTransaction;
+            return transactionRepository.save(itemToGoldTransaction);
         } else {
-            transactionToBeUpdated.update(transaction);
+            transactionToBeUpdated.update(updatedTx);
             log.info("Transaction type is not defined");
             return transactionRepository.save(transactionToBeUpdated);
         }
@@ -150,12 +155,6 @@ public class TransactionService implements IExcelService<Transaction> {
 
     @Override
     public ByteArrayInputStream listToExcel(List<Transaction> transactions) {
-        List<String> baseTxColumnNames = List.of("Transaction id", "Username", "Creator Username", "Date finished", "Type");
-        List<String> ccToGoldTxColumnNames = List.of("CC Amount", "Gold per CC", "Gold paid");
-        List<String> goldToPhpTxColumnNames = List.of("Name", "Php paid", "Gold per php", "Method of payment");
-        List<String> itemToGoldColumnNames = List.of("Item name", "Item quantity", "Item price in gold");
-        List<TransactionType> txTypes = List.of(TransactionType.CC2GOLD, TransactionType.GOLD2PHP, TransactionType.ITEM2GOLD);
-
         try (Workbook workbook = new XSSFWorkbook()) {
 
             for (TransactionType t : txTypes) {
@@ -229,8 +228,128 @@ public class TransactionService implements IExcelService<Transaction> {
     }
 
     @Override
-    public Set<Transaction> excelToList(MultipartFile file) {
-        return null;
+    public List<Transaction> excelToList(MultipartFile file) {
+        List<Transaction> transactions = new ArrayList<>();
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            for(TransactionType t: txTypes) {
+                Sheet sheet = workbook.getSheet(t.name());
+                List<String> allColumnNames = new ArrayList<>(baseTxColumnNames);
+
+                switch (t) {
+                    case GOLD2PHP:
+                        allColumnNames.addAll(goldToPhpTxColumnNames);
+                        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                            if(i == 0) continue; // HEADER, SKIP THE ROW
+                            GoldToPhpTransaction goldToPhpTransaction = new GoldToPhpTransaction();
+                            Row row = sheet.getRow(i);
+                            String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
+                            String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
+                            String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
+                            LocalDateTime dateFinished = row.getCell(allColumnNames.indexOf("Date finished")).getLocalDateTimeCellValue();
+                            String name = row.getCell(allColumnNames.indexOf("Name")).getStringCellValue();
+                            Double phpPaid = row.getCell(allColumnNames.indexOf("Php paid")).getNumericCellValue();
+                            Double goldPerPhp = row.getCell(allColumnNames.indexOf("Gold per php")).getNumericCellValue();
+                            String methodOfPayment = row.getCell(allColumnNames.indexOf("Method of payment")).getStringCellValue();
+
+                            goldToPhpTransaction.setId(txId);
+                            Account account = new Account();
+                            account.setUsername(creatorUsername);
+                            goldToPhpTransaction.setCreator(account);
+                            goldToPhpTransaction.setType(TransactionType.GOLD2PHP);
+                            goldToPhpTransaction.setUsername(username);
+                            goldToPhpTransaction.setDateFinished(dateFinished);
+                            goldToPhpTransaction.setName(name);
+                            goldToPhpTransaction.setPhpPaid(phpPaid);
+                            goldToPhpTransaction.setGoldPerPhp(goldPerPhp);
+                            goldToPhpTransaction.setMethodOfPayment(methodOfPayment);
+
+                            transactions.add(goldToPhpTransaction);
+                        }
+                        break;
+                    case CC2GOLD:
+                        allColumnNames.addAll(ccToGoldTxColumnNames);
+                        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                            if(i == 0) continue;
+                            CcToGoldTransaction ccToGoldTransaction = new CcToGoldTransaction();
+
+                            Row row = sheet.getRow(i);
+                            String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
+                            String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
+                            String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
+                            LocalDateTime dateFinished = row.getCell(allColumnNames.indexOf("Date finished")).getLocalDateTimeCellValue();
+                            BigDecimal ccAmount = BigDecimal.valueOf(row.getCell(allColumnNames.indexOf("CC Amount")).getNumericCellValue());
+                            Double goldPerCc = row.getCell(allColumnNames.indexOf("Gold per CC")).getNumericCellValue();
+                            Double goldPaid = row.getCell(allColumnNames.indexOf("Gold paid")).getNumericCellValue();
+
+                            ccToGoldTransaction.setId(txId);
+                            ccToGoldTransaction.setUsername(username);
+                            Account account = new Account();
+                            account.setUsername(creatorUsername);
+                            ccToGoldTransaction.setCreator(account);
+                            ccToGoldTransaction.setDateFinished(dateFinished);
+                            ccToGoldTransaction.setType(TransactionType.CC2GOLD);
+                            ccToGoldTransaction.setCcAmount(ccAmount);
+                            ccToGoldTransaction.setGoldPaid(goldPaid);
+                            ccToGoldTransaction.setGoldPerCC(goldPerCc);
+                            transactions.add(ccToGoldTransaction);
+                        }
+                        break;
+                    case ITEM2GOLD:
+                        allColumnNames.addAll(itemToGoldColumnNames);
+                        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                            if(i == 0) continue;
+                            ItemToGoldTransaction itemToGoldTransaction = new ItemToGoldTransaction();
+
+                            Row row = sheet.getRow(i);
+                            String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
+                            String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
+                            String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
+                            LocalDateTime dateFinished = row.getCell(allColumnNames.indexOf("Date finished")).getLocalDateTimeCellValue();
+                            String itemName = row.getCell(allColumnNames.indexOf("Item name")).getStringCellValue();
+                            Long itemQuantity = (long) row.getCell(allColumnNames.indexOf("Item quantity")).getNumericCellValue();
+                            Double itemPriceInGold = row.getCell(allColumnNames.indexOf("Item price in gold")).getNumericCellValue();
+
+                            itemToGoldTransaction.setId(txId);
+                            itemToGoldTransaction.setUsername(username);
+                            Account account = new Account();
+                            account.setUsername(creatorUsername);
+                            itemToGoldTransaction.setType(TransactionType.ITEM2GOLD);
+                            itemToGoldTransaction.setCreator(account);
+                            itemToGoldTransaction.setDateFinished(dateFinished);
+                            itemToGoldTransaction.setItemName(itemName);
+                            itemToGoldTransaction.setItemQuantity(itemQuantity);
+                            itemToGoldTransaction.setItemPriceInGold(itemPriceInGold);
+
+                            transactions.add(itemToGoldTransaction);
+                        }
+                        break;
+                }
+            }
+            return transactions;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ApiException("Something went wrong when converting Excel file to Transactions", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+    @Transactional
+    public int addOrUpdate(List<Transaction> transactions, boolean overwrite) {
+        final int[] itemsAffected = {0};
+        for(Transaction tx: transactions) {
+            transactionRepository.findById(tx.getId()).ifPresentOrElse(txDb -> {
+                // if present already in db and override is true, update
+                if(overwrite) {
+                    if(txDb.getCreator().getUsername().equals(tx.getCreator().getUsername())) {
+                        throw new ApiException("You can't update transactions from other users", HttpStatus.FORBIDDEN);
+                    }
+                    updateTransaction(txDb.getId(), tx);
+                    itemsAffected[0]++;
+                }
+            }, () -> {
+                createTransaction(tx);
+                itemsAffected[0]++;
+            });
+        }
+        return itemsAffected[0];
+    }
 }

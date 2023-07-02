@@ -39,7 +39,6 @@ public class ItemToGoldTransaction extends Transaction{
         try {
             String txString = mapper.writeValueAsString(t);
             JsonNode jsonNode = mapper.readTree(txString);
-            log.info(txString);
             this.setItemName(jsonNode.get("itemName").asText());
             this.setItemQuantity(jsonNode.get("itemQuantity").asLong());
             this.setItemPriceInGold(jsonNode.get("itemPriceInGold").asDouble());
@@ -49,9 +48,10 @@ public class ItemToGoldTransaction extends Transaction{
     }
 
     public void updateItemToGold(ItemToGoldTransaction t) {
+        log.info("Updating item to gold transaction: {}", t);
         super.update(t);
-        this.setItemPriceInGold(t.getItemPriceInGold());
-        this.setItemQuantity(t.getItemQuantity());
-        this.setItemName(t.getItemName());
+        this.itemPriceInGold = t.getItemPriceInGold();
+        this.itemQuantity = t.getItemQuantity();
+        this.itemName = t.getItemName();
     }
 }

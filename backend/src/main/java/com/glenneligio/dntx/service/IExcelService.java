@@ -9,5 +9,5 @@ import java.util.Set;
 public interface IExcelService<T> {
     ByteArrayInputStream listToExcel(List<T> objects);
 
-    Set<T> excelToList(MultipartFile file);
+    List<T> excelToList(MultipartFile file);
 }
