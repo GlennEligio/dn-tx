@@ -13,6 +13,7 @@ import DeleteTransactionSuccess from './pages/DeleteTransactionSuccess';
 import Transactions from './pages/Transactions';
 import AccountDetails from './pages/AccountDetails';
 import { IRootState } from './store';
+import ExportImportTransactions from './pages/ExportImportTransactions';
 
 export function App() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -43,6 +44,10 @@ export function App() {
             />
             <Route path="/create-transaction" element={<CreateTransaction />} />
             <Route path="/account" element={<AccountDetails />} />
+            <Route
+              path="/export-and-import"
+              element={<ExportImportTransactions />}
+            />
           </>
         )}
         <Route path="*" element={<NotFound />} />

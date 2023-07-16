@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -187,7 +188,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             dataRow.createCell(allColumnNames.indexOf("Transaction id")).setCellValue(baseTx.getId());
                             dataRow.createCell(allColumnNames.indexOf("Username")).setCellValue(baseTx.getUsername());
                             dataRow.createCell(allColumnNames.indexOf("Creator Username")).setCellValue(baseTx.getCreator().getUsername());
-                            dataRow.createCell(allColumnNames.indexOf("Date finished")).setCellValue(baseTx.getDateFinished());
+                            dataRow.createCell(allColumnNames.indexOf("Date finished")).setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(baseTx.getDateFinished()));
                             dataRow.createCell(allColumnNames.indexOf("Type")).setCellValue(baseTx.getType().name());
 
                             switch (t) {
@@ -245,7 +246,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            LocalDateTime dateFinished = row.getCell(allColumnNames.indexOf("Date finished")).getLocalDateTimeCellValue();
+                            LocalDateTime dateFinished = LocalDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                             String name = row.getCell(allColumnNames.indexOf("Name")).getStringCellValue();
                             Double phpPaid = row.getCell(allColumnNames.indexOf("Php paid")).getNumericCellValue();
                             Double goldPerPhp = row.getCell(allColumnNames.indexOf("Gold per php")).getNumericCellValue();
@@ -276,7 +277,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            LocalDateTime dateFinished = row.getCell(allColumnNames.indexOf("Date finished")).getLocalDateTimeCellValue();
+                            LocalDateTime dateFinished = LocalDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                             BigDecimal ccAmount = BigDecimal.valueOf(row.getCell(allColumnNames.indexOf("CC Amount")).getNumericCellValue());
                             Double goldPerCc = row.getCell(allColumnNames.indexOf("Gold per CC")).getNumericCellValue();
                             Double goldPaid = row.getCell(allColumnNames.indexOf("Gold paid")).getNumericCellValue();
@@ -304,7 +305,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            LocalDateTime dateFinished = row.getCell(allColumnNames.indexOf("Date finished")).getLocalDateTimeCellValue();
+                            LocalDateTime dateFinished = LocalDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                             String itemName = row.getCell(allColumnNames.indexOf("Item name")).getStringCellValue();
                             Long itemQuantity = (long) row.getCell(allColumnNames.indexOf("Item quantity")).getNumericCellValue();
                             Double itemPriceInGold = row.getCell(allColumnNames.indexOf("Item price in gold")).getNumericCellValue();
@@ -339,7 +340,7 @@ public class TransactionService implements IExcelService<Transaction> {
             transactionRepository.findById(tx.getId()).ifPresentOrElse(txDb -> {
                 // if present already in db and override is true, update
                 if(overwrite) {
-                    if(txDb.getCreator().getUsername().equals(tx.getCreator().getUsername())) {
+                    if(!txDb.getCreator().getUsername().equals(tx.getCreator().getUsername())) {
                         throw new ApiException("You can't update transactions from other users", HttpStatus.FORBIDDEN);
                     }
                     updateTransaction(txDb.getId(), tx);

@@ -26,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -139,10 +140,9 @@ public class AccountController {
                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beforeDate,
                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime afterDate,
                                             Authentication authentication) throws IOException {
-
+        final String methodName = "downloadAccountTransactions";
         log.info("Preparing Transactions list for Download");
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=transactions.xlsx");
+        log.info("Entering method {}, with inputs: beforeDate {}, afterDate {}", methodName, beforeDate, afterDate);
 
         // get username from the Authentication from SecurityContext
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -153,6 +153,10 @@ public class AccountController {
         LocalDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : LocalDateTime.MAX.withYear(9999);
         List<Transaction> transactions = transactionService.getTransactionByCreatorUsernameAndDateBetween(username, afterDatePlaceHolder, beforeDatePlaceHolder);
         log.info("Transaction count: {}", transactions.size());
+
+        response.setContentType("application/octet-stream");
+
+        response.setHeader("Content-Disposition", "attachment; filename=transactions.xlsx");
 
         ByteArrayInputStream stream = transactionService.listToExcel(transactions);
         IOUtils.copy(stream, response.getOutputStream());

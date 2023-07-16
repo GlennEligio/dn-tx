@@ -145,6 +145,31 @@ const deleteAccountOwnTransaction = (
   };
 };
 
+const uploadTransaction = async (accessToken: string, formData: FormData) => {
+  return fetch(
+    `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self/transactions/upload`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: formData,
+    }
+  );
+};
+
+const downloadTransaction = async (accessToken: string, params: string) => {
+  return fetch(
+    `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/@self/transactions/download${params}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+};
+
 export default {
   createAccountOwnTransactions,
   getAccountOwnTransactions,
@@ -152,4 +177,6 @@ export default {
   deleteAccountOwnTransaction,
   getTransactionByUsernameAndId,
   getTransactionById,
+  downloadTransaction,
+  uploadTransaction,
 };

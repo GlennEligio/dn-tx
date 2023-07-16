@@ -80,6 +80,15 @@ function Home() {
                       Logout
                     </Button>
                   </div>
+                  <div>
+                    <Button
+                      variant="outline-dark"
+                      onClick={() => navigate('/export-and-import')}
+                      className="w-100"
+                    >
+                      Export and Import
+                    </Button>
+                  </div>
                 </Stack>
               </div>
             )}

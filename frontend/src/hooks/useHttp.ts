@@ -34,9 +34,11 @@ interface ExceptionResponse {
   details: string;
 }
 
-function isExceptionResponse(object: any): object is ExceptionResponse {
+export const isExceptionResponse = (
+  object: any
+): object is ExceptionResponse => {
   return 'errors' in object && 'timestamp' in object && 'details' in object;
-}
+};
 
 export interface RequestConfig {
   body?: { [props: string]: any };

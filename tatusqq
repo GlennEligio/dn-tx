@@ -1,0 +1,171 @@
+[33mcommit 35da1c9d2499fb78feac1f7bb374d287817e436d[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/extract-transaction-history[m[33m, [m[1;31morigin/feature/extract-transaction-history[m[33m)[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Jul 2 16:56:32 2023 +0800
+
+    feat(DNTX-002): Added upload transaction feature in BE
+
+[33mcommit b5674355df0b92676110f14021940aafe66acec7[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Jun 25 22:09:24 2023 +0800
+
+    feat(DNTX-002): Added download transaction feature in BE
+
+[33mcommit 5249fcaa7ab115585bd448a04707dda055355cff[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/feature/ITEM2GOLD_TX[m[33m, [m[1;32mmaster[m[33m, [m[1;32mfeature/ITEM2GOLD_TX[m[33m)[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Jun 18 22:41:50 2023 +0800
+
+    feat(DNTX-001): Added missed changes as well from backend
+
+[33mcommit 3f3b36fcefd96f7d7072468cc3809364d94a4471[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Jun 18 20:11:40 2023 +0800
+
+    feat(DNTX-001): Added option to add Item to Gold Transactions
+
+[33mcommit ca18168d8d672e25b60653d3259fc8bb668db7dc[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Jun 11 17:08:57 2023 +0800
+
+    Configured the dntx app to be deployable in K8s cluster
+    
+    Created Dockerfile for frontend, and configured pom.xml of backend
+
+[33mcommit 044b26e45de359098ebe7a0d71aa31875d81fa3e[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Apr 30 20:21:14 2023 +0800
+
+    Modified useHttp hook's ExceptionResponse and RequestStatusMessage UI to match the error response of backend
+    
+    Also modified Container
+
+[33mcommit d4b2796845adc7492b7df86243969e6730105bb8[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sat Apr 8 22:27:59 2023 +0800
+
+    Removed useInput.ts and validations.ts
+    
+    Unused, irrelevant
+
+[33mcommit 3aba0918812d9b009c03fe8791455735691ca866[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sat Apr 8 22:26:23 2023 +0800
+
+    Added Form and Input validations using Formik and Yup modules
+
+[33mcommit df7e2a69c6b78f229b434dc44cdea666c415e839[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Fri Apr 7 12:21:55 2023 +0800
+
+    Added RequestStatusMessage component for Form submission prompt in FOrms
+
+[33mcommit 1222c86edda6033de1b538c36b20e7bf1a39d256[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Thu Apr 6 13:40:21 2023 +0800
+
+    Added style in Edit Transaction page and Delete transaction page
+
+[33mcommit c5aff8c479da049baa1984e4dcd2f8407056adac[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Wed Apr 5 22:11:04 2023 +0800
+
+    Added style in TransactionDetails page
+
+[33mcommit 26b1a67b1a084400028caad6c3bd6ecfcf4a7a45[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Apr 2 21:53:12 2023 +0800
+
+    Change Col size to 8 at xs breakpoint
+
+[33mcommit c0f3186b16b9ca4bddd05e0a34b0d23606877a1c[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Apr 2 21:52:39 2023 +0800
+
+    Modified pageNumber in backend api endpoint to take index 1
+
+[33mcommit be75e77f22b8894a11a8d8288067e8bc1b307987[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Apr 2 21:12:11 2023 +0800
+
+    Added design in the Transactions page and also pagination feature
+
+[33mcommit 6fae190c82ee9f63e9936387b3fda72962f3fba9[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Thu Mar 30 22:55:14 2023 +0800
+
+    Add style in Register and Not found page
+
+[33mcommit 3381209887c95fbaf047cddd2a54823c5d0ca80c[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Mon Mar 27 21:53:36 2023 +0800
+
+    Added style in Search and Login pages
+
+[33mcommit 5b9f2abeb46f1d687cc90cdbfe24eee545daeabb[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Mon Mar 27 17:27:44 2023 +0800
+
+    Started applying bootstrap in FRE
+
+[33mcommit 0afda2394c6625a20024b827561c92838b403b4e[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Mon Mar 27 16:21:19 2023 +0800
+
+    Modified UpdateAccountDto in backend
+
+[33mcommit 14a3de8866b0666d67a6292d9a1479a49c259024[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Mon Mar 27 16:18:52 2023 +0800
+
+    Added functionality to see account details and update it
+
+[33mcommit 7356b14d23cf6a6e73c389b522729a6c674f46c4[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Mon Mar 27 11:05:27 2023 +0800
+
+    Added Delete transaction functionality
+
+[33mcommit d9c5bfb672e48852769acfb08cccff6e1ee8d1af[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Mar 26 15:32:09 2023 +0800
+
+    Added Edit transaction funactionality in FRE
+
+[33mcommit 2c8f17a91cb454c6a929c4d2af836db489fa72bc[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sat Mar 25 21:57:44 2023 +0800
+
+    Added several pages in frontend for adding and display transaction
+
+[33mcommit b38d985bf7cecc18972264702f1f1b0da133b1fc[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Thu Mar 23 21:56:38 2023 +0800
+
+    Added some functionality for Search transaction page
+    
+    Also refactored useHttp hook and initialize redux setup
+
+[33mcommit d66dfc013aea60f2a5fca94b5fbc45918bbc20b6[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Wed Mar 22 22:12:18 2023 +0800
+
+    Added login functionality in the frontend
+
+[33mcommit b5f226800d0f4450f8fbea5a97725616abf3a21e[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Mon Mar 20 13:23:36 2023 +0800
+
+    Added validation checks in the Service and Controller layer
+
+[33mcommit 10b8e3c2fda061bb7df188adbb91775c3332645a[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sun Mar 19 18:07:00 2023 +0800
+
+    Added extra endpoints for own Account actions
+    
+    Added Route guard in the SecurityConfiguration class
+
+[33mcommit f72da84d8a5ddcdb20e5df2939be5dd5847332dc[m
+Author: John Glenn Eligio <glenneligio@gmail.com>
+Date:   Sat Mar 18 21:57:42 2023 +0800
+
+    Initial commit

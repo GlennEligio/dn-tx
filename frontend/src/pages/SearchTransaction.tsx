@@ -1,4 +1,3 @@
-import { FormEventHandler, useEffect, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Formik, FormikHelpers } from 'formik';
@@ -17,9 +16,6 @@ const searchTxFormInputSchema = yup.object().shape({
 });
 
 function SearchTransaction() {
-  const [username, setUsername] = useState('');
-  const [id, setId] = useState('');
-
   const searchTxFormInitialValues: SearchTxInput = {
     username: '',
     id: '',
@@ -31,16 +27,6 @@ function SearchTransaction() {
     sendRequest: transactionRequest,
     status: transactionStatus,
   } = useHttp<Transaction>(false);
-
-  useEffect(() => {
-    if (
-      transactionData !== null &&
-      transactionError === null &&
-      transactionStatus === 'completed'
-    ) {
-      console.log(transactionData);
-    }
-  }, [transactionData, transactionError, transactionStatus]);
 
   const searchTxSubmitHandler = (
     values: SearchTxInput,
