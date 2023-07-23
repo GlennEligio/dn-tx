@@ -25,3 +25,8 @@ GOLD to CC via CODE
  > files associated
 	> filename
 	> url, might be google drive
+	
+	
+Okteto
+1. error: You must be logged in to the server (the server has asked for the client to provide credentials)
+	> update the context configuration using the command "okteto namespace"
