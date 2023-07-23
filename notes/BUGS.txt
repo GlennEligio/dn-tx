@@ -1,0 +1,9 @@
+Bugs
+1. bugfix/InvocationTargetException-in-download-transaction-history
+	> InvocationTargetException is thrown when calling endpoint for downloading/exporting Transaction history
+	> caused by TransactionService.java (line 235)
+		- sheet.autoSizeColumn(i+1);
+	> caused by missing fonts in the environment the Spring Boot app is being hosted
+		- typical issue in downsized OS environment where in DNTX is deployed
+		- since right now, the DNTX backend is deployed in Docker, where the fonts Apache POI is looking for is missing
+		- this is also the reason why I can not replicate the issue in the local dev env, since the fonts are present in my machine

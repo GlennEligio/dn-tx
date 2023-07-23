@@ -157,8 +157,9 @@ public class TransactionService implements IExcelService<Transaction> {
     @Override
     public ByteArrayInputStream listToExcel(List<Transaction> transactions) {
         try (Workbook workbook = new XSSFWorkbook()) {
-
+            log.info("Iterating to each TransactionType");
             for (TransactionType t : txTypes) {
+                log.info("Creating sheet for transaction type {}", t.name());
                 Sheet sheet = workbook.createSheet(t.name());
                 List<Transaction> txList = transactions.stream().filter(tx -> tx.getType().name().equals(t.name())).toList();
                 List<String> allColumnNames = new ArrayList<>(baseTxColumnNames);
@@ -181,8 +182,9 @@ public class TransactionService implements IExcelService<Transaction> {
                                 }
                             }
 
-                            log.info("Transaction to process: {}", txList.get(idx));
+                            log.info("Transaction to process for type {}: {}", t.name() ,txList.get(idx));
 
+                            log.info("Added basic transaction info into the Row");
                             Row dataRow = sheet.createRow(idx + 1);
                             Transaction baseTx = txList.get(idx);
                             dataRow.createCell(allColumnNames.indexOf("Transaction id")).setCellValue(baseTx.getId());
@@ -192,6 +194,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             dataRow.createCell(allColumnNames.indexOf("Type")).setCellValue(baseTx.getType().name());
 
                             // insert file attachments
+                            log.info("Adding file attachment info into the Row");
                             int startColumn = allColumnNames.size();
                             if(baseTx.getFileAttachments() != null && !baseTx.getFileAttachments().isEmpty()) {
                                 for(FileAttachment f: baseTx.getFileAttachments()) {
@@ -201,7 +204,8 @@ public class TransactionService implements IExcelService<Transaction> {
                                 }
                             }
 
-                            
+                            // based on the type, we will add different data
+                            log.info("Adding transaction type specific data into the Row");
                             switch (t) {
                                 case CC2GOLD:
                                     CcToGoldTransaction ccToGoldTxPlaceHolder = (CcToGoldTransaction) (txList.get(idx));
@@ -226,12 +230,15 @@ public class TransactionService implements IExcelService<Transaction> {
 
                         });
 
-                // Making size of the column auto resize to fit data
-                for (int i = 0; i < allColumnNames.size(); i++) {
-                    sheet.autoSizeColumn(i);
-                }
+//                 Making size of the column auto resize to fit data
+//                 log.info("Auto resizing the columns");
+//                 for (int i = 0; i < allColumnNames.size(); i++) {
+//                    sheet.autoSizeColumn(i+1);
+//                 }
             }
 
+            // Returning the byte array input stream from the Workbook
+            log.info("Writing contents of Workbook into OutputStream and passing it in InputStream");
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             return new ByteArrayInputStream(outputStream.toByteArray());
