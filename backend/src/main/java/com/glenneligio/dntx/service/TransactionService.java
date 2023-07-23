@@ -157,7 +157,9 @@ public class TransactionService implements IExcelService<Transaction> {
     @Override
     public ByteArrayInputStream listToExcel(List<Transaction> transactions) {
         try (Workbook workbook = new XSSFWorkbook()) {
+            log.info("Iterating to each TransactionType");
             for (TransactionType t : txTypes) {
+                log.info("Creating sheet for transaction type {}", t.name());
                 Sheet sheet = workbook.createSheet(t.name());
                 List<Transaction> txList = transactions.stream().filter(tx -> tx.getType().name().equals(t.name())).toList();
                 List<String> allColumnNames = new ArrayList<>(baseTxColumnNames);
