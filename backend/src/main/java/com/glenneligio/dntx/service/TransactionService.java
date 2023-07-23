@@ -191,6 +191,17 @@ public class TransactionService implements IExcelService<Transaction> {
                             dataRow.createCell(allColumnNames.indexOf("Date finished")).setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(baseTx.getDateFinished()));
                             dataRow.createCell(allColumnNames.indexOf("Type")).setCellValue(baseTx.getType().name());
 
+                            // insert file attachments
+                            int startColumn = allColumnNames.size();
+                            if(baseTx.getFileAttachments() != null && !baseTx.getFileAttachments().isEmpty()) {
+                                for(FileAttachment f: baseTx.getFileAttachments()) {
+                                    dataRow.createCell(startColumn).setCellValue(f.getFileName());
+                                    dataRow.createCell(startColumn + 1).setCellValue(f.getFileUrl());
+                                    startColumn = startColumn +2;
+                                }
+                            }
+
+                            
                             switch (t) {
                                 case CC2GOLD:
                                     CcToGoldTransaction ccToGoldTxPlaceHolder = (CcToGoldTransaction) (txList.get(idx));
@@ -212,6 +223,7 @@ public class TransactionService implements IExcelService<Transaction> {
                                     dataRow.createCell(allColumnNames.indexOf("Item price in gold")).setCellValue(itemToGoldTransaction.getItemPriceInGold());
                                     break;
                             }
+
                         });
 
                 // Making size of the column auto resize to fit data
@@ -252,6 +264,19 @@ public class TransactionService implements IExcelService<Transaction> {
                             Double goldPerPhp = row.getCell(allColumnNames.indexOf("Gold per php")).getNumericCellValue();
                             String methodOfPayment = row.getCell(allColumnNames.indexOf("Method of payment")).getStringCellValue();
 
+                            // Check if there are existing columns with value for file attachments
+                            int fileAttColCellStart = allColumnNames.size();
+                            int lastAttColCellEnd = row.getLastCellNum();
+                            List<FileAttachment> fileAttachments = new ArrayList<>();
+                            for(int j = fileAttColCellStart; j < lastAttColCellEnd; j = j+2) {
+                                String fileName = row.getCell(j).getStringCellValue();
+                                String fileUrl = row.getCell(j+1).getStringCellValue();
+                                FileAttachment fileAttachment = new FileAttachment();
+                                fileAttachment.setFileName(fileName);
+                                fileAttachment.setFileUrl(fileUrl);
+                                fileAttachments.add(fileAttachment);
+                            }
+
                             goldToPhpTransaction.setId(txId);
                             Account account = new Account();
                             account.setUsername(creatorUsername);
@@ -263,7 +288,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             goldToPhpTransaction.setPhpPaid(phpPaid);
                             goldToPhpTransaction.setGoldPerPhp(goldPerPhp);
                             goldToPhpTransaction.setMethodOfPayment(methodOfPayment);
-
+                            goldToPhpTransaction.setFileAttachments(fileAttachments);
                             transactions.add(goldToPhpTransaction);
                         }
                         break;
@@ -282,6 +307,19 @@ public class TransactionService implements IExcelService<Transaction> {
                             Double goldPerCc = row.getCell(allColumnNames.indexOf("Gold per CC")).getNumericCellValue();
                             Double goldPaid = row.getCell(allColumnNames.indexOf("Gold paid")).getNumericCellValue();
 
+                            // Check if there are existing columns with value for file attachments
+                            int fileAttColCellStart = allColumnNames.size() + 1;
+                            int lastAttColCellEnd = row.getLastCellNum();
+                            List<FileAttachment> fileAttachments = new ArrayList<>();
+                            for(int j = fileAttColCellStart; j < lastAttColCellEnd; j = j+2) {
+                                String fileName = row.getCell(j).getStringCellValue();
+                                String fileUrl = row.getCell(j+1).getStringCellValue();
+                                FileAttachment fileAttachment = new FileAttachment();
+                                fileAttachment.setFileName(fileName);
+                                fileAttachment.setFileUrl(fileUrl);
+                                fileAttachments.add(fileAttachment);
+                            }
+
                             ccToGoldTransaction.setId(txId);
                             ccToGoldTransaction.setUsername(username);
                             Account account = new Account();
@@ -292,6 +330,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             ccToGoldTransaction.setCcAmount(ccAmount);
                             ccToGoldTransaction.setGoldPaid(goldPaid);
                             ccToGoldTransaction.setGoldPerCC(goldPerCc);
+                            ccToGoldTransaction.setFileAttachments(fileAttachments);
                             transactions.add(ccToGoldTransaction);
                         }
                         break;
@@ -310,6 +349,19 @@ public class TransactionService implements IExcelService<Transaction> {
                             Long itemQuantity = (long) row.getCell(allColumnNames.indexOf("Item quantity")).getNumericCellValue();
                             Double itemPriceInGold = row.getCell(allColumnNames.indexOf("Item price in gold")).getNumericCellValue();
 
+                            // Check if there are existing columns with value for file attachments
+                            int fileAttColCellStart = allColumnNames.size() + 1;
+                            int lastAttColCellEnd = row.getLastCellNum();
+                            List<FileAttachment> fileAttachments = new ArrayList<>();
+                            for(int j = fileAttColCellStart; j < lastAttColCellEnd; j = j+2) {
+                                String fileName = row.getCell(j).getStringCellValue();
+                                String fileUrl = row.getCell(j+1).getStringCellValue();
+                                FileAttachment fileAttachment = new FileAttachment();
+                                fileAttachment.setFileName(fileName);
+                                fileAttachment.setFileUrl(fileUrl);
+                                fileAttachments.add(fileAttachment);
+                            }
+
                             itemToGoldTransaction.setId(txId);
                             itemToGoldTransaction.setUsername(username);
                             Account account = new Account();
@@ -320,6 +372,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             itemToGoldTransaction.setItemName(itemName);
                             itemToGoldTransaction.setItemQuantity(itemQuantity);
                             itemToGoldTransaction.setItemPriceInGold(itemPriceInGold);
+                            itemToGoldTransaction.setFileAttachments(fileAttachments);
 
                             transactions.add(itemToGoldTransaction);
                         }
