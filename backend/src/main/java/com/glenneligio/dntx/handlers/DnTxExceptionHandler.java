@@ -34,6 +34,8 @@ public class DnTxExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now(),
                 request.getDescription(false));
         ex.printStackTrace();
+        // added for more exception info
+        ex.getCause();
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -45,6 +47,8 @@ public class DnTxExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now(),
                 request.getDescription(false));
         ex.printStackTrace();
+        // added for more exception info
+        ex.getCause();
         return new ResponseEntity<>(response, apiException.getStatus());
     }
 
@@ -62,6 +66,8 @@ public class DnTxExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now(),
                 request.getDescription(false));
         ex.printStackTrace();
+        // added for more exception info
+        ex.getCause();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 

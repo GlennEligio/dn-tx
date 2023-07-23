@@ -154,11 +154,16 @@ public class AccountController {
         List<Transaction> transactions = transactionService.getTransactionByCreatorUsernameAndDateBetween(username, afterDatePlaceHolder, beforeDatePlaceHolder);
         log.info("Transaction count: {}", transactions.size());
 
+        // setting response headers for download
+        log.info("Setting response headers for download excel");
         response.setContentType("application/octet-stream");
-
         response.setHeader("Content-Disposition", "attachment; filename=transactions.xlsx");
 
+        // fetching InputStream to be added in Response
+        log.info("Creating ByteArrayInputStream to be copied in Response OutputStream");
         ByteArrayInputStream stream = transactionService.listToExcel(transactions);
+        // copying the InputStream to response outputStream
+        log.info("Copying the InputStream to Response OutputStream");
         IOUtils.copy(stream, response.getOutputStream());
     }
 
