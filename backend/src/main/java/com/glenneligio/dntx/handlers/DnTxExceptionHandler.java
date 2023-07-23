@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,22 @@ public class DnTxExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now(),
                 request.getDescription(false));
         ex.printStackTrace();
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Invocation Target Exception handler
+    // bugfix/DNTX-003
+    @ExceptionHandler(value = InvocationTargetException.class)
+    public ResponseEntity<ExceptionResponse> handleInvocationTargetException (InvocationTargetException ex, WebRequest request){
+        ExceptionResponse response = new ExceptionResponse(List.of(ex.getMessage()),
+                LocalDateTime.now(),
+                request.getDescription(false));
+        log.info("Logging stack trace");
+        ex.printStackTrace();
         // added for more exception info
-        ex.getCause();
+        log.info("Logging additional exception info");
+        log.info("Target exception {}", ex.getTargetException());
+        ex.getTargetException().printStackTrace();
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
