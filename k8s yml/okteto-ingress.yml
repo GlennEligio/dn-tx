@@ -4,7 +4,7 @@ metadata:
   annotations:
     dev.okteto.com/generate-host: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://eze-glenneligio.cloud.okteto.net"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://dntx-glenneligio.cloud.okteto.net"
   name: eze
 spec:
   rules:
