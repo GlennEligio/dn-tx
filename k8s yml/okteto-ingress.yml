@@ -5,7 +5,7 @@ metadata:
     dev.okteto.com/generate-host: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://dntx-glenneligio.cloud.okteto.net"
-  name: eze
+  name: dntx
 spec:
   rules:
     - http:
