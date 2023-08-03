@@ -1,3 +1,4 @@
 0.0.1 - Initial Version
 0.0.2 - Import/Export of Transaction history is added
 0.0.2.1 - Fixed issue related to export transaction history not being properly exported
+0.0.2.2 - Fixed issue related to import transaction excel file

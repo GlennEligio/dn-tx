@@ -250,6 +250,8 @@ public class TransactionService implements IExcelService<Transaction> {
 
     @Override
     public List<Transaction> excelToList(MultipartFile file) {
+        final String methodName = "excelToList";
+        log.info("Entering method {}", methodName);
         List<Transaction> transactions = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             for(TransactionType t: txTypes) {
@@ -273,10 +275,11 @@ public class TransactionService implements IExcelService<Transaction> {
                             String methodOfPayment = row.getCell(allColumnNames.indexOf("Method of payment")).getStringCellValue();
 
                             // Check if there are existing columns with value for file attachments
-                            int fileAttColCellStart = allColumnNames.size();
-                            int lastAttColCellEnd = row.getLastCellNum();
+                            int fileAttColCellStart = allColumnNames.size(); // 0th indexed
+                            int lastAttColCellEnd = row.getLastCellNum() -1; // 1st indexed
                             List<FileAttachment> fileAttachments = new ArrayList<>();
                             for(int j = fileAttColCellStart; j < lastAttColCellEnd; j = j+2) {
+                                // row.getCell(0) is the first column
                                 String fileName = row.getCell(j).getStringCellValue();
                                 String fileUrl = row.getCell(j+1).getStringCellValue();
                                 FileAttachment fileAttachment = new FileAttachment();
@@ -316,10 +319,11 @@ public class TransactionService implements IExcelService<Transaction> {
                             Double goldPaid = row.getCell(allColumnNames.indexOf("Gold paid")).getNumericCellValue();
 
                             // Check if there are existing columns with value for file attachments
-                            int fileAttColCellStart = allColumnNames.size() + 1;
-                            int lastAttColCellEnd = row.getLastCellNum();
+                            int fileAttColCellStart = allColumnNames.size(); // 0th indexed
+                            int lastAttColCellEnd = row.getLastCellNum() -1; // 1st indexed
                             List<FileAttachment> fileAttachments = new ArrayList<>();
                             for(int j = fileAttColCellStart; j < lastAttColCellEnd; j = j+2) {
+                                // row.getCell(0) is the first column
                                 String fileName = row.getCell(j).getStringCellValue();
                                 String fileUrl = row.getCell(j+1).getStringCellValue();
                                 FileAttachment fileAttachment = new FileAttachment();
@@ -358,10 +362,11 @@ public class TransactionService implements IExcelService<Transaction> {
                             Double itemPriceInGold = row.getCell(allColumnNames.indexOf("Item price in gold")).getNumericCellValue();
 
                             // Check if there are existing columns with value for file attachments
-                            int fileAttColCellStart = allColumnNames.size() + 1;
-                            int lastAttColCellEnd = row.getLastCellNum();
+                            int fileAttColCellStart = allColumnNames.size(); // 0th indexed
+                            int lastAttColCellEnd = row.getLastCellNum() -1; // 1st indexed
                             List<FileAttachment> fileAttachments = new ArrayList<>();
                             for(int j = fileAttColCellStart; j < lastAttColCellEnd; j = j+2) {
+                                // row.getCell(0) is the first column
                                 String fileName = row.getCell(j).getStringCellValue();
                                 String fileUrl = row.getCell(j+1).getStringCellValue();
                                 FileAttachment fileAttachment = new FileAttachment();

@@ -7,3 +7,6 @@ Bugs
 		- typical issue in downsized OS environment where in DNTX is deployed
 		- since right now, the DNTX backend is deployed in Docker, where the fonts Apache POI is looking for is missing
 		- this is also the reason why I can not replicate the issue in the local dev env, since the fonts are present in my machine
+		
+2. hotfix(DNTX-004)
+	> incorrect logic to determine the start and end column for file attachments
