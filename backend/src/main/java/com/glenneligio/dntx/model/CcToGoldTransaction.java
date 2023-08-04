@@ -32,6 +32,7 @@ public class CcToGoldTransaction extends Transaction{
 
     public CcToGoldTransaction(Transaction t)  {
         log.info("Updating cc to gold transaction: {}", t);
+        this.setId(t.getId());
         this.setUsername(t.getUsername());
         this.setCreator(t.getCreator());
         this.setDateFinished(t.getDateFinished());

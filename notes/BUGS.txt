@@ -10,3 +10,6 @@ Bugs
 		
 2. hotfix(DNTX-004)
 	> incorrect logic to determine the start and end column for file attachments
+	
+3. hotfix/uploading-existing-transaction-results-in-different-transaction-id
+	> in the constructors of Transaction's child classes, we need to add logic to assign id of child class to the Transaction parameter

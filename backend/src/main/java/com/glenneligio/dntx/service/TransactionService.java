@@ -51,7 +51,7 @@ public class TransactionService implements IExcelService<Transaction> {
         log.info("Creating transaction {}", transaction);
         Account account = accountService.getAccountByUsername(transaction.getCreator().getUsername());
         transaction.setCreator(account);
-        transaction.setDateFinished(LocalDateTime.now());
+        transaction.setDateFinished(transaction.getDateFinished() != null ? transaction.getDateFinished() : LocalDateTime.now());
 
         switch (transaction.getType()) {
             case GOLD2PHP:
@@ -403,8 +403,11 @@ public class TransactionService implements IExcelService<Transaction> {
     public int addOrUpdate(List<Transaction> transactions, boolean overwrite) {
         final int[] itemsAffected = {0};
         for(Transaction tx: transactions) {
+            log.info("Transaction to add or update: {}", tx);
+            log.info("Tx id: {}", tx.getId());
             transactionRepository.findById(tx.getId()).ifPresentOrElse(txDb -> {
                 // if present already in db and override is true, update
+                log.info("Updating the transaction from database");
                 if(overwrite) {
                     if(!txDb.getCreator().getUsername().equals(tx.getCreator().getUsername())) {
                         throw new ApiException("You can't update transactions from other users", HttpStatus.FORBIDDEN);
@@ -413,6 +416,7 @@ public class TransactionService implements IExcelService<Transaction> {
                     itemsAffected[0]++;
                 }
             }, () -> {
+                log.info("Adding the transaction to the database");
                 createTransaction(tx);
                 itemsAffected[0]++;
             });

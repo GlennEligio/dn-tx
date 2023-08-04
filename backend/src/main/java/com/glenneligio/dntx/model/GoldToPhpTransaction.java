@@ -37,6 +37,7 @@ public class GoldToPhpTransaction extends Transaction {
     private String methodOfPayment;
 
     public GoldToPhpTransaction(Transaction t)  {
+        this.setId(t.getId());
         this.setUsername(t.getUsername());
         this.setCreator(t.getCreator());
         this.setDateFinished(t.getDateFinished());

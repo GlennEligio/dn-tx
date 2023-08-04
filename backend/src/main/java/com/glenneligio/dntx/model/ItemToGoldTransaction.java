@@ -28,6 +28,7 @@ public class ItemToGoldTransaction extends Transaction{
     private Double itemPriceInGold;
 
     public ItemToGoldTransaction(Transaction t)  {
+        this.setId(t.getId());
         this.setUsername(t.getUsername());
         this.setCreator(t.getCreator());
         this.setDateFinished(t.getDateFinished());
