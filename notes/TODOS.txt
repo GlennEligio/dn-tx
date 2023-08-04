@@ -1,0 +1,2 @@
+DNTX-005: Make the delete Transaction seemless
+ > as of now, the user needs to close the modal, then go back to the Transaction list to see the effect
