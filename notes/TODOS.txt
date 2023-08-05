@@ -1,2 +1,14 @@
 DNTX-005: Make the delete Transaction seemless
  > as of now, the user needs to close the modal, then go back to the Transaction list to see the effect
+ 
+DNTX-006: Use OAuth for Gdrive
+ > as of now, if user uses the gdrive as cloud storage for files, they need to create a link that is accessible to everyone and add it in the log
+ > this creates security issue with regards to gdrive files
+ > to solve this, we will need to use OAuth to authorize DNTX to access Gdrive of the user
+ 
+DNTX-007: Forgot password using email
+ > user must be able to reset their password using their email
+ > dntx will send an email with link
+ 
+DNTX-008: Add "Re-enter password" field in Register form
+ > this is to ensure that user entered the correct password 
