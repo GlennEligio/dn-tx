@@ -12,3 +12,7 @@ DNTX-007: Forgot password using email
  
 DNTX-008: Add "Re-enter password" field in Register form
  > this is to ensure that user entered the correct password 
+ 
+DNTX-009: Add filter option in the Transaction history page
+
+DNTX-010: Add date information in the excel filename of the 
