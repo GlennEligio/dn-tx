@@ -10,7 +10,7 @@ DNTX-007: Forgot password using email
  > user must be able to reset their password using their email
  > dntx will send an email with link
  
-DNTX-008: Add "Re-enter password" field in Register form
+(DONE) DNTX-008: Add "Re-enter password" field in Register form
  > this is to ensure that user entered the correct password 
  
 DNTX-009: Add filter option in the Transaction history page
