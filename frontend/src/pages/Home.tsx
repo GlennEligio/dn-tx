@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Col, Container, Image, Row, Button, Stack } from 'react-bootstrap';
+import { Col, Container, Row, Button, Stack } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IRootState } from '../store';
 import { authActions } from '../store/authSlice';
+import DnTxLogo from '../components/UI/DnTxLogo';
 
 function Home() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -28,7 +29,7 @@ function Home() {
         <Col />
         <Col xs={10} md={8} lg={6} xl={4}>
           <div>
-            <Image fluid src="/dn-tx-logo.png" alt="DN-TX Logo" />
+            <DnTxLogo />
             {loggedIn && (
               <div className="d-flex flex-column">
                 <Stack gap={3}>

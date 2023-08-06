@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Button, Col, Container, Form, Image, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
@@ -11,6 +11,7 @@ import AccountApi, {
 import useHttp from '../hooks/useHttp';
 import { authActions } from '../store/authSlice';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
+import DnTxLogo from '../components/UI/DnTxLogo';
 
 interface LoginInputFormSchema {
   username: string;
@@ -78,7 +79,7 @@ function Login() {
         <Col />
         <Col xs={10} md={8} lg={6} xl={4} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
-            <Image src="/dn-tx-logo.png" alt="DN-TX logo" fluid />
+            <DnTxLogo />
             <div>
               <h3 className="text-center">Login</h3>
             </div>

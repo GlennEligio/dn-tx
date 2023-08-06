@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Col, Container, Row, Image, Form, Button } from 'react-bootstrap';
+import { Col, Container, Row, Form, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, FormikHelpers } from 'formik';
@@ -11,6 +11,11 @@ import accountApi, {
 import useHttp from '../hooks/useHttp';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 import { authActions } from '../store/authSlice';
+import DnTxLogo from '../components/UI/DnTxLogo';
+
+const getCharacterValidationError = (str: string) => {
+  return `Your password must have at least 1 ${str} character`;
+};
 
 function Register() {
   const dispatch = useDispatch();
@@ -19,6 +24,7 @@ function Register() {
   interface RegisterFormInput {
     username: string;
     password: string;
+    repassword: string;
     email: string;
     fullName: string;
   }
@@ -28,11 +34,23 @@ function Register() {
     password: '',
     email: '',
     fullName: '',
+    repassword: '',
   };
 
   const registerFormInputSchema = yup.object().shape({
     username: yup.string().required('Username is required'),
-    password: yup.string().required('Password is required'),
+    password: yup
+      .string()
+      .required('Password is required')
+      .min(8, 'Password must have at least 8 characters') // check minimum characters
+      // different error messages for different requirements
+      .matches(/[0-9]/, getCharacterValidationError('digit'))
+      .matches(/[a-z]/, getCharacterValidationError('lowercase'))
+      .matches(/[A-Z]/, getCharacterValidationError('uppercase')),
+    repassword: yup
+      .string()
+      .required('Please re-type the password')
+      .oneOf([yup.ref('password')], 'Password does not match'),
     email: yup
       .string()
       .email('Email must be valid')
@@ -89,7 +107,7 @@ function Register() {
         <Col />
         <Col xs={10} md={8} lg={6} xl={4} className="vh-100">
           <div className="d-flex flex-column h-100 py-5">
-            <Image src="/dn-tx-logo.png" alt="DN-TX logo" fluid />
+            <DnTxLogo />
             <div>
               <h3 className="text-center">Register</h3>
             </div>
@@ -144,6 +162,25 @@ function Register() {
                     />
                     <Form.Control.Feedback type="invalid">
                       {errors.password}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group
+                    className="mb-3"
+                    controlId="registerFormRePassword"
+                  >
+                    <Form.Label>Re-enter Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Re-enter password"
+                      name="repassword"
+                      value={values.repassword}
+                      isValid={touched.repassword && !errors.repassword}
+                      isInvalid={!!errors.repassword}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.repassword}
                     </Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group className="mb-3" controlId="registerFormFullName">
