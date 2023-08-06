@@ -109,8 +109,7 @@ function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
   const sendRequest = useCallback(async (requestConfig: RequestConfig) => {
     dispatch({ type: RequestActionKind.SEND });
     try {
-      // const responseData = await requestFunction(requestConfig);
-      const responseObj: T | ExceptionResponse = await fetch(
+      const responseObj: T | boolean | ExceptionResponse = await fetch(
         requestConfig.relativeUrl || '',
         {
           method: requestConfig.method || 'GET',
@@ -122,11 +121,7 @@ function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
         }
       ).then((response) => {
         if (response.ok) {
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.indexOf('application/json') !== -1) {
-            return response.json();
-          }
-          return true;
+          return response.json();
         }
         if (response.status >= 400 && response.status < 500) {
           return response.json() as Promise<ExceptionResponse>;

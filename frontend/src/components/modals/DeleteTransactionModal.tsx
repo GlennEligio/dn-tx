@@ -32,7 +32,6 @@ function DeleteTransactionModal({
   // Checks the result of delete transaction request
   useEffect(() => {
     if (deleteTxError === null && deleteTxStatus === 'completed') {
-      console.log('Transaction deleted');
       navigate(redirectUrl);
     }
   }, [deleteTxError, deleteTxStatus, navigate, redirectUrl]);
@@ -59,7 +58,7 @@ function DeleteTransactionModal({
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={deleteTxHandler}>
+        <Button variant="danger" onClick={deleteTxHandler}>
           Delete
         </Button>
       </Modal.Footer>

@@ -227,8 +227,8 @@ public class AccountController {
                                                             Authentication authentication) {
         log.info("Delete own transaction with id {}", id);
         checkIfOwnTransaction(authentication, id, "You can only delete your own transactions");
-        transactionService.deleteTransaction(id);
-        return ResponseEntity.ok().build();
+        Transaction deletedTransaction = transactionService.deleteTransaction(id);
+        return ResponseEntity.ok(deletedTransaction);
     }
 
     private void checkIfOwnTransaction(Authentication authentication, String id, String message) {

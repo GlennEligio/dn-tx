@@ -113,9 +113,10 @@ public class TransactionService implements IExcelService<Transaction> {
         }
     }
 
-    public void deleteTransaction(String id) {
+    public Transaction deleteTransaction(String id) {
         var transactionToBeDeleted = getTransactionById(id);
         transactionRepository.deleteById(transactionToBeDeleted.getId());
+        return transactionToBeDeleted;
     }
 
     public List<Transaction> getTransactionsByCreatorUsername(String username) {

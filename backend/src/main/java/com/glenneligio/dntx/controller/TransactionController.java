@@ -1,5 +1,7 @@
 package com.glenneligio.dntx.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.glenneligio.dntx.dtos.CreateUpdateTransactionDto;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.TransactionService;
@@ -55,6 +57,9 @@ public class TransactionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTransaction(@PathVariable String id) {
         service.deleteTransaction(id);
-        return ResponseEntity.ok().build();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("id", id);
+        return ResponseEntity.ok(objectNode);
     }
 }
