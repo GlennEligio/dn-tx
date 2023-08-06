@@ -13,3 +13,8 @@ Bugs
 	
 3. hotfix/uploading-existing-transaction-results-in-different-transaction-id
 	> in the constructors of Transaction's child classes, we need to add logic to assign id of child class to the Transaction parameter
+	
+	
+4. feature/DNTX-005
+	> fixed issue where the delete own transaction endpoint is not processed properly by the useHttp hook
+	> changed the response of the backend endpoint
