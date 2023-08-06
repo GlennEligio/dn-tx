@@ -57,9 +57,19 @@ function ExportImportTransactions() {
     };
     params = `?${new URLSearchParams(queryParams).toString()}`;
 
+    let filename = 'Transaction.xlsx';
     TransactionService.downloadTransaction(auth.accessToken, params)
-      .then((resp) => resp.blob())
-      .then((blob) => fileDownload(blob, 'Transactions.xlsx'))
+      .then((resp) => {
+        const contentDispositionHeader = resp.headers.get(
+          'Content-Disposition'
+        );
+        if (contentDispositionHeader !== null) {
+          const parts = contentDispositionHeader.split('filename=');
+          filename = parts[1].substring(1, parts[1].length - 1);
+        }
+        return resp.blob();
+      })
+      .then((blob) => fileDownload(blob, filename))
       .catch((error) =>
         console.log('Error in downlading the transaction excel file', error)
       );

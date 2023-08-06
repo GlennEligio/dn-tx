@@ -26,7 +26,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,8 +158,11 @@ public class AccountController {
 
         // setting response headers for download
         log.info("Setting response headers for download excel");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, YYYY");
+        String currentDateTime = LocalDateTime.now().atZone(ZoneId.of("Asia/Manila")).format(dateTimeFormatter);
+        String filename = "Transaction " + currentDateTime + ".xlsx";
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=transactions.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=\""+ filename + "\"");
 
         // fetching InputStream to be added in Response
         log.info("Creating ByteArrayInputStream to be copied in Response OutputStream");
