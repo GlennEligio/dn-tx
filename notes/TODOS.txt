@@ -15,4 +15,4 @@ DNTX-007: Forgot password using email
  
 DNTX-009: Add filter option in the Transaction history page
 
-DNTX-010: Add date information in the excel filename of the 
+(DONE) DNTX-010: Add date information in the excel filename of the 
