@@ -29,6 +29,7 @@ public class Account {
     private String password;
     @Email(message = "Account email must be a valid email")
     @NotBlank(message = "Account email must not be blank")
+    @Indexed(unique = true)
     private String email;
     private LocalDateTime dateRegistered;
 

@@ -1,5 +1,6 @@
 package com.glenneligio.dntx.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.glenneligio.dntx.dtos.*;
@@ -7,8 +8,12 @@ import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Account;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.AccountService;
+import com.glenneligio.dntx.service.EmailService;
+import com.glenneligio.dntx.service.ResetPasswordTokenService;
 import com.glenneligio.dntx.service.TransactionService;
 import com.glenneligio.dntx.util.JwtUtil;
+import com.glenneligio.dntx.util.Utils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +31,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -44,6 +51,10 @@ public class AccountController {
     private AccountService accountService;
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    private ResetPasswordTokenService resetPasswordTokenService;
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -101,6 +112,54 @@ public class AccountController {
         return ResponseEntity.ok(loginResponseDto);
     }
 
+    @PutMapping("/password/create-token")
+    public ResponseEntity<Object> createResetTokenPassword(@RequestBody @Valid CreateResetPasswordTokenDto dto,
+                                           HttpServletRequest request) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
+        String email = dto.getEmail();
+        Account account = accountService.getAccountByEmail(email);
+        String token = resetPasswordTokenService.createPasswordToken();
+
+        if(account != null) {
+            resetPasswordTokenService.createResetPasswordToken(account, token);
+
+            // Prepare email info
+            String subject = "Reset Password for DNTX";
+
+            // hostname of the request for the password reset will be used
+            // since it will also be the hostname for the frontend's resetPassword page
+            String hostname = request.getHeader("Host");
+            String senderBrowserAndDevice = request.getHeader("User-Agent");
+            String resetPasswordLink =  MessageFormat.format("https://{0}/resetPassword?token={1}", hostname, token);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh:mm a MMM. d, uuuu - z");
+            String currentTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("GMT+8")).format(dateTimeFormatter);
+            String body = MessageFormat.format("Hello {0},\n\n" +
+                    "You recently requested to reset your password for your DNTX account. Use the link below to reset it.\n\n" +
+                    "{1}\n\n" +
+                    "This password reset is only valid for the next 24 hours.\n" +
+                    "For security purposes, this request was received from: {2}\n" +
+                    "If you did not request a password reset, below Please send an email to this email address.\n\n" +
+                    "Best regards,\n" +
+                    "DN-TX team - {3}", account.getFullName(), resetPasswordLink, senderBrowserAndDevice, currentTime);
+
+            // send email using the email provided
+            emailService.sendEmail(email, subject, body);
+        }
+
+        Map<String, Object> respBody = new HashMap<>();
+        respBody.put("success", true);
+        ObjectNode resp = Utils.createObjectNodeFromMap(respBody);
+        return ResponseEntity.ok(resp);
+    }
+
+    @PutMapping("/password/reset")
+    public ResponseEntity<Object> redeemResetPasswordToken(@RequestBody @Valid RedeemResetPasswordTokenDto dto) throws NoSuchAlgorithmException {
+        resetPasswordTokenService.redeemResetPasswordToken(dto.getNewPassword(), dto.getToken());
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/@self")
     public ResponseEntity<Account> getOwnAccount(Authentication authentication) {
         log.info("Fetching own account details with principal {}", authentication.getPrincipal());
@@ -120,6 +179,8 @@ public class AccountController {
         Account updatedAccount = accountService.updateAccount(username, account);
         return ResponseEntity.ok(updatedAccount);
     }
+
+    @PutMapping("/")
 
     @GetMapping("/@self/transactions")
     public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "1") int pageNumber,

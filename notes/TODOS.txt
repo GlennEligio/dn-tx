@@ -16,3 +16,7 @@ DNTX-007: Forgot password using email
 DNTX-009: Add filter option in the Transaction history page
 
 (DONE) DNTX-010: Add date information in the excel filename of the 
+
+DNTX-011: Add option for entering transaction date in the create Transaction feature
+
+DNTX-012: Use ZonedDateTime instead of LocalDateTime for time related informations

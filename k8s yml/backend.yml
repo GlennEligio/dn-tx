@@ -71,6 +71,9 @@ data:
   DNTX_MONGODB_USERNAME: sampleuserprod
   DNTX_MONGODB_PASSWORD: samplepassprod
   DNTX_JWT_SECRET_KEY: samplesecretkeyprod
+  DNTX_BACKEND_EMAIL_SENDER_USERNAME: dntx.supp@gmail.com
+  # pulled from Okteto secrets
+  DNTX_BACKEND_EMAIL_SENDER_PASSWORD: $DNTX_BACKEND_EMAIL_SENDER_PASSWORD
 kind: ConfigMap
 metadata:
   name: dntx-backend-spring-configmap

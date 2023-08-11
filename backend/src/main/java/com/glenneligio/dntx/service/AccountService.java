@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,7 +27,7 @@ public class AccountService implements UserDetailsService {
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
@@ -45,6 +45,10 @@ public class AccountService implements UserDetailsService {
                 .orElseThrow(() -> new ApiException("No account with specified username was found", HttpStatus.NOT_FOUND));
     }
 
+    public Account getAccountByEmail(String email) {
+        return accountRepository.findByEmail(email).orElse(null);
+    }
+
     public Account createAccount(Account account) {
         Optional<Account> existingAccount = accountRepository.findByUsername(account.getUsername());
         if(existingAccount.isPresent()) throw new ApiException("Account with same username", HttpStatus.BAD_REQUEST);
@@ -54,7 +58,7 @@ public class AccountService implements UserDetailsService {
     public Account updateAccount(String username, Account account) {
         account.setUsername(username);
         Account accountToUpdate = getAccountByUsername(username);
-        account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         accountToUpdate.update(account);
         return accountRepository.save(accountToUpdate);
     }
@@ -75,7 +79,7 @@ public class AccountService implements UserDetailsService {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new ApiException("Invalid credentials", HttpStatus.UNAUTHORIZED));
         // Check if the password in login and the encrypted password in database matches
-        boolean match = bCryptPasswordEncoder.matches(password, account.getPassword());
+        boolean match = passwordEncoder.matches(password, account.getPassword());
         if(!match) throw new ApiException("Invalid credentials", HttpStatus.UNAUTHORIZED);
         return account;
     }
@@ -83,7 +87,7 @@ public class AccountService implements UserDetailsService {
     public Account register (Account account) {
         Optional<Account> existingAccount = accountRepository.findByUsername(account.getUsername());
         if(existingAccount.isPresent()) throw new ApiException("Account with same username already exist", HttpStatus.BAD_REQUEST);
-        account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         account.setDateRegistered(LocalDateTime.now());
         account.setAccountType(AccountType.USER);
         return accountRepository.save(account);

@@ -34,6 +34,11 @@ public class SecurityConfiguration {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
+    /*
+    * When testing in local environment:
+    * Comment line 57-59,60
+    * Uncomment line 61
+    * */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults());
@@ -42,6 +47,7 @@ public class SecurityConfiguration {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,"/api/*/accounts/login", "/api/*/accounts/register").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/*/accounts/password/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll() // For Spring Actuator
                 .requestMatchers(HttpMethod.GET, "/api/*/transactions/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/*/accounts/@self/**").hasAnyAuthority("ADMIN", "USER")

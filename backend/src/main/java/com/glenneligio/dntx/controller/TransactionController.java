@@ -1,10 +1,12 @@
 package com.glenneligio.dntx.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.glenneligio.dntx.dtos.CreateUpdateTransactionDto;
 import com.glenneligio.dntx.model.Transaction;
 import com.glenneligio.dntx.service.TransactionService;
+import com.glenneligio.dntx.util.Utils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
@@ -55,11 +59,11 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTransaction(@PathVariable String id) {
+    public ResponseEntity<?> deleteTransaction(@PathVariable String id) throws JsonProcessingException {
         service.deleteTransaction(id);
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("id", id);
-        return ResponseEntity.ok(objectNode);
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        ObjectNode response = Utils.createObjectNodeFromMap(map);
+        return ResponseEntity.ok(response);
     }
 }
