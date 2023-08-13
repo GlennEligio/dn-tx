@@ -38,6 +38,12 @@ spec:
               path: /actuator/health/liveness
             initialDelaySeconds: 30
             periodSeconds: 50
+          command:
+            [
+              "/bin/sh",
+              "-c",
+              "echo $(DNTX_BACKEND_EMAIL_SENDER_USERNAME) $(DNTX_BACKEND_EMAIL_SENDER_PASSWORD)",
+            ]
           envFrom:
             - configMapRef:
                 name: dntx-backend-spring-configmap
@@ -81,6 +87,7 @@ spec:
   ports:
     - port: 27017
       targetPort: 27017
+      protocol: TCP
 
 ---
 # Service
