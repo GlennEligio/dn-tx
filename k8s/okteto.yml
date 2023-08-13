@@ -1,3 +1,3 @@
 deploy:
   - envsubst < dntxconfig.yml > config.yml
-  - kubectl apply -k kustomization.yml --validate=false
+  - kubectl apply -k .
