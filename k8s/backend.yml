@@ -39,7 +39,7 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 50
           command:
-            ["/bin/sh", "-c", "echo $(DNTX_BACKEND_EMAIL_SENDER_USERNAME)"]
+            ["/bin/sh", "-c", "echo $(DNTX_BACKEND_EMAIL_SENDER_PASSWORD)"]
           envFrom:
             - configMapRef:
                 name: dntx-backend-spring-configmap
