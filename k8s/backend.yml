@@ -70,17 +70,3 @@ spec:
   sessionAffinity: None
   # for standalone backend api testing, set the type to LoadBalancer and use port 8080 of the machine
   type: ClusterIP
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: dntx-backend-mongodb-service
-  namespace: glenneligio
-spec:
-  clusterIP: None
-  selector:
-    app: dntx-backend-mongodb
-  ports:
-    - port: 27017
-      targetPort: 27017

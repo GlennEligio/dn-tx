@@ -35,3 +35,17 @@ spec:
         resources:
           requests:
             storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dntx-backend-mongodb-service
+  namespace: glenneligio
+spec:
+  clusterIP: None
+  selector:
+    app: dntx-backend-mongodb
+  ports:
+    - port: 27017
+      targetPort: 27017
