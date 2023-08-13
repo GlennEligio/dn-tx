@@ -32,16 +32,20 @@ spec:
             httpGet:
               port: 8080
               path: /actuator/health/readiness
-          envFrom:
-            - configMapRef:
-                name: dntx-config
           livenessProbe:
             httpGet:
               port: 8080
               path: /actuator/health/liveness
             initialDelaySeconds: 30
             periodSeconds: 50
+          volumeMounts:
+            - name: dntx-backend-config
+              mountPath: /etc/config
       restartPolicy: Always
+      volumes:
+        - name: dntx-backend-config
+          configMap:
+            name: dntx-config
 
 ---
 # Mongo DB Service
