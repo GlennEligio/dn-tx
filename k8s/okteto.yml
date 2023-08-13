@@ -1,3 +1,6 @@
 deploy:
   - envsubst < dntxconfig.yml > config.yml
-  - kubectl apply -k .
+  - kubectl apply -f kustomization.yml
+  - kubectl apply -f database.yml
+  - kubectl apply -f backend.yml
+  - kubectl apply -f frontend.yml
