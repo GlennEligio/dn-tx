@@ -26,10 +26,10 @@ spec:
               value: "samplepassprod"
           volumeMounts:
             - mountPath: /data/dntx
-              name: dntx-backend-mongodb-data
+              name: dntx-mongodb-data
   volumeClaimTemplates:
     - metadata:
-        name: dntx-backend-mongodb-data
+        name: dntx-mongodb-data
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:

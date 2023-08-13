@@ -45,13 +45,21 @@ spec:
               "cat /etc/config/config.yml && echo && tail -f /dev/null",
             ]
           volumeMounts:
-            - name: config-volume
+            - name: dntx-backend-config
               mountPath: /etc/config
       restartPolicy: Always
       volumes:
-        - name: config-volume
+        - name: dntx-backend-config
           configMap:
             name: config-app
+  volumeClaimTemplates:
+    - metadata:
+        name: dntx-backend-config
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Mb
 
 ---
 # Service
