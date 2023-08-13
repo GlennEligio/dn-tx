@@ -42,7 +42,7 @@ spec:
             [
               "/bin/sh",
               "-c",
-              "echo $(DNTX_BACKEND_EMAIL_SENDER_USERNAME) $(DNTX_BACKEND_EMAIL_SENDER_PASSWORD)",
+              "echo $(DNTX_BACKEND_EMAIL_SENDER_USERNAME) $(config.yml.DNTX_BACKEND_EMAIL_SENDER_PASSWORD)",
             ]
           envFrom:
             - configMapRef:
