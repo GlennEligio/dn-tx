@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.glenneligio</groupId>
 	<artifactId>dntx-backend</artifactId>
-	<version>0.0.2.3-PROD</version>
+	<version>0.0.2.4-PROD</version>
 	<name>dntx</name>
 	<description>DragonNest Transaction Logger</description>
 	<properties>

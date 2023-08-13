@@ -109,7 +109,7 @@ function useHttp<T>(startWithPending: boolean, initReqConf?: RequestConfig) {
   const sendRequest = useCallback(async (requestConfig: RequestConfig) => {
     dispatch({ type: RequestActionKind.SEND });
     try {
-      const responseObj: T | boolean | ExceptionResponse = await fetch(
+      const responseObj: T | ExceptionResponse = await fetch(
         requestConfig.relativeUrl || '',
         {
           method: requestConfig.method || 'GET',
