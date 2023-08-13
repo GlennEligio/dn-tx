@@ -38,12 +38,6 @@ spec:
               path: /actuator/health/liveness
             initialDelaySeconds: 30
             periodSeconds: 50
-          command:
-            [
-              "/bin/sh",
-              "-c",
-              "cat /etc/config/config.yml && echo && tail -f /dev/null",
-            ]
           volumeMounts:
             - name: dntx-backend-config
               mountPath: /etc/config
