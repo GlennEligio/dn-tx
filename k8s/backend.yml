@@ -38,6 +38,11 @@ spec:
               path: /actuator/health/liveness
             initialDelaySeconds: 30
             periodSeconds: 50
+          envFrom:
+            - configMapRef:
+                name: dntx-backend-spring-configmap
+            - configMapRef:
+                name: dntx-secrets
           volumeMounts:
             - name: dntx-backend-config
               mountPath: /etc/config
@@ -45,7 +50,24 @@ spec:
       volumes:
         - name: dntx-backend-config
           configMap:
-            name: dntx-config
+            name: dntx-
+
+---
+# Configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dntx-backend-spring-configmap
+  namespace: glenneligio
+data:
+  DNTX_MONGODB_HOST: dntx-backend-mongodb-service
+  DNTX_MONGODB_PORT: "27017"
+  DNTX_MONGODB_DATABASE: dntx
+  DNTX_MONGODB_USERNAME: sampleuserprod
+  DNTX_MONGODB_PASSWORD: samplepassprod
+  DNTX_JWT_SECRET_KEY: samplesecretkeyprod
+  DNTX_BACKEND_EMAIL_SENDER_USERNAME: dntx.supp@gmail.com
+  DNTX_BE_PORT: "8080"
 
 ---
 # Mongo DB Service
