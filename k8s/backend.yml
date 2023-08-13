@@ -66,7 +66,6 @@ data:
   DNTX_MONGODB_USERNAME: sampleuserprod
   DNTX_MONGODB_PASSWORD: samplepassprod
   DNTX_JWT_SECRET_KEY: samplesecretkeyprod
-  DNTX_BACKEND_EMAIL_SENDER_USERNAME: dntx.supp@gmail.com
   DNTX_BE_PORT: "8080"
 
 ---
