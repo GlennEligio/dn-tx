@@ -2,3 +2,8 @@
 0.0.2 - Import/Export of Transaction history is added
 0.0.2.1 - Fixed issue related to export transaction history not being properly exported
 0.0.2.2 - Fixed issue related to import transaction excel file
+0.0.2.3 - Fixed issue related to import transaction excel where 
+0.0.2.4 - DNTX-005
+			DNTX-007
+			DNTX-008
+			DNTX-010
