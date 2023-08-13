@@ -52,14 +52,6 @@ spec:
         - name: dntx-backend-config
           configMap:
             name: config-app
-  volumeClaimTemplates:
-    - metadata:
-        name: dntx-backend-config
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 5Mb
 
 ---
 # Service
