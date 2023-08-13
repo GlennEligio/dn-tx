@@ -1,0 +1,3 @@
+deploy:
+  - envsubst < dntxconfig.env > .env
+  - kubectl apply -k .

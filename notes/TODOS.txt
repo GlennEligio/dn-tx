@@ -6,7 +6,7 @@ DNTX-006: Use OAuth for Gdrive
  > this creates security issue with regards to gdrive files
  > to solve this, we will need to use OAuth to authorize DNTX to access Gdrive of the user
  
-DNTX-007: Forgot password using email
+(DONE) DNTX-007: Forgot password using email
  > user must be able to reset their password using their email
  > dntx will send an email with link
  
@@ -20,3 +20,5 @@ DNTX-009: Add filter option in the Transaction history page
 DNTX-011: Add option for entering transaction date in the create Transaction feature
 
 DNTX-012: Use ZonedDateTime instead of LocalDateTime for time related informations
+
+DNTX-013: Inject Okteto Secret for sensitive data. Modify k8s yaml for better decoupling of components
