@@ -41,8 +41,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: dntx-backend-spring-configmap
-            - configMapRef:
-                name: dntx-secrets
           volumeMounts:
             - name: dntx-backend-config
               mountPath: /etc/config
@@ -50,7 +48,7 @@ spec:
       volumes:
         - name: dntx-backend-config
           configMap:
-            name: dntx-
+            name: dntx-secrets
 
 ---
 # Configmap
