@@ -5,4 +5,6 @@ configMapGenerator:
     files:
       - config.yml
 resources:
+  - database.yml
+  - frontend.yml
   - backend.yml
