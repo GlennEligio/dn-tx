@@ -7,8 +7,6 @@ configMapGenerator:
   - name: dntx-config
     files:
       - config.yml
-generatorOptions:
-  disableNameSuffixHash: true
 resources:
   - database.yml
   - frontend.yml
