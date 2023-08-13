@@ -51,7 +51,7 @@ spec:
       volumes:
         - name: dntx-backend-config
           configMap:
-            name: config-app
+            name: dntx-config
 
 ---
 # Service

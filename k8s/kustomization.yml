@@ -4,9 +4,11 @@ metadata:
   name: dntx-kustomization
   namespace: glenneligio
 configMapGenerator:
-  - name: config-app
+  - name: dntx-config
     files:
       - config.yml
+generatorOptions:
+  disableNameSuffixHash: true
 resources:
   - database.yml
   - frontend.yml
