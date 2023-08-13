@@ -12,10 +12,7 @@ import useHttp from '../hooks/useHttp';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 import { authActions } from '../store/authSlice';
 import DnTxLogo from '../components/UI/DnTxLogo';
-
-const getCharacterValidationError = (str: string) => {
-  return `Your password must have at least 1 ${str} character`;
-};
+import { getCharacterValidationError } from '../util/utils';
 
 function Register() {
   const dispatch = useDispatch();

@@ -127,19 +127,10 @@ public class AccountController {
 
             // hostname of the request for the password reset will be used
             // since it will also be the hostname for the frontend's resetPassword page
-            String hostname = request.getHeader("Host");
+            String hostname = request.getHeader("Origin");
             String senderBrowserAndDevice = request.getHeader("User-Agent");
-            String resetPasswordLink =  MessageFormat.format("https://{0}/resetPassword?token={1}", hostname, token);
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh:mm a MMM. d, uuuu - z");
-            String currentTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("GMT+8")).format(dateTimeFormatter);
-            String body = MessageFormat.format("Hello {0},\n\n" +
-                    "You recently requested to reset your password for your DNTX account. Use the link below to reset it.\n\n" +
-                    "{1}\n\n" +
-                    "This password reset is only valid for the next 24 hours.\n" +
-                    "For security purposes, this request was received from: {2}\n" +
-                    "If you did not request a password reset, below Please send an email to this email address.\n\n" +
-                    "Best regards,\n" +
-                    "DN-TX team - {3}", account.getFullName(), resetPasswordLink, senderBrowserAndDevice, currentTime);
+            String resetPasswordLink =  MessageFormat.format("{0}/reset?token={1}", hostname, token);
+            String body = emailService.createResetPasswordBody(account.getFullName(), resetPasswordLink, senderBrowserAndDevice);
 
             // send email using the email provided
             emailService.sendEmail(email, subject, body);

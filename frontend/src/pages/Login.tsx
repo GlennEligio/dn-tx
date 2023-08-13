@@ -137,7 +137,8 @@ function Login() {
                       {errors.password}
                     </Form.Control.Feedback>
                   </Form.Group>
-                  <div className="d-flex justify-content-end">
+                  <div className="d-flex justify-content-between">
+                    <Link to="/forgot">Forgot password?</Link>
                     <Button variant="primary" type="submit">
                       Login
                     </Button>

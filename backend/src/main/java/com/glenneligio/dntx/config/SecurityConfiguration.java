@@ -54,9 +54,9 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/*/accounts/@self/transactions/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/*/accounts/@self", "/api/*/accounts/@self/transactions/*").hasAnyAuthority("ADMIN","USER")
                 .requestMatchers(HttpMethod.DELETE, "/api/*/accounts/@self/transactions/*").hasAnyAuthority("USER", "ADMIN")
-//                .requestMatchers(HttpMethod.POST, "/api/*/transactions").hasAnyAuthority("USER", "ADMIN")
-//                .requestMatchers(HttpMethod.PUT, "/api/v1/accounts/**").authenticated()
-//                .requestMatchers(HttpMethod.GET, "/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/*/transactions").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/accounts/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/**").authenticated()
                 .anyRequest().hasAnyAuthority("ADMIN");
 //                .anyRequest().permitAll();
         return http.build();

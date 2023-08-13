@@ -14,6 +14,8 @@ import Transactions from './pages/Transactions';
 import AccountDetails from './pages/AccountDetails';
 import { IRootState } from './store';
 import ExportImportTransactions from './pages/ExportImportTransactions';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 export function App() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -27,6 +29,8 @@ export function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<SearchTransaction />} />
+        <Route path="/forgot" element={<ForgotPassword />} />
+        <Route path="/reset" element={<ResetPassword />} />
         {loggedIn && (
           <>
             <Route path="/transactions" element={<Transactions />} />

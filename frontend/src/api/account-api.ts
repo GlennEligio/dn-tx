@@ -108,9 +108,40 @@ const register = (registerInfo: RegisterRequestDto): RequestConfig => {
   };
 };
 
+const forgotPassword = (email: string): RequestConfig => {
+  return {
+    body: {
+      email,
+    },
+    headers: {
+      'Content-type': 'application/json',
+    },
+    method: 'PUT',
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/password/create-token`,
+    defaultErrorMessage: "Can't send the email for password reset right now",
+  };
+};
+
+const resetPassword = (newPassword: string, token: string): RequestConfig => {
+  return {
+    body: {
+      newPassword,
+      token,
+    },
+    headers: {
+      'Content-type': 'application/json',
+    },
+    method: 'PUT',
+    relativeUrl: `${BACKEND_URI}/api/${BACKEND_VERSION}/accounts/password/reset`,
+    defaultErrorMessage: "Can't reset the password as of now",
+  };
+};
+
 export default {
   login,
   register,
   getOwnAccountDetails,
   updateOwnAccountDetails,
+  forgotPassword,
+  resetPassword,
 };

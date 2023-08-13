@@ -50,9 +50,9 @@ public class ResetPasswordTokenService {
     }
 
     @Transactional
-    public void useResetPasswordToken(String hashedToken, String userId, String newPassword) {
+    public void useResetPasswordToken(String hashedToken, String accountId, String newPassword) {
         // fetch all the tokens for the said account
-        List<ResetPasswordToken> resetPasswordTokenListOfAccount = resetPasswordTokenRepository.findByAccountId(userId);
+        List<ResetPasswordToken> resetPasswordTokenListOfAccount = resetPasswordTokenRepository.findByAccountId(accountId);
 
         // check if the token still exist in the account's list of token
         // if not, it is already redeemed
