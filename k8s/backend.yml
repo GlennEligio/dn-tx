@@ -38,10 +38,11 @@ spec:
               path: /actuator/health/liveness
             initialDelaySeconds: 30
             periodSeconds: 50
-          command: ["/bin/sh", "-c", "echo $(config.yml)"]
           envFrom:
             - configMapRef:
                 name: dntx-backend-spring-configmap
+            - configMapRef:
+                name: dntx-secrets
           volumeMounts:
             - name: dntx-backend-config
               mountPath: /etc/config
