@@ -5,8 +5,8 @@ metadata:
   namespace: glenneligio
 configMapGenerator:
   - name: dntx-secrets
-    files:
-      - config.yml
+    envs:
+      - "config.yml"
 generatorOptions:
   disableNameSuffixHash: true
 resources:
