@@ -46,6 +46,7 @@ spec:
           volumeMounts:
             - name: dntx-backend-config
               mountPath: /etc/config
+              subPath: config.yml
       restartPolicy: Always
       volumes:
         - name: dntx-backend-config
