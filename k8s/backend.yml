@@ -29,7 +29,7 @@ spec:
           imagePullPolicy: IfNotPresent
           name: dntx-backend-spring
           command:
-            ["/bin/sh", "-c", "echo ${DNTX_BACKEND_EMAIL_SENDER_PASSWORD}"]
+            ["/bin/sh", "-c", "echo $(DNTX_BACKEND_EMAIL_SENDER_PASSWORD)"]
           readinessProbe:
             httpGet:
               port: 8080
