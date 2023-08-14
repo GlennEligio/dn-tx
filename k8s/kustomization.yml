@@ -6,7 +6,7 @@ metadata:
 configMapGenerator:
   - name: dntx-secrets
     envs:
-      - "config.yml"
+      - .env
 generatorOptions:
   disableNameSuffixHash: true
 resources:
