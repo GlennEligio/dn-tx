@@ -92,6 +92,17 @@ function TransactionDetails() {
                         value={transactionData.type}
                       />
                     </Form.Group>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="txDetailsDateFinished"
+                    >
+                      <Form.Label>Date finished</Form.Label>
+                      <Form.Control
+                        type="datetime-local"
+                        readOnly
+                        value={transactionData.dateFinished}
+                      />
+                    </Form.Group>
                     {transactionData.type === TransactionType.GOLD2PHP && (
                       <>
                         <Form.Group

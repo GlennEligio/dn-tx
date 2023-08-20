@@ -40,5 +40,6 @@ public class Transaction implements Serializable {
     public void update(Transaction t) {
         this.username = t.getUsername();
         this.fileAttachments = t.getFileAttachments();
+        this.dateFinished = t.getDateFinished();
     }
 }

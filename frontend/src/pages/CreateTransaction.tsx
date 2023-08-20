@@ -29,6 +29,7 @@ interface CreateTxFormInput {
   itemName: string;
   itemQuantity: number;
   itemPriceInGold: number;
+  dateFinished: string;
 }
 
 const createTxFormInputSchema = yup.object().shape({
@@ -106,6 +107,7 @@ const createTxFormInputSchema = yup.object().shape({
       schema.min(1, 'Must be greater than 1').required('Required'),
     otherwise: (schema) => schema.notRequired(),
   }),
+  dateFinished: yup.date().notRequired(),
 });
 
 function CreateTransaction() {
@@ -125,6 +127,7 @@ function CreateTransaction() {
     itemName: '',
     itemQuantity: 1,
     itemPriceInGold: 1,
+    dateFinished: '',
   };
 
   const {
@@ -157,6 +160,7 @@ function CreateTransaction() {
         username: auth.username,
       },
       type: values.type,
+      dateFinished: values.dateFinished,
     };
 
     let finalTransaction = null;
@@ -249,6 +253,26 @@ function CreateTransaction() {
                       />
                       <Form.Control.Feedback type="invalid">
                         {errors.username}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="createTxFormDateFinished"
+                    >
+                      <Form.Label>Date finished</Form.Label>
+                      <Form.Control
+                        type="datetime-local"
+                        name="dateFinished"
+                        value={values.dateFinished}
+                        isValid={touched.dateFinished && !errors.dateFinished}
+                        isInvalid={
+                          touched.dateFinished && !!errors.dateFinished
+                        }
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.dateFinished}
                       </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="createTxFormType">

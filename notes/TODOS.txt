@@ -21,4 +21,4 @@ DNTX-011: Add option for entering transaction date in the create Transaction fea
 
 DNTX-012: Use ZonedDateTime instead of LocalDateTime for time related informations
 
-DNTX-013: Inject Okteto Secret for sensitive data. Modify k8s yaml for better decoupling of components
+(DONE) DNTX-013: Inject Okteto Secret for sensitive data. Modify k8s yaml for better decoupling of components

@@ -171,8 +171,6 @@ public class AccountController {
         return ResponseEntity.ok(updatedAccount);
     }
 
-    @PutMapping("/")
-
     @GetMapping("/@self/transactions")
     public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "1") int pageNumber,
                                                                     @RequestParam(defaultValue = "1") int pageSize,

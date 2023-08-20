@@ -17,7 +17,7 @@ export interface Transaction {
   creator?: {
     username: string;
   };
-  dateFinished?: string;
+  dateFinished: string;
   fileAttachments: FileAttachment[];
   type: TransactionType;
 }

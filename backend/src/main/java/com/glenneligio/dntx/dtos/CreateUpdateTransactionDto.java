@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -42,6 +43,9 @@ public class CreateUpdateTransactionDto {
 
     private String itemName;
 
+    @PastOrPresent(message = "Must be either in past or present")
+    private LocalDateTime dateFinished;
+
     @Positive(message = "itemQuantity must be positive")
     private Long itemQuantity;
 
@@ -60,6 +64,7 @@ public class CreateUpdateTransactionDto {
                 transaction1.setCcAmount(ccAmount);
                 transaction1.setGoldPerCC(goldPerCC);
                 transaction1.setGoldPaid(goldPaid);
+                transaction1.setDateFinished(dateFinished);
                 transaction = transaction1;
                 break;
             case GOLD2PHP:
@@ -73,6 +78,7 @@ public class CreateUpdateTransactionDto {
                 transaction2.setPhpPaid(phpPaid);
                 transaction2.setGoldPerPhp(goldPerPhp);
                 transaction2.setMethodOfPayment(methodOfPayment);
+                transaction2.setDateFinished(dateFinished);
                 transaction = transaction2;
                 break;
             case ITEM2GOLD:
@@ -85,6 +91,7 @@ public class CreateUpdateTransactionDto {
                 transaction3.setItemName(itemName);
                 transaction3.setItemQuantity(itemQuantity);
                 transaction3.setItemPriceInGold(itemPriceInGold);
+                transaction3.setDateFinished(dateFinished);
                 transaction = transaction3;
                 break;
         }

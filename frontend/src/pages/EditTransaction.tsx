@@ -18,6 +18,7 @@ import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 
 interface EditTxFormInput {
   username: string;
+  dateFinished: string;
   type: TransactionType;
   fileAttachments: FileAttachment[];
   ccAmount: number;
@@ -34,6 +35,7 @@ interface EditTxFormInput {
 
 const editTxFormInputSchema = yup.object().shape({
   username: yup.string().required('Username is required.'),
+  dateFinished: yup.date().notRequired(),
   type: yup
     .mixed()
     .oneOf(
@@ -116,6 +118,7 @@ function EditTransaction() {
   // General Transaction inputs
   const [username, setUsername] = useState('');
   const [type, setType] = useState<TransactionType>(TransactionType.CC2GOLD);
+  const [dateFinished, setDateFinished] = useState('');
   const [fileAttachments, setFileAttachment] = useState<FileAttachment[]>([]);
 
   // For CcToGoldTransaction
@@ -137,6 +140,7 @@ function EditTransaction() {
   // initial form input values
   const editTxFormInitialValues: EditTxFormInput = {
     username,
+    dateFinished,
     type,
     fileAttachments,
     ccAmount,
@@ -185,6 +189,7 @@ function EditTransaction() {
     ) {
       setUsername(currentTxData.username);
       setType(currentTxData.type);
+      setDateFinished(currentTxData.dateFinished);
       setFileAttachment(currentTxData.fileAttachments);
 
       if (currentTxData.type === TransactionType.CC2GOLD) {
@@ -226,6 +231,7 @@ function EditTransaction() {
     if (transactionId) {
       const transaction: Transaction = {
         username: values.username,
+        dateFinished: values.dateFinished,
         fileAttachments: values.fileAttachments,
         creator: {
           username: auth.username,
@@ -331,6 +337,26 @@ function EditTransaction() {
                         />
                         <Form.Control.Feedback type="invalid">
                           {errors.username}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="editTxFormDateFinished"
+                      >
+                        <Form.Label>Date finished</Form.Label>
+                        <Form.Control
+                          type="datetime-local"
+                          name="dateFinished"
+                          value={values.dateFinished}
+                          isValid={touched.dateFinished && !errors.dateFinished}
+                          isInvalid={
+                            touched.dateFinished && !!errors.dateFinished
+                          }
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.dateFinished}
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group className="mb-3" controlId="editTxFormType">
