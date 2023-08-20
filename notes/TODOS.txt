@@ -7,7 +7,7 @@ DNTX-006: Use OAuth for Gdrive
  > to solve this, we will need to use OAuth to authorize DNTX to access Gdrive of the user
  
 (DONE) DNTX-007: Forgot password using email
- > user must be able to reset their password using their email
+ > user must be able to reset their password using thewir email
  > dntx will send an email with link
  
 (DONE) DNTX-008: Add "Re-enter password" field in Register form
