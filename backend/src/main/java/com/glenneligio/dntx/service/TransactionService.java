@@ -124,9 +124,16 @@ public class TransactionService implements IExcelService<Transaction> {
         return transactionRepository.findByCreatorId(account.getId());
     }
 
-    public Page<Transaction> getTransactionPageByCreatorUsername(String username, int pageNumber, int pageSize) {
+    public Page<Transaction> getTransactionPageByCreatorUsernameTypeAndDateFinished(String username,
+                                                                                    List<TransactionType> txTypes,
+                                                                                    LocalDateTime afterDate,
+                                                                                    LocalDateTime beforeDate,
+                                                                                    int pageNumber,
+                                                                                    int pageSize) {
         Account account = accountService.getAccountByUsername(username);
-        return transactionRepository.findByCreatorId(account.getId(), PageRequest.of(pageNumber - 1, pageSize).withSort(Sort.by("dateFinished").descending()));
+        Page<Transaction> transaction = transactionRepository.findOwnTransactionsUsingDateFinishedAndTxType(account.getId(), txTypes, afterDate, beforeDate,PageRequest.of(pageNumber - 1, pageSize).withSort(Sort.by("dateFinished").descending()));
+        log.info("Transactions: {}", transaction.getContent());
+        return transaction;
     }
 
     public List<Transaction> getTransactionByCreatorUsernameAndDateBetween(String username, LocalDateTime afterDate, LocalDateTime beforeDate) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.glenneligio.dntx.dtos.*;
+import com.glenneligio.dntx.enums.TransactionType;
 import com.glenneligio.dntx.exception.ApiException;
 import com.glenneligio.dntx.model.Account;
 import com.glenneligio.dntx.model.Transaction;
@@ -114,12 +115,12 @@ public class AccountController {
 
     @PutMapping("/password/create-token")
     public ResponseEntity<Object> createResetTokenPassword(@RequestBody @Valid CreateResetPasswordTokenDto dto,
-                                           HttpServletRequest request) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
+                                                           HttpServletRequest request) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
         String email = dto.getEmail();
         Account account = accountService.getAccountByEmail(email);
         String token = resetPasswordTokenService.createPasswordToken();
 
-        if(account != null) {
+        if (account != null) {
             resetPasswordTokenService.createResetPasswordToken(account, token);
 
             // Prepare email info
@@ -129,7 +130,7 @@ public class AccountController {
             // since it will also be the hostname for the frontend's resetPassword page
             String hostname = request.getHeader("Origin");
             String senderBrowserAndDevice = request.getHeader("User-Agent");
-            String resetPasswordLink =  MessageFormat.format("{0}/reset?token={1}", hostname, token);
+            String resetPasswordLink = MessageFormat.format("{0}/reset?token={1}", hostname, token);
             String body = emailService.createResetPasswordBody(account.getFullName(), resetPasswordLink, senderBrowserAndDevice);
 
             // send email using the email provided
@@ -173,12 +174,31 @@ public class AccountController {
 
     @GetMapping("/@self/transactions")
     public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "1") int pageNumber,
-                                                                    @RequestParam(defaultValue = "1") int pageSize,
-                                                                    Authentication authentication) {
+                                                                     @RequestParam(defaultValue = "1") int pageSize,
+                                                                     @RequestParam(defaultValue = "") String txType,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beforeDate,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime afterDate,
+                                                                     Authentication authentication) {
         log.info("Fetching own transactions with principal {}", authentication);
+        // Prepare txType param
+        List<TransactionType> types = new ArrayList<>();
+        if(!txType.isBlank()) {
+            List<TransactionType> tempList = new ArrayList<>();
+            Arrays.stream(txType.split(",")).forEach(t -> {
+                tempList.add(TransactionType.getTransactionType(t));
+            });
+            types.addAll(tempList);
+        } else {
+            types.addAll(List.of(TransactionType.CC2GOLD, TransactionType.GOLD2PHP, TransactionType.ITEM2GOLD));
+        }
+
+        // Prepare after and before Date param
+        LocalDateTime afterDatePlaceHolder = afterDate != null ? afterDate : LocalDateTime.MIN.withYear(-9999);
+        LocalDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : LocalDateTime.MAX.withYear(9999);
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
-        Page<Transaction> transactionPage = transactionService.getTransactionPageByCreatorUsername(username, pageNumber, pageSize);
+        Page<Transaction> transactionPage = transactionService.getTransactionPageByCreatorUsernameTypeAndDateFinished(username, types, afterDatePlaceHolder, beforeDatePlaceHolder, pageNumber, pageSize);
         TransactionPageDto transactionPageDto = new TransactionPageDto(transactionPage.getContent(),
                 transactionPage.getTotalPages(),
                 transactionPage.getTotalElements(),
@@ -212,7 +232,7 @@ public class AccountController {
         String currentDateTime = LocalDateTime.now().atZone(ZoneId.of("Asia/Manila")).format(dateTimeFormatter);
         String filename = "Transaction " + currentDateTime + ".xlsx";
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=\""+ filename + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 
         // fetching InputStream to be added in Response
         log.info("Creating ByteArrayInputStream to be copied in Response OutputStream");
@@ -240,7 +260,8 @@ public class AccountController {
 
         // check if all transactions are owned by the creator
         boolean allTxOwned = transactions.stream().allMatch(tx -> tx.getCreator().getUsername().equals(username));
-        if(!allTxOwned) throw new ApiException("You can upload transactions from other creators", HttpStatus.FORBIDDEN);
+        if (!allTxOwned)
+            throw new ApiException("You can upload transactions from other creators", HttpStatus.FORBIDDEN);
 
         int itemsAffected = transactionService.addOrUpdate(transactions, overwrite);
         log.info("Successfully updated {} transactions database using the excel file", itemsAffected);
@@ -262,9 +283,9 @@ public class AccountController {
         transaction.getCreator().setUsername(username);
         Transaction transactionCreated = transactionService.createTransaction(transaction);
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(transactionCreated.getId())
-                .toUri())
+                        .path("/{id}")
+                        .buildAndExpand(transactionCreated.getId())
+                        .toUri())
                 .body(transactionCreated);
     }
 

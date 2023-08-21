@@ -14,10 +14,13 @@ DNTX-006: Use OAuth for Gdrive
  > this is to ensure that user entered the correct password 
  
 DNTX-009: Add filter option in the Transaction history page
+ > filters include:
+	- date range for dateFinished
+	- type of transaction
 
 (DONE) DNTX-010: Add date information in the excel filename of the 
 
-DNTX-011: Add option for entering transaction date in the create Transaction feature
+(DONE) DNTX-011: Add option for entering transaction date in the create Transaction feature
 
 DNTX-012: Use ZonedDateTime instead of LocalDateTime for time related informations
 
