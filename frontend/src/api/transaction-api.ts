@@ -4,6 +4,7 @@ export enum TransactionType {
   CC2GOLD = 'CC2GOLD',
   GOLD2PHP = 'GOLD2PHP',
   ITEM2GOLD = 'ITEM2GOLD',
+  getAccountOwnTransactions = 'getAccountOwnTransactions',
 }
 
 export interface FileAttachment {
@@ -85,11 +86,17 @@ const getTransactionById = (id: string): RequestConfig => {
 const getAccountOwnTransactions = (
   accessToken: string,
   pageNumber: number,
-  pageSize: number
+  pageSize: number,
+  txType: string | undefined,
+  afterDate: string | undefined,
+  beforeDate: string | undefined
 ): RequestConfig => {
   const searchParams = new URLSearchParams({
     pageNumber: pageNumber.toString(),
     pageSize: pageSize.toString(),
+    txType: txType || '',
+    afterDate: afterDate || '',
+    beforeDate: beforeDate || '',
   }).toString();
   return {
     headers: {

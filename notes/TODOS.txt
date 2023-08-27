@@ -13,7 +13,7 @@ DNTX-006: Use OAuth for Gdrive
 (DONE) DNTX-008: Add "Re-enter password" field in Register form
  > this is to ensure that user entered the correct password 
  
-DNTX-009: Add filter option in the Transaction history page
+(DONE) DNTX-009: Add filter option in the Transaction history page
  > filters include:
 	- date range for dateFinished
 	- type of transaction
