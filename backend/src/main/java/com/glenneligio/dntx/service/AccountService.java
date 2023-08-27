@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +88,7 @@ public class AccountService implements UserDetailsService {
         Optional<Account> existingAccount = accountRepository.findByUsername(account.getUsername());
         if(existingAccount.isPresent()) throw new ApiException("Account with same username already exist", HttpStatus.BAD_REQUEST);
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        account.setDateRegistered(LocalDateTime.now());
+        account.setDateRegistered(ZonedDateTime.now());
         account.setAccountType(AccountType.USER);
         return accountRepository.save(account);
     }

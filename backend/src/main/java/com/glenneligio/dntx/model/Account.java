@@ -11,7 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -31,7 +31,7 @@ public class Account {
     @NotBlank(message = "Account email must not be blank")
     @Indexed(unique = true)
     private String email;
-    private LocalDateTime dateRegistered;
+    private ZonedDateTime dateRegistered;
 
     @NotBlank(message = "Account full name can't be blank")
     private String fullName;

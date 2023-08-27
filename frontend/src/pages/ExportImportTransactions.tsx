@@ -147,7 +147,7 @@ function ExportImportTransactions() {
                           >
                             <Form.Label>Date from:</Form.Label>
                             <Form.Control
-                              type="date"
+                              type="datetime-local"
                               name="dateFrom"
                               value={values.dateFrom}
                               isValid={touched.dateFrom && !errors.dateFrom}
@@ -167,7 +167,7 @@ function ExportImportTransactions() {
                           >
                             <Form.Label>Date from:</Form.Label>
                             <Form.Control
-                              type="date"
+                              type="datetime-local"
                               name="dateTo"
                               value={values.dateTo}
                               isValid={touched.dateTo && !errors.dateTo}

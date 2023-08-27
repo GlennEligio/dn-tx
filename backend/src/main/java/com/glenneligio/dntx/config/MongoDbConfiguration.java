@@ -20,6 +20,8 @@ public class MongoDbConfiguration {
         converterList.add(new TransactionReadingConverter());
         converterList.add(new AccountTypeReadingConverter());
         converterList.add(new AccountTypeWritingConverter());
+        converterList.add(new ZonedDateTimeWriteConverter());
+        converterList.add(new ZonedDateTimeReadConverter());
         return new MongoCustomConversions(converterList);
     }
 }

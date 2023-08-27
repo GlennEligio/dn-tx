@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -32,7 +33,7 @@ public class Transaction implements Serializable {
     @NotNull(message = "Transaction's creator must not be null")
     private Account creator;
     @PastOrPresent(message = "Transaction's date finished must be only present or past")
-    private LocalDateTime dateFinished;
+    private ZonedDateTime dateFinished;
     private List<FileAttachment> fileAttachments;
 
     private TransactionType type;

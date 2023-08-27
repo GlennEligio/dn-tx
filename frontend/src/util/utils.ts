@@ -1,3 +1,5 @@
+import * as moment from 'moment-timezone';
+
 const getPageArray = (
   currentPage: number,
   totalPages: number,
@@ -33,4 +35,11 @@ export default {
 
 export const getCharacterValidationError = (str: string) => {
   return `Your password must have at least 1 ${str} character`;
+};
+
+export const getZonedDateTimeFromDateString = (date: string) => {
+  const dateString = moment(date)
+    .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    .toISOString();
+  return dateString || '';
 };

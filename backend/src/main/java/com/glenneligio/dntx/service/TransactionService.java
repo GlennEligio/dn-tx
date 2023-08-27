@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -51,7 +52,7 @@ public class TransactionService implements IExcelService<Transaction> {
         log.info("Creating transaction {}", transaction);
         Account account = accountService.getAccountByUsername(transaction.getCreator().getUsername());
         transaction.setCreator(account);
-        transaction.setDateFinished(transaction.getDateFinished() != null ? transaction.getDateFinished() : LocalDateTime.now());
+        transaction.setDateFinished(transaction.getDateFinished() != null ? transaction.getDateFinished() : ZonedDateTime.now());
 
         switch (transaction.getType()) {
             case GOLD2PHP:
@@ -126,8 +127,8 @@ public class TransactionService implements IExcelService<Transaction> {
 
     public Page<Transaction> getTransactionPageByCreatorUsernameTypeAndDateFinished(String username,
                                                                                     List<TransactionType> txTypes,
-                                                                                    LocalDateTime afterDate,
-                                                                                    LocalDateTime beforeDate,
+                                                                                    ZonedDateTime afterDate,
+                                                                                    ZonedDateTime beforeDate,
                                                                                     int pageNumber,
                                                                                     int pageSize) {
         Account account = accountService.getAccountByUsername(username);
@@ -136,7 +137,7 @@ public class TransactionService implements IExcelService<Transaction> {
         return transaction;
     }
 
-    public List<Transaction> getTransactionByCreatorUsernameAndDateBetween(String username, LocalDateTime afterDate, LocalDateTime beforeDate) {
+    public List<Transaction> getTransactionByCreatorUsernameAndDateBetween(String username, ZonedDateTime afterDate, ZonedDateTime beforeDate) {
         Account account = accountService.getAccountByUsername(username);
         return transactionRepository.findByCreatorIdAndDateFinishedBetween(account.getId(), afterDate, beforeDate);
     }
@@ -276,7 +277,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            LocalDateTime dateFinished = LocalDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                            ZonedDateTime dateFinished = ZonedDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                             String name = row.getCell(allColumnNames.indexOf("Name")).getStringCellValue();
                             Double phpPaid = row.getCell(allColumnNames.indexOf("Php paid")).getNumericCellValue();
                             Double goldPerPhp = row.getCell(allColumnNames.indexOf("Gold per php")).getNumericCellValue();
@@ -321,7 +322,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            LocalDateTime dateFinished = LocalDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                            ZonedDateTime dateFinished = ZonedDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                             BigDecimal ccAmount = BigDecimal.valueOf(row.getCell(allColumnNames.indexOf("CC Amount")).getNumericCellValue());
                             Double goldPerCc = row.getCell(allColumnNames.indexOf("Gold per CC")).getNumericCellValue();
                             Double goldPaid = row.getCell(allColumnNames.indexOf("Gold paid")).getNumericCellValue();
@@ -364,7 +365,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            LocalDateTime dateFinished = LocalDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                            ZonedDateTime dateFinished = ZonedDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                             String itemName = row.getCell(allColumnNames.indexOf("Item name")).getStringCellValue();
                             Long itemQuantity = (long) row.getCell(allColumnNames.indexOf("Item quantity")).getNumericCellValue();
                             Double itemPriceInGold = row.getCell(allColumnNames.indexOf("Item price in gold")).getNumericCellValue();

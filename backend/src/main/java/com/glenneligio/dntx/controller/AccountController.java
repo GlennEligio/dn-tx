@@ -176,8 +176,8 @@ public class AccountController {
     public ResponseEntity<TransactionPageDto> getAccountTransactions(@RequestParam(defaultValue = "1") int pageNumber,
                                                                      @RequestParam(defaultValue = "1") int pageSize,
                                                                      @RequestParam(defaultValue = "") String txType,
-                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beforeDate,
-                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime afterDate,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime beforeDate,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime afterDate,
                                                                      Authentication authentication) {
         log.info("Fetching own transactions with principal {}", authentication);
         // Prepare txType param
@@ -193,8 +193,8 @@ public class AccountController {
         }
 
         // Prepare after and before Date param
-        LocalDateTime afterDatePlaceHolder = afterDate != null ? afterDate : LocalDateTime.MIN.withYear(-9999);
-        LocalDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : LocalDateTime.MAX.withYear(9999);
+        ZonedDateTime afterDatePlaceHolder = afterDate != null ? afterDate : ZonedDateTime.now().withYear(-9999);
+        ZonedDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : ZonedDateTime.now().withYear(9999);
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
@@ -209,8 +209,8 @@ public class AccountController {
 
     @GetMapping("/@self/transactions/download")
     public void downloadAccountTransactions(HttpServletResponse response,
-                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beforeDate,
-                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime afterDate,
+                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime beforeDate,
+                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime afterDate,
                                             Authentication authentication) throws IOException {
         final String methodName = "downloadAccountTransactions";
         log.info("Preparing Transactions list for Download");
@@ -221,8 +221,8 @@ public class AccountController {
         String username = userDetails.getUsername();
 
         // if fromDate and toDate is present, filter the transactions again
-        LocalDateTime afterDatePlaceHolder = afterDate != null ? afterDate : LocalDateTime.MIN.withYear(-9999);
-        LocalDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : LocalDateTime.MAX.withYear(9999);
+        ZonedDateTime afterDatePlaceHolder = afterDate != null ? afterDate : ZonedDateTime.now().withYear(-9999);
+        ZonedDateTime beforeDatePlaceHolder = beforeDate != null ? beforeDate : ZonedDateTime.now().withYear(9999);
         List<Transaction> transactions = transactionService.getTransactionByCreatorUsernameAndDateBetween(username, afterDatePlaceHolder, beforeDatePlaceHolder);
         log.info("Transaction count: {}", transactions.size());
 

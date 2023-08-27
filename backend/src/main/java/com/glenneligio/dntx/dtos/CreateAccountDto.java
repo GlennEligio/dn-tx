@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class CreateAccountDto {
 
     @PastOrPresent(message = "Date registered can only be present or past dates")
     @NotNull(message = "Date registered must be present")
-    private LocalDateTime dateRegistered;
+    private ZonedDateTime dateRegistered;
 
     @NotBlank(message = "Account full name can't be blank")
     private String fullName;

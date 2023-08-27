@@ -9,7 +9,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @ReadingConverter
@@ -32,7 +32,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
                 ccToGoldTx.setGoldPerCC((Double) source.get("goldPerCC"));
                 ccToGoldTx.setCcAmount((BigDecimal) source.get("ccAmount"));
                 ccToGoldTx.setUsername((String) source.get("username"));
-                ccToGoldTx.setDateFinished((LocalDateTime) source.get("dateFinished"));
+                ccToGoldTx.setDateFinished((ZonedDateTime) source.get("dateFinished"));
                 ccToGoldTx.setFileAttachments((List<FileAttachment>) source.get("fileAttachments"));
                 transaction = ccToGoldTx;
                 break;
@@ -42,7 +42,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
                 goldToPhpTx.setType(TransactionType.CC2GOLD);
                 goldToPhpTx.setCreator((Account) source.get("creator"));
                 goldToPhpTx.setUsername((String) source.get("username"));
-                goldToPhpTx.setDateFinished((LocalDateTime) source.get("dateFinished"));
+                goldToPhpTx.setDateFinished((ZonedDateTime) source.get("dateFinished"));
                 goldToPhpTx.setFileAttachments((List<FileAttachment>) source.get("fileAttachments"));
                 goldToPhpTx.setGoldPerPhp((Double) source.get("goldPerPhp"));
                 goldToPhpTx.setMethodOfPayment((String) source.get("methodOfPayment"));
@@ -55,7 +55,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
                 itemToGoldTx.setType(TransactionType.CC2GOLD);
                 itemToGoldTx.setCreator((Account) source.get("creator"));
                 itemToGoldTx.setUsername((String) source.get("username"));
-                itemToGoldTx.setDateFinished((LocalDateTime) source.get("dateFinished"));
+                itemToGoldTx.setDateFinished((ZonedDateTime) source.get("dateFinished"));
                 itemToGoldTx.setFileAttachments((List<FileAttachment>) source.get("fileAttachments"));
                 itemToGoldTx.setItemQuantity((Long) source.get("itemQuantity"));
                 itemToGoldTx.setItemName((String) source.get("itemName"));
@@ -68,7 +68,7 @@ public class TransactionReadingConverter implements Converter<DBObject, Transact
                 tx.setType(TransactionType.CC2GOLD);
                 tx.setCreator((Account) source.get("creator"));
                 tx.setUsername((String) source.get("username"));
-                tx.setDateFinished((LocalDateTime) source.get("dateFinished"));
+                tx.setDateFinished((ZonedDateTime) source.get("dateFinished"));
                 tx.setFileAttachments((List<FileAttachment>) source.get("fileAttachments"));
                 transaction = tx;
                 break;

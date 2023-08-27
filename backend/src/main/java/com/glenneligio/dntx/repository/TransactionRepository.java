@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
 
     Page<Transaction> findByCreatorId(String id, Pageable pageable);
 
-    List<Transaction> findByCreatorIdAndDateFinishedBetween(String id, LocalDateTime afterDate, LocalDateTime beforeDate);
+    List<Transaction> findByCreatorIdAndDateFinishedBetween(String id, ZonedDateTime afterDate, ZonedDateTime beforeDate);
 
     @Query(value = "{'$and': [" +
             "{'creator.id': ?0}," +
@@ -28,8 +29,8 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
             "]}")
     Page<Transaction> findOwnTransactionsUsingDateFinishedAndTxType(String id,
                                                                     List<TransactionType> txTypes,
-                                                                    LocalDateTime afterDate,
-                                                                    LocalDateTime beforeDate,
+                                                                    ZonedDateTime afterDate,
+                                                                    ZonedDateTime beforeDate,
                                                                     Pageable pageable);
 
 }

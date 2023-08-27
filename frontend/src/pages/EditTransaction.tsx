@@ -15,6 +15,7 @@ import transactionApi, {
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
+import { getZonedDateTimeFromDateString } from '../util/utils';
 
 interface EditTxFormInput {
   username: string;
@@ -231,7 +232,7 @@ function EditTransaction() {
     if (transactionId) {
       const transaction: Transaction = {
         username: values.username,
-        dateFinished: values.dateFinished,
+        dateFinished: getZonedDateTimeFromDateString(values.dateFinished),
         fileAttachments: values.fileAttachments,
         creator: {
           username: auth.username,

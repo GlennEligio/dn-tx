@@ -3,12 +3,14 @@ import { useSelector } from 'react-redux';
 import { Button, Col, Form, Offcanvas, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ArrowClockwise } from 'react-bootstrap-icons';
+import * as moment from 'moment-timezone';
 import transactionApi, {
   TransactionPageDto,
   TransactionType,
 } from '../../api/transaction-api';
 import useHttp from '../../hooks/useHttp';
 import { IRootState } from '../../store';
+import { getZonedDateTimeFromDateString } from '../../util/utils';
 
 interface TransactionFilterProps {
   initTxType: TransactionType[];
@@ -49,8 +51,8 @@ function TransactionFilter({
   const saveSearchFiltersHandler = () => {
     const urlParams = {
       txType: txType.join(','),
-      afterDate,
-      beforeDate,
+      afterDate: getZonedDateTimeFromDateString(afterDate),
+      beforeDate: getZonedDateTimeFromDateString(beforeDate),
     };
     navigate(`?${new URLSearchParams(urlParams).toString()}`);
   };
@@ -62,8 +64,8 @@ function TransactionFilter({
       1,
       10,
       txType.join(','),
-      afterDate,
-      beforeDate
+      getZonedDateTimeFromDateString(afterDate),
+      getZonedDateTimeFromDateString(beforeDate)
     );
     filteredTxRequest(requestConf);
   }, [auth.accessToken, txType, beforeDate, afterDate, filteredTxRequest]);

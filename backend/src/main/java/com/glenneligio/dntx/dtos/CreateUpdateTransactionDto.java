@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Slf4j
@@ -44,7 +44,7 @@ public class CreateUpdateTransactionDto {
     private String itemName;
 
     @PastOrPresent(message = "Must be either in past or present")
-    private LocalDateTime dateFinished;
+    private ZonedDateTime dateFinished;
 
     @Positive(message = "itemQuantity must be positive")
     private Long itemQuantity;

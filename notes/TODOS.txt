@@ -22,6 +22,9 @@ DNTX-006: Use OAuth for Gdrive
 
 (DONE) DNTX-011: Add option for entering transaction date in the create Transaction feature
 
-DNTX-012: Use ZonedDateTime instead of LocalDateTime for time related informations
+DNTX-012: Use ZonedDateTime instead of LocalDateTime for time related information of Transactions
+ > places where we need to take account of timezones
+	- input for date in creating/editing Transaction
+		-> backend and frontend
 
 (DONE) DNTX-013: Inject Okteto Secret for sensitive data. Modify k8s yaml for better decoupling of components

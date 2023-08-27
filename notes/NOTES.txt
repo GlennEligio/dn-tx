@@ -32,3 +32,12 @@ Okteto
 	> update the context configuration using the command "okteto namespace"
 	
 	
+For building the docker images:
+FE: docker build -f Dockerfile.prod -t shuntjg/dntx-frontend:0.0.2.4-PROD 
+BE: ./mvnw spring-boot:build-image -DskipTests
+
+
+
+For handling dates in database
+1. Prefer using Instant/LocalDateTime with timezone UTC
+2. Default timezone of docker containers is UTC

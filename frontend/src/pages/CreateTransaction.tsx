@@ -3,6 +3,7 @@ import { Form, Col, Container, Row, Button, Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
+import * as moment from 'moment-timezone';
 import * as yup from 'yup';
 import TransactionApi, {
   CcToGoldTransaction,
@@ -14,6 +15,7 @@ import TransactionApi, {
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
+import { getZonedDateTimeFromDateString } from '../util/utils';
 
 interface CreateTxFormInput {
   username: string;
@@ -152,7 +154,6 @@ function CreateTransaction() {
     actions: FormikHelpers<CreateTxFormInput>
   ) => {
     actions.setSubmitting(false);
-
     const transaction: Transaction = {
       username: values.username,
       fileAttachments: values.fileAttachments,
@@ -160,7 +161,7 @@ function CreateTransaction() {
         username: auth.username,
       },
       type: values.type,
-      dateFinished: values.dateFinished,
+      dateFinished: getZonedDateTimeFromDateString(values.dateFinished),
     };
 
     let finalTransaction = null;
