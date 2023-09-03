@@ -1,12 +1,12 @@
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Link, redirect, useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Formik, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import useHttp from '../hooks/useHttp';
 import accountApi from '../api/account-api';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 import { getCharacterValidationError } from '../util/utils';
-import { useEffect } from 'react';
 
 interface ResetPasswordInput {
   newPassword: string;

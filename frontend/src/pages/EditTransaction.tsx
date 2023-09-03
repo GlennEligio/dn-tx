@@ -1,7 +1,15 @@
 import { FormEventHandler, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { Container, Row, Col, Form, Button, Stack } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Stack,
+  InputGroup,
+} from 'react-bootstrap';
 import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
 import * as yup from 'yup';
 import transactionApi, {
@@ -19,6 +27,7 @@ import {
   getDateFromZonedDateTimeString,
   getZonedDateTimeFromDateString,
 } from '../util/utils';
+import { ArrowLeftRight } from 'react-bootstrap-icons';
 
 interface EditTxFormInput {
   username: string;
@@ -124,6 +133,7 @@ function EditTransaction() {
   const [type, setType] = useState<TransactionType>(TransactionType.CC2GOLD);
   const [dateFinished, setDateFinished] = useState('');
   const [fileAttachments, setFileAttachment] = useState<FileAttachment[]>([]);
+  const [reversed, setReversed] = useState(false);
 
   // For CcToGoldTransaction
   const [ccAmount, setCcAmount] = useState(1);
@@ -195,6 +205,7 @@ function EditTransaction() {
       setType(currentTxData.type);
       setDateFinished(currentTxData.dateFinished);
       setFileAttachment(currentTxData.fileAttachments);
+      setReversed(currentTxData.reversed);
 
       if (currentTxData.type === TransactionType.CC2GOLD) {
         const ccToGoldTx = currentTxData as CcToGoldTransaction;
@@ -240,6 +251,7 @@ function EditTransaction() {
         creator: {
           username: auth.username,
         },
+        reversed,
         type: values.type,
       };
 
@@ -284,6 +296,10 @@ function EditTransaction() {
       editTxRequest(editTxReqConf);
       actions.setSubmitting(false);
     }
+  };
+
+  const reverseTxHandler = () => {
+    setReversed((prevState) => !prevState);
   };
 
   const validCurrentTx =
@@ -367,25 +383,33 @@ function EditTransaction() {
                       </Form.Group>
                       <Form.Group className="mb-3" controlId="editTxFormType">
                         <Form.Label>Type</Form.Label>
-                        <Form.Select
-                          aria-label="Transaction type"
-                          name="type"
-                          value={values.type}
-                          isValid={touched.type && !errors.type}
-                          isInvalid={touched.type && !!errors.type}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                        >
-                          <option value={TransactionType.CC2GOLD}>
-                            CC to Gold
-                          </option>
-                          <option value={TransactionType.GOLD2PHP}>
-                            Gold to PHP
-                          </option>
-                          <option value={TransactionType.ITEM2GOLD}>
-                            Item to Gold
-                          </option>
-                        </Form.Select>
+                        <InputGroup>
+                          <Form.Select
+                            aria-label="Transaction type"
+                            name="type"
+                            value={values.type}
+                            isValid={touched.type && !errors.type}
+                            isInvalid={touched.type && !!errors.type}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          >
+                            <option value={TransactionType.CC2GOLD}>
+                              {reversed ? 'Gold to CC' : 'CC to Gold'}
+                            </option>
+                            <option value={TransactionType.GOLD2PHP}>
+                              {reversed ? 'PHP to Gold' : 'Gold to PHP'}
+                            </option>
+                            <option value={TransactionType.ITEM2GOLD}>
+                              {reversed ? 'Gold to Item' : 'Item to Gold'}
+                            </option>
+                          </Form.Select>
+                          <Button
+                            variant="outline-secondary"
+                            onClick={reverseTxHandler}
+                          >
+                            <ArrowLeftRight />
+                          </Button>
+                        </InputGroup>
                         <Form.Control.Feedback type="invalid">
                           {errors.type}
                         </Form.Control.Feedback>
