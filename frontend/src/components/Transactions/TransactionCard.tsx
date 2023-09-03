@@ -1,6 +1,6 @@
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { Transaction } from '../../api/transaction-api';
 import {
   getDateFromZonedDateTimeString,
