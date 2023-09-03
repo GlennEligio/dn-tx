@@ -25,7 +25,7 @@ spec:
         app: dntx-frontend-react
     spec:
       containers:
-        - image: "shuntjg/dntx-frontend:0.0.2.4-PROD"
+        - image: "shuntjg/dntx-frontend:0.0.2.5-PROD"
           name: dntx-frontend-react
           envFrom:
             - configMapRef:
