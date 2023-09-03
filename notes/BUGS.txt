@@ -18,3 +18,7 @@ Bugs
 4. feature/DNTX-005
 	> fixed issue where the delete own transaction endpoint is not processed properly by the useHttp hook
 	> changed the response of the backend endpoint
+
+bugfix(0.0.2.5.1)
+ > Intl namespace is not available in the Dockerized environment where the FE is deployed
+ > needs to install "intl" package using npm

@@ -1,4 +1,5 @@
 import * as moment from 'moment-timezone';
+import 'intl';
 import { TransactionType } from '../api/transaction-api';
 
 const getPageArray = (
