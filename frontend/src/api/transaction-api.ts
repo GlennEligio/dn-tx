@@ -4,7 +4,6 @@ export enum TransactionType {
   CC2GOLD = 'CC2GOLD',
   GOLD2PHP = 'GOLD2PHP',
   ITEM2GOLD = 'ITEM2GOLD',
-  getAccountOwnTransactions = 'getAccountOwnTransactions',
 }
 
 export interface FileAttachment {
@@ -20,6 +19,7 @@ export interface Transaction {
   };
   dateFinished: string;
   fileAttachments: FileAttachment[];
+  reversed: boolean;
   type: TransactionType;
 }
 

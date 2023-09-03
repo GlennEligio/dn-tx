@@ -15,7 +15,10 @@ import transactionApi, {
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
-import { getZonedDateTimeFromDateString } from '../util/utils';
+import {
+  getDateFromZonedDateTimeString,
+  getZonedDateTimeFromDateString,
+} from '../util/utils';
 
 interface EditTxFormInput {
   username: string;
@@ -348,7 +351,9 @@ function EditTransaction() {
                         <Form.Control
                           type="datetime-local"
                           name="dateFinished"
-                          value={values.dateFinished}
+                          value={getDateFromZonedDateTimeString(
+                            values.dateFinished
+                          )}
                           isValid={touched.dateFinished && !errors.dateFinished}
                           isInvalid={
                             touched.dateFinished && !!errors.dateFinished

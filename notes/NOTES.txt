@@ -33,7 +33,7 @@ Okteto
 	
 	
 For building the docker images:
-FE: docker build -f Dockerfile.prod -t shuntjg/dntx-frontend:0.0.2.4-PROD 
+FE: docker build -f Dockerfile.prod -t shuntjg/dntx-frontend:0.0.2.5-PROD .
 BE: ./mvnw spring-boot:build-image -DskipTests
 
 

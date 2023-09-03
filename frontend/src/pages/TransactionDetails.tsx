@@ -12,6 +12,7 @@ import transactionApi, {
 import DeleteTransactionModal from '../components/modals/DeleteTransactionModal';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
+import { getDateFromZonedDateTimeString, txTypeText } from '../util/utils';
 
 function TransactionDetails() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -89,7 +90,10 @@ function TransactionDetails() {
                         type="text"
                         placeholder="Enter type"
                         readOnly
-                        value={transactionData.type}
+                        value={txTypeText(
+                          transactionData.type,
+                          transactionData.reversed
+                        )}
                       />
                     </Form.Group>
                     <Form.Group
@@ -100,7 +104,9 @@ function TransactionDetails() {
                       <Form.Control
                         type="datetime-local"
                         readOnly
-                        value={transactionData.dateFinished}
+                        value={getDateFromZonedDateTimeString(
+                          transactionData.dateFinished
+                        )}
                       />
                     </Form.Group>
                     {transactionData.type === TransactionType.GOLD2PHP && (

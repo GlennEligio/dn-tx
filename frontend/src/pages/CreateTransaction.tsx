@@ -1,10 +1,18 @@
-import { useEffect } from 'react';
-import { Form, Col, Container, Row, Button, Stack } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import {
+  Form,
+  Col,
+  Container,
+  Row,
+  Button,
+  Stack,
+  InputGroup,
+} from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
-import * as moment from 'moment-timezone';
 import * as yup from 'yup';
+import { ArrowLeftRight } from 'react-bootstrap-icons';
 import TransactionApi, {
   CcToGoldTransaction,
   FileAttachment,
@@ -21,6 +29,7 @@ interface CreateTxFormInput {
   username: string;
   type: TransactionType;
   fileAttachments: FileAttachment[];
+  reversed: boolean;
   ccAmount: number;
   goldPerCC: number;
   goldPaid: number;
@@ -114,11 +123,13 @@ const createTxFormInputSchema = yup.object().shape({
 
 function CreateTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
+  const [reversed, setReversed] = useState(false);
 
   const createTxFormInitialValues: CreateTxFormInput = {
     username: '',
     type: TransactionType.CC2GOLD,
     fileAttachments: [],
+    reversed,
     ccAmount: 1,
     goldPaid: 1,
     goldPerCC: 1,
@@ -160,6 +171,7 @@ function CreateTransaction() {
       creator: {
         username: auth.username,
       },
+      reversed,
       type: values.type,
       dateFinished: getZonedDateTimeFromDateString(values.dateFinished),
     };
@@ -202,6 +214,10 @@ function CreateTransaction() {
     );
 
     createTxRequest(createTxReqConf);
+  };
+
+  const reverseTxHandler = () => {
+    setReversed((prevState) => !prevState);
   };
 
   return (
@@ -278,25 +294,33 @@ function CreateTransaction() {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="createTxFormType">
                       <Form.Label>Type</Form.Label>
-                      <Form.Select
-                        aria-label="Transaction type"
-                        name="type"
-                        value={values.type}
-                        isValid={touched.type && !errors.type}
-                        isInvalid={touched.type && !!errors.type}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      >
-                        <option value={TransactionType.CC2GOLD}>
-                          CC to Gold
-                        </option>
-                        <option value={TransactionType.GOLD2PHP}>
-                          Gold to PHP
-                        </option>
-                        <option value={TransactionType.ITEM2GOLD}>
-                          Item to Gold
-                        </option>
-                      </Form.Select>
+                      <InputGroup>
+                        <Form.Select
+                          aria-label="Transaction type"
+                          name="type"
+                          value={values.type}
+                          isValid={touched.type && !errors.type}
+                          isInvalid={touched.type && !!errors.type}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        >
+                          <option value={TransactionType.CC2GOLD}>
+                            {reversed ? 'Gold to CC' : 'CC to Gold'}
+                          </option>
+                          <option value={TransactionType.GOLD2PHP}>
+                            {reversed ? 'PHP to Gold' : 'Gold to PHP'}
+                          </option>
+                          <option value={TransactionType.ITEM2GOLD}>
+                            {reversed ? 'Gold to Item' : 'Item to Gold'}
+                          </option>
+                        </Form.Select>
+                        <Button
+                          variant="outline-secondary"
+                          onClick={reverseTxHandler}
+                        >
+                          <ArrowLeftRight />
+                        </Button>
+                      </InputGroup>
                       <Form.Control.Feedback type="invalid">
                         {errors.type}
                       </Form.Control.Feedback>

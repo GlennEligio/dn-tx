@@ -24,9 +24,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -35,7 +35,7 @@ import java.util.stream.IntStream;
 public class TransactionService implements IExcelService<Transaction> {
 
     private static final String CLASS_NAME = TransactionService.class.getName();
-    private static final List<String> baseTxColumnNames = List.of("Transaction id", "Username", "Creator Username", "Date finished", "Type");
+    private static final List<String> baseTxColumnNames = List.of("Transaction id", "Username", "Creator Username", "Date finished", "Is Reversed", "Type");
     private static final List<String> ccToGoldTxColumnNames = List.of("CC Amount", "Gold per CC", "Gold paid");
     private static final List<String> goldToPhpTxColumnNames = List.of("Name", "Php paid", "Gold per php", "Method of payment");
     private static final List<String> itemToGoldColumnNames = List.of("Item name", "Item quantity", "Item price in gold");
@@ -199,7 +199,8 @@ public class TransactionService implements IExcelService<Transaction> {
                             dataRow.createCell(allColumnNames.indexOf("Transaction id")).setCellValue(baseTx.getId());
                             dataRow.createCell(allColumnNames.indexOf("Username")).setCellValue(baseTx.getUsername());
                             dataRow.createCell(allColumnNames.indexOf("Creator Username")).setCellValue(baseTx.getCreator().getUsername());
-                            dataRow.createCell(allColumnNames.indexOf("Date finished")).setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(baseTx.getDateFinished()));
+                            dataRow.createCell(allColumnNames.indexOf("Date finished")).setCellValue(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(baseTx.getDateFinished()));
+                            dataRow.createCell(allColumnNames.indexOf("Is Reversed")).setCellValue(baseTx.isReversed());
                             dataRow.createCell(allColumnNames.indexOf("Type")).setCellValue(baseTx.getType().name());
 
                             // insert file attachments
@@ -277,7 +278,8 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            ZonedDateTime dateFinished = ZonedDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                            ZonedDateTime dateFinished = ZonedDateTime.ofInstant(Instant.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue()), ZoneOffset.UTC);
+                            Boolean isReversed = row.getCell(allColumnNames.indexOf("Is Reversed")).getBooleanCellValue();
                             String name = row.getCell(allColumnNames.indexOf("Name")).getStringCellValue();
                             Double phpPaid = row.getCell(allColumnNames.indexOf("Php paid")).getNumericCellValue();
                             Double goldPerPhp = row.getCell(allColumnNames.indexOf("Gold per php")).getNumericCellValue();
@@ -304,6 +306,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             goldToPhpTransaction.setType(TransactionType.GOLD2PHP);
                             goldToPhpTransaction.setUsername(username);
                             goldToPhpTransaction.setDateFinished(dateFinished);
+                            goldToPhpTransaction.setReversed(isReversed);
                             goldToPhpTransaction.setName(name);
                             goldToPhpTransaction.setPhpPaid(phpPaid);
                             goldToPhpTransaction.setGoldPerPhp(goldPerPhp);
@@ -322,7 +325,8 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            ZonedDateTime dateFinished = ZonedDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                            ZonedDateTime dateFinished = ZonedDateTime.ofInstant(Instant.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue()), ZoneOffset.UTC);
+                            Boolean isReversed = row.getCell(allColumnNames.indexOf("Is Reversed")).getBooleanCellValue();
                             BigDecimal ccAmount = BigDecimal.valueOf(row.getCell(allColumnNames.indexOf("CC Amount")).getNumericCellValue());
                             Double goldPerCc = row.getCell(allColumnNames.indexOf("Gold per CC")).getNumericCellValue();
                             Double goldPaid = row.getCell(allColumnNames.indexOf("Gold paid")).getNumericCellValue();
@@ -348,6 +352,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             ccToGoldTransaction.setCreator(account);
                             ccToGoldTransaction.setDateFinished(dateFinished);
                             ccToGoldTransaction.setType(TransactionType.CC2GOLD);
+                            ccToGoldTransaction.setReversed(isReversed);
                             ccToGoldTransaction.setCcAmount(ccAmount);
                             ccToGoldTransaction.setGoldPaid(goldPaid);
                             ccToGoldTransaction.setGoldPerCC(goldPerCc);
@@ -365,7 +370,8 @@ public class TransactionService implements IExcelService<Transaction> {
                             String txId = row.getCell(allColumnNames.indexOf("Transaction id")).getStringCellValue();
                             String username = row.getCell(allColumnNames.indexOf("Username")).getStringCellValue();
                             String creatorUsername = row.getCell(allColumnNames.indexOf("Creator Username")).getStringCellValue();
-                            ZonedDateTime dateFinished = ZonedDateTime.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                            ZonedDateTime dateFinished = ZonedDateTime.ofInstant(Instant.parse(row.getCell(allColumnNames.indexOf("Date finished")).getStringCellValue()), ZoneOffset.UTC);
+                            Boolean isReversed = row.getCell(allColumnNames.indexOf("Is Reversed")).getBooleanCellValue();
                             String itemName = row.getCell(allColumnNames.indexOf("Item name")).getStringCellValue();
                             Long itemQuantity = (long) row.getCell(allColumnNames.indexOf("Item quantity")).getNumericCellValue();
                             Double itemPriceInGold = row.getCell(allColumnNames.indexOf("Item price in gold")).getNumericCellValue();
@@ -391,6 +397,7 @@ public class TransactionService implements IExcelService<Transaction> {
                             itemToGoldTransaction.setType(TransactionType.ITEM2GOLD);
                             itemToGoldTransaction.setCreator(account);
                             itemToGoldTransaction.setDateFinished(dateFinished);
+                            itemToGoldTransaction.setReversed(isReversed);
                             itemToGoldTransaction.setItemName(itemName);
                             itemToGoldTransaction.setItemQuantity(itemQuantity);
                             itemToGoldTransaction.setItemPriceInGold(itemPriceInGold);

@@ -2,7 +2,11 @@ import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import * as moment from 'moment-timezone';
 import { Transaction } from '../../api/transaction-api';
-import { getZonedDateTimeFromDateString } from '../../util/utils';
+import {
+  getDateFromZonedDateTimeString,
+  getZonedDateTimeFromDateString,
+  txTypeText,
+} from '../../util/utils';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -17,7 +21,7 @@ function TransactionCard({ transaction, className }: TransactionCardProps) {
           <Link to={`/transactions/${transaction.id}`}>{transaction.id}</Link>
         </Card.Title>
         <Card.Subtitle className="mb-2 text-muted">
-          {transaction.type}
+          {txTypeText(transaction.type, transaction.reversed)}
         </Card.Subtitle>
         <Card.Text>
           <b>Username: </b>
@@ -28,7 +32,7 @@ function TransactionCard({ transaction, className }: TransactionCardProps) {
           <br />
           <span className="text-muted">
             {moment(
-              getZonedDateTimeFromDateString(transaction.dateFinished)
+              getDateFromZonedDateTimeString(transaction.dateFinished)
             ).format('LLL')}
           </span>
         </Card.Text>

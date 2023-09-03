@@ -1,4 +1,5 @@
 import * as moment from 'moment-timezone';
+import { TransactionType } from '../api/transaction-api';
 
 const getPageArray = (
   currentPage: number,
@@ -42,4 +43,28 @@ export const getZonedDateTimeFromDateString = (date: string) => {
     .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
     .toISOString();
   return dateString || '';
+};
+
+export const getDateFromZonedDateTimeString = (zdt: string) => {
+  const date = moment(zdt)
+    .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    .format('yyyy-MM-DDTHH:mm');
+  return date;
+};
+
+export const txTypeText = (txType: TransactionType, isReversed: boolean) => {
+  const txTextMap: { [any: string]: string } = {
+    CC2GOLD: 'CC to Gold',
+    GOLD2CC: 'Gold to CC',
+    GOLD2PHP: 'Gold to PHP',
+    PHP2GOLD: 'PHP to Gold',
+    ITEM2GOLD: 'Item to Gold',
+    GOLD2ITEM: 'Gold to Item',
+  };
+
+  const splitTx = txType.split('2');
+  const finalTxTypeString = isReversed
+    ? [splitTx[1], '2', splitTx[0]].join('')
+    : txType;
+  return txTextMap[finalTxTypeString];
 };

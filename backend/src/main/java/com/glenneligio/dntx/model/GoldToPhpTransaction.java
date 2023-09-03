@@ -42,6 +42,7 @@ public class GoldToPhpTransaction extends Transaction {
         this.setCreator(t.getCreator());
         this.setDateFinished(t.getDateFinished());
         this.setFileAttachments(t.getFileAttachments());
+        this.setReversed(t.isReversed());
         this.setType(t.getType());
 
         ObjectMapper mapper = new ObjectMapper();

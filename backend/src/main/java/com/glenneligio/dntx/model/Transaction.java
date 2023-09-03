@@ -36,11 +36,14 @@ public class Transaction implements Serializable {
     private ZonedDateTime dateFinished;
     private List<FileAttachment> fileAttachments;
 
+    private boolean reversed;
+
     private TransactionType type;
 
     public void update(Transaction t) {
         this.username = t.getUsername();
         this.fileAttachments = t.getFileAttachments();
         this.dateFinished = t.getDateFinished();
+        this.reversed = t.isReversed();
     }
 }

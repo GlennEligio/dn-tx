@@ -27,6 +27,8 @@ public class CreateUpdateTransactionDto {
     @NotNull(message = "Transaction type must be present")
     private String type;
 
+    private Boolean reversed;
+
     @Positive
     private BigDecimal ccAmount;
     @Positive
@@ -61,6 +63,8 @@ public class CreateUpdateTransactionDto {
                 transaction1.setCreator(creator);
                 transaction1.setFileAttachments(fileAttachments);
                 transaction1.setType(TransactionType.CC2GOLD);
+                transaction1.setReversed(reversed);
+
                 transaction1.setCcAmount(ccAmount);
                 transaction1.setGoldPerCC(goldPerCC);
                 transaction1.setGoldPaid(goldPaid);
@@ -73,6 +77,7 @@ public class CreateUpdateTransactionDto {
                 transaction2.setCreator(creator);
                 transaction2.setFileAttachments(fileAttachments);
                 transaction2.setType(TransactionType.GOLD2PHP);
+                transaction2.setReversed(reversed);
 
                 transaction2.setName(name);
                 transaction2.setPhpPaid(phpPaid);
@@ -87,6 +92,7 @@ public class CreateUpdateTransactionDto {
                 transaction3.setCreator(creator);
                 transaction3.setFileAttachments(fileAttachments);
                 transaction3.setType(TransactionType.ITEM2GOLD);
+                transaction3.setReversed(reversed);
 
                 transaction3.setItemName(itemName);
                 transaction3.setItemQuantity(itemQuantity);
