@@ -22,3 +22,8 @@ Bugs
 bugfix(0.0.2.5.1)
  > Intl namespace is not available in the Dockerized environment where the FE is deployed
  > needs to install "intl" package using npm
+ > in addition, we should not import ALL of the objects exposed by moment timezone js as "moment"
+	- this is because moment timezone also exposes an object named "moment"
+	- to fix this, instead of A, we should do B, where UNIQUENAME does not collide with any object exported by the moment timezone
+		a. import * as moment from 'moment-timezone'
+		b. import moment, * from UNIQUENAME from 'moment-timezone'
