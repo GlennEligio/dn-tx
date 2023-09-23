@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,9 +16,8 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "transactions")
 @Slf4j
-public class CcToGoldTransaction extends Transaction{
+public class CcToGoldTransactionItem extends TransactionItem {
 
     @Positive(message = "CcToGoldTransaction's cc amount must be positive")
     @NotNull(message = "Cc amount must not be null")
@@ -30,16 +31,8 @@ public class CcToGoldTransaction extends Transaction{
     @NotNull(message = "Gold paid must not be null")
     private Double goldPaid;
 
-    public CcToGoldTransaction(Transaction t)  {
-        log.info("Updating cc to gold transaction: {}", t);
-        this.setId(t.getId());
-        this.setUsername(t.getUsername());
-        this.setCreator(t.getCreator());
-        this.setDateFinished(t.getDateFinished());
-        this.setFileAttachments(t.getFileAttachments());
-        this.setReversed(t.isReversed());
-        this.setType(t.getType());
-
+    public CcToGoldTransactionItem(TransactionItem t)  {
+        log.info("Updating cc to gold transaction item: {}", t);
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         try {
@@ -53,10 +46,12 @@ public class CcToGoldTransaction extends Transaction{
         }
     }
 
-    public void updateCcToGold(CcToGoldTransaction t) {
-        super.update(t);
-        this.ccAmount = t.getCcAmount();
-        this.goldPerCC = t.getGoldPerCC();
-        this.goldPaid = t.getGoldPaid();
+    @Override
+    public TransactionItem update(TransactionItem t) {
+        CcToGoldTransactionItem src = new CcToGoldTransactionItem(t);
+        this.ccAmount = src.getCcAmount();
+        this.goldPerCC = src.getGoldPerCC();
+        this.goldPaid = src.getGoldPaid();
+        return this;
     }
 }

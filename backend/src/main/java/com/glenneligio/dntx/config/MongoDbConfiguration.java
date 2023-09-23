@@ -17,7 +17,6 @@ public class MongoDbConfiguration {
         List<Converter<?, ?>> converterList = new ArrayList<>();
         converterList.add(new TransactionTypeReadingConverter());
         converterList.add(new TransactionTypeWritingConverter());
-        converterList.add(new TransactionReadingConverter());
         converterList.add(new AccountTypeReadingConverter());
         converterList.add(new AccountTypeWritingConverter());
         converterList.add(new ZonedDateTimeWriteConverter());

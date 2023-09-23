@@ -1,6 +1,5 @@
 package com.glenneligio.dntx.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glenneligio.dntx.exception.ApiException;
@@ -16,9 +15,8 @@ import org.springframework.http.HttpStatus;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "transactions")
 @Slf4j
-public class ItemToGoldTransaction extends Transaction{
+public class ItemToGoldTransactionItem extends TransactionItem{
 
     @NotBlank(message = "itemName can not be blank")
     private String itemName;
@@ -27,33 +25,27 @@ public class ItemToGoldTransaction extends Transaction{
     @Positive(message = "itemPriceInGold must be positive")
     private Double itemPriceInGold;
 
-    public ItemToGoldTransaction(Transaction t)  {
-        this.setId(t.getId());
-        this.setUsername(t.getUsername());
-        this.setCreator(t.getCreator());
-        this.setDateFinished(t.getDateFinished());
-        this.setFileAttachments(t.getFileAttachments());
-        this.setReversed(t.isReversed());
-        this.setType(t.getType());
-
+    public ItemToGoldTransactionItem(TransactionItem t)  {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         try {
             String txString = mapper.writeValueAsString(t);
+            log.info(txString);
             JsonNode jsonNode = mapper.readTree(txString);
             this.setItemName(jsonNode.get("itemName").asText());
             this.setItemQuantity(jsonNode.get("itemQuantity").asLong());
             this.setItemPriceInGold(jsonNode.get("itemPriceInGold").asDouble());
         } catch (Exception e) {
-            throw new ApiException("Something when wrong went parsing Transaction to ItemToGoldTx", HttpStatus.BAD_REQUEST);
+            throw new ApiException("Something when wrong went parsing TransactionItem to ItemToGoldTxItem", HttpStatus.BAD_REQUEST);
         }
     }
 
-    public void updateItemToGold(ItemToGoldTransaction t) {
+    public TransactionItem update(TransactionItem t) {
         log.info("Updating item to gold transaction: {}", t);
-        super.update(t);
-        this.itemPriceInGold = t.getItemPriceInGold();
-        this.itemQuantity = t.getItemQuantity();
-        this.itemName = t.getItemName();
+        ItemToGoldTransactionItem src = new ItemToGoldTransactionItem(t);
+        this.itemPriceInGold = src.getItemPriceInGold();
+        this.itemQuantity = src.getItemQuantity();
+        this.itemName = src.getItemName();
+        return src;
     }
 }

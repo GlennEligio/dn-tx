@@ -256,7 +256,7 @@ public class AccountController {
         String username = userDetails.getUsername();
 
         List<Transaction> transactions = transactionService.excelToList(file);
-        log.info("Got the transactions from excel");
+        log.info("Got the transactions from excel, size: {}", transactions.size());
 
         // check if all transactions are owned by the creator
         boolean allTxOwned = transactions.stream().allMatch(tx -> tx.getCreator().getUsername().equals(username));

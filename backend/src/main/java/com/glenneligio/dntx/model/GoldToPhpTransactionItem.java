@@ -18,9 +18,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "transactions")
 @Slf4j
-public class GoldToPhpTransaction extends Transaction {
+public class GoldToPhpTransactionItem extends TransactionItem {
 
     @NotBlank(message = "GoldToPhpTransaction's name must not be blank")
     private String name;
@@ -36,15 +35,7 @@ public class GoldToPhpTransaction extends Transaction {
     @NotBlank(message = "GoldToPhpTransaction's method of payment must not be blank")
     private String methodOfPayment;
 
-    public GoldToPhpTransaction(Transaction t)  {
-        this.setId(t.getId());
-        this.setUsername(t.getUsername());
-        this.setCreator(t.getCreator());
-        this.setDateFinished(t.getDateFinished());
-        this.setFileAttachments(t.getFileAttachments());
-        this.setReversed(t.isReversed());
-        this.setType(t.getType());
-
+    public GoldToPhpTransactionItem(TransactionItem t)  {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         try {
@@ -60,13 +51,14 @@ public class GoldToPhpTransaction extends Transaction {
     }
 
 
-    public void updateGold2Php(GoldToPhpTransaction t) {
-        log.info("Updating gold to php transaction: {}", t);
-        super.update(t);
-        this.name = t.getName();
-        this.phpPaid = t.getPhpPaid();
-        this.goldPerPhp = t.getGoldPerPhp();
-        this.methodOfPayment = t.getMethodOfPayment();
+    public TransactionItem update(TransactionItem src) {
+        log.info("Updating gold to php transaction: {}", src);
+        GoldToPhpTransactionItem convertedSrc = new GoldToPhpTransactionItem(src);
+        this.name = convertedSrc.getName();
+        this.phpPaid = convertedSrc.getPhpPaid();
+        this.goldPerPhp = convertedSrc.getGoldPerPhp();
+        this.methodOfPayment = convertedSrc.getMethodOfPayment();
+        return convertedSrc;
     }
 
 }
