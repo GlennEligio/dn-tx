@@ -18,24 +18,29 @@ export interface Transaction {
     username: string;
   };
   dateFinished: string;
+  transactionItems: TransactionItem[];
   fileAttachments: FileAttachment[];
   reversed: boolean;
   type: TransactionType;
 }
 
-export interface CcToGoldTransaction extends Transaction {
+export interface TransactionItem {
+  [prop: string]: any;
+}
+
+export interface CcToGoldTransactionItem extends TransactionItem {
   ccAmount: number;
   goldPerCC: number;
   goldPaid: number;
 }
 
-export interface ItemToGoldTransaction extends Transaction {
+export interface ItemToGoldTransactionItem extends TransactionItem {
   itemName: string;
   itemQuantity: number;
   itemPriceInGold: number;
 }
 
-export interface GoldToPhpTransaction extends Transaction {
+export interface GoldToPhpTransactionItem extends TransactionItem {
   name: string;
   phpPaid: number;
   goldPerPhp: number;

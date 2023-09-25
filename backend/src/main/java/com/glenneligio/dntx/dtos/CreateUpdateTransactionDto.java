@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,8 @@ public class CreateUpdateTransactionDto {
     @NotNull(message = "Creator must be present, at least the username")
     private Account creator;
     private List<FileAttachment> fileAttachments;
+
+    private ZonedDateTime dateFinished;
 
     @Pattern(regexp = "(CC2GOLD|GOLD2PHP|ITEM2GOLD)", message = "Transaction type can only be CC2GOLD, GOLD2PHP, or ITEM2GOLD")
     @NotNull(message = "Transaction type must be present")
@@ -40,6 +43,7 @@ public class CreateUpdateTransactionDto {
         transaction.setFileAttachments(fileAttachments);
         transaction.setType(TransactionType.getTransactionType(type));
         transaction.setReversed(reversed);
+        transaction.setDateFinished(dateFinished);
 
         transaction.setTransactionItems(transactionItems.stream()
                 .map(t -> t.toTransactionItem(transaction.getType()))

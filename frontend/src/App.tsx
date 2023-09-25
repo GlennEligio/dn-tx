@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import SearchTransaction from './pages/SearchTransaction';
 import TransactionDetails from './pages/TransactionDetails';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 import DeleteTransactionSuccess from './pages/DeleteTransactionSuccess';
 import Transactions from './pages/Transactions';
 import AccountDetails from './pages/AccountDetails';

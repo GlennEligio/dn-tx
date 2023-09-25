@@ -33,3 +33,25 @@ DNTX-006: Use OAuth for Gdrive
  > used for changing current transaction type in reverse
 	- ex: CC2GOLD to GOLD2CC
 	- this means that instead of the User trading their CC to Gold, they trade their Gold for CC
+	
+DNTX-015: TransactionItem class
+ > as of now, each Transaction can only represent a single item in the said Transaction
+	- for Transaction with multiple items (i.e. ITEM2GOLD, where there are multiple items in a single Transaction), we will need to create multiple Transaction objects
+ > to remedy this, for each Transaction, there will be multiple transaction items
+ > TransactionItem class will have the same attribute fields as the current Transaction class right now
+ > Then the Transaction class will have a field of TransactionItems[], to reference multiple TransactionItem
+ > this change will affect the following places
+	a. Backend
+		1. "model" classes
+			- Transaction
+			- TransactionItem
+		2. services
+			- TransactionService
+				= excelToList
+				= listToExcel
+	b. Frontend
+		1. Transaction details
+		2. Create/Edit/Delete Transaction page
+		3. Transaction Card, specify the number of Transaction items
+	
+ 

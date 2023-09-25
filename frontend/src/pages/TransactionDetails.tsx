@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Col, Row, Container, Form, Stack, Button } from 'react-bootstrap';
+import {
+  Col,
+  Row,
+  Container,
+  Form,
+  Stack,
+  Button,
+  Carousel,
+} from 'react-bootstrap';
 import transactionApi, {
-  CcToGoldTransaction,
-  GoldToPhpTransaction,
-  ItemToGoldTransaction,
+  CcToGoldTransactionItem,
+  GoldToPhpTransactionItem,
+  ItemToGoldTransactionItem,
   Transaction,
   TransactionType,
 } from '../api/transaction-api';
@@ -13,6 +21,7 @@ import DeleteTransactionModal from '../components/modals/DeleteTransactionModal'
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import { getDateFromZonedDateTimeString, txTypeText } from '../util/utils';
+import TransactionItemsCarousel from '../components/Transactions/TransactionItemsCarousel';
 
 function TransactionDetails() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -65,7 +74,7 @@ function TransactionDetails() {
     <Container>
       <Row>
         <Col />
-        <Col xs={10} md={8} lg={6} xl={4}>
+        <Col xs={11} md={10} lg={8} xl={6}>
           <div className="d-flex flex-column py-3">
             <div className="text-center mb-3">
               <h3>Transaction Details</h3>
@@ -109,170 +118,12 @@ function TransactionDetails() {
                         )}
                       />
                     </Form.Group>
-                    {transactionData.type === TransactionType.GOLD2PHP && (
-                      <>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormName"
-                        >
-                          <Form.Label>Name</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter name"
-                            readOnly
-                            value={
-                              (transactionData as GoldToPhpTransaction).name
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormPhpPaid"
-                        >
-                          <Form.Label>PHP paid</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter php amount"
-                            readOnly
-                            value={
-                              (transactionData as GoldToPhpTransaction).phpPaid
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormGoldPerPhp"
-                        >
-                          <Form.Label>Gold per PHP</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter gold to php ratio"
-                            readOnly
-                            value={
-                              (transactionData as GoldToPhpTransaction)
-                                .goldPerPhp
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormMethodOfPayment"
-                        >
-                          <Form.Label>Method of payment</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter method of payment"
-                            readOnly
-                            value={
-                              (transactionData as GoldToPhpTransaction)
-                                .methodOfPayment
-                            }
-                          />
-                        </Form.Group>
-                      </>
-                    )}
-                    {transactionData.type === TransactionType.CC2GOLD && (
-                      <>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormCcAmount"
-                        >
-                          <Form.Label>CC Amount</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter CC amount"
-                            readOnly
-                            value={
-                              (transactionData as CcToGoldTransaction).ccAmount
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormGoldPerCc"
-                        >
-                          <Form.Label>Gold per CC</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter gold to cc ratio"
-                            readOnly
-                            value={
-                              (transactionData as CcToGoldTransaction).goldPerCC
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormGoldPaid"
-                        >
-                          <Form.Label>Gold paid</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter gold paid"
-                            readOnly
-                            value={
-                              (transactionData as CcToGoldTransaction).goldPaid
-                            }
-                          />
-                        </Form.Group>
-                      </>
-                    )}
-                    {transactionData.type === TransactionType.ITEM2GOLD && (
-                      <>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormItemName"
-                        >
-                          <Form.Label>Item name</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter item name"
-                            readOnly
-                            value={
-                              (transactionData as ItemToGoldTransaction)
-                                .itemName
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormItemQuantity"
-                        >
-                          <Form.Label>Item quantity</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter item quantity"
-                            readOnly
-                            value={
-                              (transactionData as ItemToGoldTransaction)
-                                .itemQuantity
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormItemPriceInGold"
-                        >
-                          <Form.Label>Item price in gold</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter item price in gold"
-                            readOnly
-                            value={
-                              (transactionData as ItemToGoldTransaction)
-                                .itemPriceInGold
-                            }
-                          />
-                        </Form.Group>
-                      </>
-                    )}
+                    <TransactionItemsCarousel
+                      transactionItems={transactionData.transactionItems}
+                      txType={transactionData.type}
+                      key="transaction-carousel"
+                      readOnly
+                    />
                   </div>
                   <div className="mb-3">
                     <h5>File attachments</h5>
@@ -282,7 +133,7 @@ function TransactionDetails() {
                         transactionData.fileAttachments.map(
                           (fileInput, index) => {
                             return (
-                              <div key={`File input ${index}`}>
+                              <div key={`file-attachment-${index}`}>
                                 <div>
                                   <b>File #{index + 1}</b>
                                 </div>

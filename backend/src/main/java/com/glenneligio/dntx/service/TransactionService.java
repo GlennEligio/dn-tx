@@ -56,6 +56,7 @@ public class TransactionService implements IExcelService<Transaction> {
         transaction.setDateFinished(transaction.getDateFinished() != null ? transaction.getDateFinished() : ZonedDateTime.now());
 
         transaction.setTransactionItems(Transaction.convertTransactionItems(transaction));
+        transaction.setFileAttachments(transaction.getFileAttachments() != null ? transaction.getFileAttachments() : new ArrayList<>());
         validateTransaction(transaction);
         return transactionRepository.save(transaction);
     }

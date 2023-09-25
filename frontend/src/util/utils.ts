@@ -43,6 +43,7 @@ export const getZonedDateTimeFromDateString = (date: string) => {
   const dateString = moment(date)
     .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
     .toISOString();
+  console.log(dateString);
   return dateString || '';
 };
 
