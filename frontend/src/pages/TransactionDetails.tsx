@@ -10,13 +10,7 @@ import {
   Button,
   Carousel,
 } from 'react-bootstrap';
-import transactionApi, {
-  CcToGoldTransactionItem,
-  GoldToPhpTransactionItem,
-  ItemToGoldTransactionItem,
-  Transaction,
-  TransactionType,
-} from '../api/transaction-api';
+import transactionApi, { Transaction } from '../api/transaction-api';
 import DeleteTransactionModal from '../components/modals/DeleteTransactionModal';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
@@ -45,17 +39,6 @@ function TransactionDetails() {
       transactionRequest(getTransactionByIdReqConf);
     }
   }, [transactionId, transactionRequest]);
-
-  // Checks the transactionData
-  useEffect(() => {
-    if (
-      transactionData &&
-      transactionError === null &&
-      transactionStatus === 'completed'
-    ) {
-      console.log(transactionData);
-    }
-  }, [transactionData, transactionError, transactionStatus]);
 
   const deleteTxModalShowHandler = () => {
     setShowDeleteModal(true);

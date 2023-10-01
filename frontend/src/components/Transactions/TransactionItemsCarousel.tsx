@@ -1,11 +1,15 @@
-import React, { ChangeEventHandler, useEffect, useState } from 'react';
+import React, {
+  ChangeEventHandler,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { FormikErrors, FormikTouched, getIn } from 'formik';
 import { Button, Form } from 'react-bootstrap';
 import {
   CcToGoldTransactionItem,
   GoldToPhpTransactionItem,
   ItemToGoldTransactionItem,
-  Transaction,
   TransactionItem,
   TransactionType,
 } from '../../api/transaction-api';
@@ -15,11 +19,10 @@ import CarouselWithAddRemove from '../UI/CarouselWithAddRemove';
 interface TransactionItemsCarouselProps<T> {
   txType: TransactionType;
   transactionItems: TransactionItem[];
-  setNewTxItems?: (newTxItems: TransactionItem[]) => void;
   readOnly: boolean;
-  values: T;
-  touched: FormikTouched<T>;
-  errors: FormikErrors<T>;
+  setNewTxItems?: (newTxItems: TransactionItem[]) => void;
+  touched?: FormikTouched<T>;
+  errors?: FormikErrors<T>;
 }
 
 function TransactionItemsCarousel<T>({
@@ -27,18 +30,17 @@ function TransactionItemsCarousel<T>({
   txType,
   setNewTxItems = () => {},
   readOnly,
-  values,
-  errors,
-  touched,
+  errors = {},
+  touched = {},
 }: TransactionItemsCarouselProps<T>) {
   const [currIdx, setCurrIdx] = useState(0);
 
-  const addTransactionItem = () => {
+  const createNewTransaction = useCallback((type: TransactionType) => {
     let newTx:
       | CcToGoldTransactionItem
       | ItemToGoldTransactionItem
       | GoldToPhpTransactionItem;
-    switch (txType) {
+    switch (type) {
       case TransactionType.CC2GOLD:
         newTx = {
           ccAmount: 1,
@@ -69,6 +71,16 @@ function TransactionItemsCarousel<T>({
         } as ItemToGoldTransactionItem;
         break;
     }
+    return newTx;
+  }, []);
+
+  useEffect(() => {
+    const newTx = createNewTransaction(txType);
+    setNewTxItems([newTx]);
+  }, [txType, createNewTransaction, setNewTxItems]);
+
+  const addTransactionItem = () => {
+    const newTx = createNewTransaction(txType);
     setNewTxItems([...transactionItems, newTx]);
   };
 
@@ -107,8 +119,6 @@ function TransactionItemsCarousel<T>({
     setNewTxItems(updatedTxItems);
   };
 
-  const currentTxItem = transactionItems.at(currIdx);
-
   const getArrayItemFieldPath = (
     arrayField: string,
     itemField: string,
@@ -141,11 +151,13 @@ function TransactionItemsCarousel<T>({
     itemField: string,
     idx: number
   ) => {
-    const fieldPath = `${arrayField}[${idx}].${itemField}`;
+    const fieldPath = getArrayItemFieldPath(arrayField, itemField, idx);
     const inputError = getIn(errors, fieldPath);
     const inputTouched = getIn(touched, fieldPath);
     return inputTouched && !!inputError;
   };
+
+  const currentTxItem = transactionItems.at(currIdx);
 
   return (
     <>
@@ -184,7 +196,7 @@ function TransactionItemsCarousel<T>({
                     'name',
                     currIdx
                   )}
-                  value={(currentTxItem as GoldToPhpTransactionItem).name}
+                  value={(currentTxItem as GoldToPhpTransactionItem).name || ''}
                 />
                 <Form.Control.Feedback type="invalid">
                   {getArrayItemFieldError('transactionItems', 'name', currIdx)}
@@ -198,7 +210,9 @@ function TransactionItemsCarousel<T>({
                   readOnly={readOnly}
                   name="phpPaid"
                   onChange={changeTxItemValue}
-                  value={(currentTxItem as GoldToPhpTransactionItem).phpPaid}
+                  value={
+                    (currentTxItem as GoldToPhpTransactionItem).phpPaid || 1
+                  }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
                     'phpPaid',
@@ -226,7 +240,9 @@ function TransactionItemsCarousel<T>({
                   readOnly={readOnly}
                   name="goldPerPhp"
                   onChange={changeTxItemValue}
-                  value={(currentTxItem as GoldToPhpTransactionItem).goldPerPhp}
+                  value={
+                    (currentTxItem as GoldToPhpTransactionItem).goldPerPhp || 1
+                  }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
                     'goldPerPhp',
@@ -258,7 +274,8 @@ function TransactionItemsCarousel<T>({
                   name="methodOfPayment"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as GoldToPhpTransactionItem).methodOfPayment
+                    (currentTxItem as GoldToPhpTransactionItem)
+                      .methodOfPayment || ''
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -292,7 +309,9 @@ function TransactionItemsCarousel<T>({
                   readOnly={readOnly}
                   name="ccAmount"
                   onChange={changeTxItemValue}
-                  value={(currentTxItem as CcToGoldTransactionItem).ccAmount}
+                  value={
+                    (currentTxItem as CcToGoldTransactionItem).ccAmount || 1
+                  }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
                     'ccAmount',
@@ -316,12 +335,13 @@ function TransactionItemsCarousel<T>({
                 <Form.Label>Gold per CC</Form.Label>
                 <Form.Control
                   type="number"
-                  min={1}
                   placeholder="Enter gold to cc ratio"
                   readOnly={readOnly}
                   name="goldPerCC"
                   onChange={changeTxItemValue}
-                  value={(currentTxItem as CcToGoldTransactionItem).goldPerCC}
+                  value={
+                    (currentTxItem as CcToGoldTransactionItem).goldPerCC || 1
+                  }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
                     'goldPerCC',
@@ -350,7 +370,9 @@ function TransactionItemsCarousel<T>({
                   readOnly={readOnly}
                   name="goldPaid"
                   onChange={changeTxItemValue}
-                  value={(currentTxItem as CcToGoldTransactionItem).goldPaid}
+                  value={
+                    (currentTxItem as CcToGoldTransactionItem).goldPaid || 1
+                  }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
                     'goldPaid',
@@ -382,7 +404,9 @@ function TransactionItemsCarousel<T>({
                   readOnly={readOnly}
                   name="itemName"
                   onChange={changeTxItemValue}
-                  value={(currentTxItem as ItemToGoldTransactionItem).itemName}
+                  value={
+                    (currentTxItem as ItemToGoldTransactionItem).itemName || ''
+                  }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
                     'itemName',
@@ -406,13 +430,13 @@ function TransactionItemsCarousel<T>({
                 <Form.Label>Item quantity</Form.Label>
                 <Form.Control
                   type="number"
-                  min={1}
                   placeholder="Enter item quantity"
                   readOnly={readOnly}
                   name="itemQuantity"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as ItemToGoldTransactionItem).itemQuantity
+                    (currentTxItem as ItemToGoldTransactionItem).itemQuantity ||
+                    1
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -446,7 +470,8 @@ function TransactionItemsCarousel<T>({
                   name="itemPriceInGold"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as ItemToGoldTransactionItem).itemPriceInGold
+                    (currentTxItem as ItemToGoldTransactionItem)
+                      .itemPriceInGold || 1
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',

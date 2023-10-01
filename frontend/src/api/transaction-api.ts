@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import { RequestConfig } from '../hooks/useHttp';
 
 export enum TransactionType {
@@ -54,6 +55,167 @@ export interface TransactionPageDto {
   pageNumber: number;
   pageSize: number;
 }
+
+export interface CreateEditTxFormInput {
+  username: string;
+  dateFinished: string;
+  type: TransactionType;
+  fileAttachments: FileAttachment[];
+  transactionItems: TransactionItem[];
+}
+
+export const CreateEditTxFormInputSchema = yup.object().shape({
+  username: yup.string().required('Username is required.'),
+  dateFinished: yup.date().notRequired(),
+  type: yup
+    .mixed()
+    .oneOf(
+      [
+        TransactionType.CC2GOLD,
+        TransactionType.GOLD2PHP,
+        TransactionType.ITEM2GOLD,
+      ],
+      'Type can only be CC to GOLD, GOLD to PHP, ITEM to GOLD'
+    ),
+  fileAttachments: yup.array().of(
+    yup.object().shape({
+      fileName: yup.string().required('Required.'),
+      fileUrl: yup.string().url('Must be a url').required('Required'),
+    })
+  ),
+  transactionItems: yup.array().of(
+    yup.object().shape({
+      ccAmount: yup
+        .number()
+        .test(
+          'CC2GOLD ccAmount test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.CC2GOLD) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+      goldPerCC: yup
+        .number()
+        .test(
+          'CC2GOLD goldPerCC test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.CC2GOLD) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+      goldPaid: yup
+        .number()
+        .test(
+          'CC2GOLD goldPaid test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.CC2GOLD) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+      name: yup
+        .string()
+        .test('GOLD2PHP name test', 'Required', (value, context) => {
+          let isValid = true;
+          const type = context.from && context.from[1].value.type;
+          if (type === TransactionType.GOLD2PHP) {
+            if (!value || value.length < 0) isValid = false;
+          }
+          return isValid;
+        }),
+      phpPaid: yup
+        .number()
+        .test(
+          'GOLD2PHP phpPaid test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.GOLD2PHP) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+      goldPerPhp: yup
+        .number()
+        .test(
+          'GOLD2PHP goldPerPhp test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.GOLD2PHP) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+      methodOfPayment: yup
+        .string()
+        .test('GOLD2PHP methodOfPayment test', 'Required', (value, context) => {
+          let isValid = true;
+          const type = context.from && context.from[1].value.type;
+          if (type === TransactionType.GOLD2PHP) {
+            if (!value || value.length < 0) isValid = false;
+          }
+          return isValid;
+        }),
+      itemName: yup
+        .string()
+        .test('ITEM2GOLD itemName test', 'Required', (value, context) => {
+          let isValid = true;
+          const type = context.from && context.from[1].value.type;
+          if (type === TransactionType.ITEM2GOLD) {
+            if (!value || value.length < 0) isValid = false;
+          }
+          return isValid;
+        }),
+      itemQuantity: yup
+        .number()
+        .test(
+          'ITEM2GOLD itemQuantity test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.ITEM2GOLD) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+      itemPriceInGold: yup
+        .number()
+        .test(
+          'ITEM2GOLD itemPriceInGold test',
+          'Must be greater than 0',
+          (value, context) => {
+            let isValid = true;
+            const type = context.from && context.from[1].value.type;
+            if (type === TransactionType.ITEM2GOLD) {
+              if (!value || value < 0) isValid = false;
+            }
+            return isValid;
+          }
+        ),
+    })
+  ),
+});
 
 const getBackendUri = () => {
   if (import.meta.env.DEV && import.meta.env.VITE_BACKEND_SERVICE_URI_DEV) {

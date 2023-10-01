@@ -11,136 +11,38 @@ import {
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
-import * as yup from 'yup';
 import { ArrowLeftRight } from 'react-bootstrap-icons';
 import TransactionApi, {
-  CcToGoldTransaction,
-  FileAttachment,
-  GoldToPhpTransaction,
   Transaction,
   TransactionType,
+  CreateEditTxFormInput,
+  CreateEditTxFormInputSchema,
+  TransactionItem,
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import RequestStatusMessage from '../components/UI/RequestStatusMessage';
-import { getZonedDateTimeFromDateString } from '../util/utils';
-
-interface CreateTxFormInput {
-  username: string;
-  type: TransactionType;
-  fileAttachments: FileAttachment[];
-  reversed: boolean;
-  ccAmount: number;
-  goldPerCC: number;
-  goldPaid: number;
-  name: string;
-  phpPaid: number;
-  goldPerPhp: number;
-  methodOfPayment: string;
-  itemName: string;
-  itemQuantity: number;
-  itemPriceInGold: number;
-  dateFinished: string;
-}
-
-const createTxFormInputSchema = yup.object().shape({
-  username: yup.string().required('Username is required.'),
-  type: yup
-    .mixed()
-    .oneOf(
-      [
-        TransactionType.CC2GOLD,
-        TransactionType.GOLD2PHP,
-        TransactionType.ITEM2GOLD,
-      ],
-      'Type can only be CC2GOLD, GOLD2PHP, or ITEM2GOLD'
-    ),
-  fileAttachments: yup.array().of(
-    yup.object().shape({
-      fileName: yup.string().required('Required.'),
-      fileUrl: yup.string().url('Must be a url').required('Required'),
-    })
-  ),
-  ccAmount: yup.number().when('type', {
-    is: TransactionType.CC2GOLD,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  goldPerCC: yup.number().when('type', {
-    is: TransactionType.CC2GOLD,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  goldPaid: yup.number().when('type', {
-    is: TransactionType.CC2GOLD,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  name: yup.string().when('type', {
-    is: TransactionType.GOLD2PHP,
-    then: (schema) => schema.required('Name is required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  phpPaid: yup.number().when('type', {
-    is: TransactionType.GOLD2PHP,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  goldPerPhp: yup.number().when('type', {
-    is: TransactionType.GOLD2PHP,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  methodOfPayment: yup.string().when('type', {
-    is: TransactionType.GOLD2PHP,
-    then: (schema) => schema.required('Method of payment is required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  itemName: yup.string().when('type', {
-    is: TransactionType.ITEM2GOLD,
-    then: (schema) => schema.required('Item name is required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  itemQuantity: yup.number().when('type', {
-    is: TransactionType.ITEM2GOLD,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  itemPriceInGold: yup.number().when('type', {
-    is: TransactionType.ITEM2GOLD,
-    then: (schema) =>
-      schema.min(1, 'Must be greater than 1').required('Required'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  dateFinished: yup.date().notRequired(),
-});
+import {
+  getZonedDateTimeFromDateString,
+  transformTxItems,
+} from '../util/utils';
+import TransactionItemsCarousel from '../components/Transactions/TransactionItemsCarousel';
 
 function CreateTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
   const [reversed, setReversed] = useState(false);
+  const [transactionItems, setTransactionItems] = useState<TransactionItem[]>(
+    []
+  );
+  const [type, setType] = useState<TransactionType>(TransactionType.ITEM2GOLD);
 
-  const createTxFormInitialValues: CreateTxFormInput = {
+  // initial form input values
+  const createTxFormInitialValues: CreateEditTxFormInput = {
     username: '',
-    type: TransactionType.CC2GOLD,
+    type,
     fileAttachments: [],
-    reversed,
-    ccAmount: 1,
-    goldPaid: 1,
-    goldPerCC: 1,
-    name: '',
-    phpPaid: 1,
-    goldPerPhp: 1,
-    methodOfPayment: '',
-    itemName: '',
-    itemQuantity: 1,
-    itemPriceInGold: 1,
     dateFinished: '',
+    transactionItems,
   };
 
   const {
@@ -150,19 +52,9 @@ function CreateTransaction() {
     status: createTxStatus,
   } = useHttp<Transaction>(false);
 
-  useEffect(() => {
-    if (
-      createTxData &&
-      createTxError === null &&
-      createTxStatus === 'completed'
-    ) {
-      console.log(createTxData);
-    }
-  }, [createTxData, createTxError, createTxStatus]);
-
   const createTransactionSubmitHandler = (
-    values: CreateTxFormInput,
-    actions: FormikHelpers<CreateTxFormInput>
+    values: CreateEditTxFormInput,
+    actions: FormikHelpers<CreateEditTxFormInput>
   ) => {
     actions.setSubmitting(false);
     const transaction: Transaction = {
@@ -174,42 +66,11 @@ function CreateTransaction() {
       reversed,
       type: values.type,
       dateFinished: getZonedDateTimeFromDateString(values.dateFinished),
+      transactionItems: transformTxItems(values.type, transactionItems),
     };
 
-    let finalTransaction = null;
-
-    switch (values.type) {
-      case TransactionType.CC2GOLD:
-        finalTransaction = {
-          ...transaction,
-          ccAmount: values.ccAmount,
-          goldPaid: values.goldPaid,
-          goldPerCC: values.goldPerCC,
-        } as CcToGoldTransaction;
-        break;
-      case TransactionType.GOLD2PHP:
-        finalTransaction = {
-          ...transaction,
-          goldPerPhp: values.goldPerPhp,
-          methodOfPayment: values.methodOfPayment,
-          name: values.name,
-          phpPaid: values.phpPaid,
-        } as GoldToPhpTransaction;
-        break;
-      case TransactionType.ITEM2GOLD:
-        finalTransaction = {
-          ...transaction,
-          itemName: values.itemName,
-          itemQuantity: values.itemQuantity,
-          itemPriceInGold: values.itemPriceInGold,
-        };
-        break;
-      default:
-        finalTransaction = transaction;
-    }
-
     const createTxReqConf = TransactionApi.createAccountOwnTransactions(
-      finalTransaction,
+      transaction,
       auth.accessToken
     );
 
@@ -230,9 +91,10 @@ function CreateTransaction() {
               <h3>Create Transaction</h3>
             </div>
             <Formik
-              validationSchema={createTxFormInputSchema}
+              validationSchema={CreateEditTxFormInputSchema}
               onSubmit={createTransactionSubmitHandler}
               initialValues={createTxFormInitialValues}
+              enableReinitialize
             >
               {({
                 handleSubmit,
@@ -298,10 +160,12 @@ function CreateTransaction() {
                         <Form.Select
                           aria-label="Transaction type"
                           name="type"
-                          value={values.type}
+                          value={type}
                           isValid={touched.type && !errors.type}
                           isInvalid={touched.type && !!errors.type}
-                          onChange={handleChange}
+                          onChange={(e) =>
+                            setType(e.currentTarget.value as TransactionType)
+                          }
                           onBlur={handleBlur}
                         >
                           <option value={TransactionType.CC2GOLD}>
@@ -325,229 +189,15 @@ function CreateTransaction() {
                         {errors.type}
                       </Form.Control.Feedback>
                     </Form.Group>
-                    {values.type === TransactionType.GOLD2PHP && (
-                      <>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormName"
-                        >
-                          <Form.Label>Name</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter name"
-                            name="name"
-                            value={values.name}
-                            isValid={touched.name && !errors.name}
-                            isInvalid={touched.name && !!errors.name}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.name}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormPhpPaid"
-                        >
-                          <Form.Label>PHP paid</Form.Label>
-                          <Form.Control
-                            type="number"
-                            name="phpPaid"
-                            value={values.phpPaid}
-                            isValid={touched.phpPaid && !errors.phpPaid}
-                            isInvalid={touched.phpPaid && !!errors.phpPaid}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.phpPaid}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormGoldPerPhp"
-                        >
-                          <Form.Label>Gold per PHP</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter gold to php ratio"
-                            name="goldPerPhp"
-                            value={values.goldPerPhp}
-                            isValid={touched.goldPerPhp && !errors.goldPerPhp}
-                            isInvalid={
-                              touched.goldPerPhp && !!errors.goldPerPhp
-                            }
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.goldPerPhp}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormMethodOfPayment"
-                        >
-                          <Form.Label>Method of payment</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter method of payment"
-                            name="methodOfPayment"
-                            value={values.methodOfPayment}
-                            isValid={
-                              touched.methodOfPayment && !errors.methodOfPayment
-                            }
-                            isInvalid={
-                              touched.methodOfPayment &&
-                              !!errors.methodOfPayment
-                            }
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.methodOfPayment}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </>
-                    )}
-                    {values.type === TransactionType.CC2GOLD && (
-                      <>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormCcAmount"
-                        >
-                          <Form.Label>CC Amount</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter CC amount"
-                            name="ccAmount"
-                            value={values.ccAmount}
-                            isValid={touched.ccAmount && !errors.ccAmount}
-                            isInvalid={touched.ccAmount && !!errors.ccAmount}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.ccAmount}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormGoldPerCc"
-                        >
-                          <Form.Label>Gold per CC</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter gold to cc ratio"
-                            name="goldPerCC"
-                            value={values.goldPerCC}
-                            isValid={touched.goldPerCC && !errors.goldPerCC}
-                            isInvalid={touched.goldPerCC && !!errors.goldPerCC}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.goldPerCC}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormGoldPaid"
-                        >
-                          <Form.Label>Gold paid</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter gold paid"
-                            name="goldPaid"
-                            value={values.goldPaid}
-                            isValid={touched.goldPaid && !errors.goldPaid}
-                            isInvalid={touched.goldPaid && !!errors.goldPaid}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.goldPaid}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </>
-                    )}
-                    {values.type === TransactionType.ITEM2GOLD && (
-                      <>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormItemName"
-                        >
-                          <Form.Label>Item name</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter item name"
-                            name="itemName"
-                            value={values.itemName}
-                            isValid={touched.itemName && !errors.itemName}
-                            isInvalid={touched.itemName && !!errors.itemName}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.itemName}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormItemQuantity"
-                        >
-                          <Form.Label>Item quantity</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter item quantity"
-                            name="itemQuantity"
-                            value={values.itemQuantity}
-                            isValid={
-                              touched.itemQuantity && !errors.itemQuantity
-                            }
-                            isInvalid={
-                              touched.itemQuantity && !!errors.itemQuantity
-                            }
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.itemQuantity}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="createTxFormItemPriceInGold"
-                        >
-                          <Form.Label>Item price in gold</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min={1}
-                            placeholder="Enter item price in gold"
-                            name="itemPriceInGold"
-                            value={values.itemPriceInGold}
-                            isValid={
-                              touched.itemPriceInGold && !errors.itemPriceInGold
-                            }
-                            isInvalid={
-                              touched.itemPriceInGold &&
-                              !!errors.itemPriceInGold
-                            }
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.itemPriceInGold}
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </>
-                    )}
+                    <TransactionItemsCarousel
+                      transactionItems={transactionItems}
+                      txType={values.type}
+                      key="transaction-carousel"
+                      readOnly={false}
+                      setNewTxItems={setTransactionItems}
+                      touched={touched}
+                      errors={errors}
+                    />
                   </div>
                   <div className="mb-3">
                     <h5>File attachments</h5>

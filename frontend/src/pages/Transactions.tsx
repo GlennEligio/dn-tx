@@ -16,7 +16,7 @@ import TransactionFilter from '../components/UI/TransactionFilter';
 function Transactions() {
   const auth = useSelector((state: IRootState) => state.auth);
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [showFilter, setShowFilter] = useState(false);
 
   const {
@@ -45,17 +45,6 @@ function Transactions() {
     );
     getAccountOwnTransactionsRequest(requestConf);
   }, [auth.accessToken, searchParams, getAccountOwnTransactionsRequest]);
-
-  // for logging transaction list request
-  useEffect(() => {
-    if (
-      latestTxData !== null &&
-      latestTxError === null &&
-      latestTxStatus === 'completed'
-    ) {
-      console.log(latestTxData);
-    }
-  }, [latestTxData, latestTxError, latestTxStatus]);
 
   // for constructing redirect url of pagination widget items
   const redirectUrlFn = (pageParam: number) => {

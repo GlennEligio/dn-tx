@@ -1,6 +1,12 @@
 import moment from 'moment-timezone';
 import 'intl';
-import { TransactionType } from '../api/transaction-api';
+import {
+  CcToGoldTransactionItem,
+  GoldToPhpTransactionItem,
+  ItemToGoldTransactionItem,
+  TransactionItem,
+  TransactionType,
+} from '../api/transaction-api';
 
 const getPageArray = (
   currentPage: number,
@@ -43,7 +49,6 @@ export const getZonedDateTimeFromDateString = (date: string) => {
   const dateString = moment(date)
     .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
     .toISOString();
-  console.log(dateString);
   return dateString || '';
 };
 
@@ -69,4 +74,47 @@ export const txTypeText = (txType: TransactionType, isReversed: boolean) => {
     ? [splitTx[1], '2', splitTx[0]].join('')
     : txType;
   return txTextMap[finalTxTypeString];
+};
+
+export const transformTxItems = (
+  type: TransactionType,
+  items: TransactionItem[]
+) => {
+  let finalItems: TransactionItem[] = [];
+  finalItems = items.map((i) => {
+    let finalItem = null;
+    switch (type) {
+      case TransactionType.CC2GOLD:
+        finalItem = {
+          ccAmount: (i as CcToGoldTransactionItem).ccAmount,
+          goldPaid: (i as CcToGoldTransactionItem).goldPaid,
+          goldPerCC: (i as CcToGoldTransactionItem).goldPerCC,
+        } as CcToGoldTransactionItem;
+        break;
+      case TransactionType.GOLD2PHP:
+        finalItem = {
+          goldPerPhp: (i as GoldToPhpTransactionItem).goldPerPhp,
+          methodOfPayment: (i as GoldToPhpTransactionItem).methodOfPayment,
+          name: (i as GoldToPhpTransactionItem).name,
+          phpPaid: (i as GoldToPhpTransactionItem).phpPaid,
+        } as GoldToPhpTransactionItem;
+        break;
+      case TransactionType.ITEM2GOLD:
+        finalItem = {
+          itemName: (i as ItemToGoldTransactionItem).itemName,
+          itemPriceInGold: (i as ItemToGoldTransactionItem).itemPriceInGold,
+          itemQuantity: (i as ItemToGoldTransactionItem).itemQuantity,
+        } as ItemToGoldTransactionItem;
+        break;
+      default:
+        finalItem = {
+          ccAmount: (i as CcToGoldTransactionItem).ccAmount,
+          goldPaid: (i as CcToGoldTransactionItem).goldPaid,
+          goldPerCC: (i as CcToGoldTransactionItem).goldPerCC,
+        } as CcToGoldTransactionItem;
+        break;
+    }
+    return finalItem;
+  });
+  return finalItems;
 };

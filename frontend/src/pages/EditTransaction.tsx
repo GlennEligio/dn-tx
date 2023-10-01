@@ -11,7 +11,6 @@ import {
   InputGroup,
 } from 'react-bootstrap';
 import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
-import * as yup from 'yup';
 import { ArrowLeftRight } from 'react-bootstrap-icons';
 import transactionApi, {
   FileAttachment,
@@ -21,6 +20,8 @@ import transactionApi, {
   GoldToPhpTransactionItem,
   ItemToGoldTransactionItem,
   TransactionItem,
+  CreateEditTxFormInputSchema,
+  CreateEditTxFormInput,
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
@@ -28,169 +29,9 @@ import RequestStatusMessage from '../components/UI/RequestStatusMessage';
 import {
   getDateFromZonedDateTimeString,
   getZonedDateTimeFromDateString,
+  transformTxItems,
 } from '../util/utils';
 import TransactionItemsCarousel from '../components/Transactions/TransactionItemsCarousel';
-
-interface EditTxFormInput {
-  username: string;
-  dateFinished: string;
-  type: TransactionType;
-  fileAttachments: FileAttachment[];
-  transactionItems: TransactionItem[];
-}
-
-const editTxFormInputSchema = yup.object().shape({
-  username: yup.string().required('Username is required.'),
-  dateFinished: yup.date().notRequired(),
-  type: yup
-    .mixed()
-    .oneOf(
-      [
-        TransactionType.CC2GOLD,
-        TransactionType.GOLD2PHP,
-        TransactionType.ITEM2GOLD,
-      ],
-      'Type can only be CC to GOLD, GOLD to PHP, ITEM to GOLD'
-    ),
-  fileAttachments: yup.array().of(
-    yup.object().shape({
-      fileName: yup.string().required('Required.'),
-      fileUrl: yup.string().url('Must be a url').required('Required'),
-    })
-  ),
-  transactionItems: yup.array().of(
-    yup.object().shape({
-      ccAmount: yup
-        .number()
-        .test(
-          'CC2GOLD ccAmount test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.CC2GOLD) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-      goldPerCC: yup
-        .number()
-        .test(
-          'CC2GOLD goldPerCC test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.CC2GOLD) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-      goldPaid: yup
-        .number()
-        .test(
-          'CC2GOLD goldPaid test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.CC2GOLD) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-      name: yup
-        .string()
-        .test('GOLD2PHP name test', 'Required', (value, context) => {
-          let isValid = true;
-          const type = context.from && context.from[1].value.type;
-          if (type === TransactionType.GOLD2PHP) {
-            if (!value || value.length < 0) isValid = false;
-          }
-          return isValid;
-        }),
-      phpPaid: yup
-        .number()
-        .test(
-          'GOLD2PHP phpPaid test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.GOLD2PHP) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-      goldPerPhp: yup
-        .number()
-        .test(
-          'GOLD2PHP goldPerPhp test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.GOLD2PHP) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-      methodOfPayment: yup
-        .string()
-        .test('GOLD2PHP methodOfPayment test', 'Required', (value, context) => {
-          let isValid = true;
-          const type = context.from && context.from[1].value.type;
-          if (type === TransactionType.GOLD2PHP) {
-            if (!value || value.length < 0) isValid = false;
-          }
-          return isValid;
-        }),
-      itemName: yup
-        .string()
-        .test('ITEM2GOLD itemName test', 'Required', (value, context) => {
-          let isValid = true;
-          const type = context.from && context.from[1].value.type;
-          if (type === TransactionType.ITEM2GOLD) {
-            if (!value || value.length < 0) isValid = false;
-          }
-          return isValid;
-        }),
-      itemQuantity: yup
-        .number()
-        .test(
-          'ITEM2GOLD itemQuantity test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.ITEM2GOLD) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-      itemPriceInGold: yup
-        .number()
-        .test(
-          'ITEM2GOLD itemPriceInGold test',
-          'Must be greater than 0',
-          (value, context) => {
-            let isValid = true;
-            const type = context.from && context.from[1].value.type;
-            if (type === TransactionType.ITEM2GOLD) {
-              if (!value || value < 0) isValid = false;
-            }
-            return isValid;
-          }
-        ),
-    })
-  ),
-});
 
 function EditTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -209,7 +50,7 @@ function EditTransaction() {
   );
 
   // initial form input values
-  const editTxFormInitialValues: EditTxFormInput = {
+  const editTxFormInitialValues: CreateEditTxFormInput = {
     username,
     dateFinished,
     type,
@@ -225,6 +66,7 @@ function EditTransaction() {
     sendRequest: currentTxRequest,
   } = useHttp<Transaction>(false);
 
+  // For updating transaction data
   const {
     data: editTxData,
     error: editTxError,
@@ -275,21 +117,11 @@ function EditTransaction() {
     }
   }, [currentTxData, currentTxError, currentTxStatus]);
 
-  // Checking the result of edit transaction request
-  useEffect(() => {
-    if (editTxData && editTxError === null && editTxStatus === 'completed') {
-      console.log(editTxData);
-    }
-  }, [editTxData, editTxError, editTxStatus]);
-
   // Edit Transcation form submit handler
   const editTransactionSubmitHandler = (
-    values: EditTxFormInput,
-    actions: FormikHelpers<EditTxFormInput>
+    values: CreateEditTxFormInput,
+    actions: FormikHelpers<CreateEditTxFormInput>
   ) => {
-    console.log('sending');
-    console.log(values);
-    console.log(getZonedDateTimeFromDateString(values.dateFinished));
     if (transactionId) {
       const transaction: Transaction = {
         username: values.username,
@@ -298,7 +130,7 @@ function EditTransaction() {
         creator: {
           username: auth.username,
         },
-        transactionItems,
+        transactionItems: transformTxItems(values.type, transactionItems),
         reversed,
         type: values.type,
       };
@@ -332,7 +164,7 @@ function EditTransaction() {
             </div>
             {validCurrentTx && (
               <Formik
-                validationSchema={editTxFormInputSchema}
+                validationSchema={CreateEditTxFormInputSchema}
                 onSubmit={editTransactionSubmitHandler}
                 initialValues={editTxFormInitialValues}
                 enableReinitialize
@@ -400,25 +232,17 @@ function EditTransaction() {
                       <Form.Group className="mb-3" controlId="editTxFormType">
                         <Form.Label>Type</Form.Label>
                         <InputGroup>
-                          <Form.Select
-                            aria-label="Transaction type"
+                          <Form.Control
+                            type="text"
+                            placeholder="Enter username"
                             name="type"
-                            value={values.type}
+                            value={type}
                             isValid={touched.type && !errors.type}
                             isInvalid={touched.type && !!errors.type}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                          >
-                            <option value={TransactionType.CC2GOLD}>
-                              {reversed ? 'Gold to CC' : 'CC to Gold'}
-                            </option>
-                            <option value={TransactionType.GOLD2PHP}>
-                              {reversed ? 'PHP to Gold' : 'Gold to PHP'}
-                            </option>
-                            <option value={TransactionType.ITEM2GOLD}>
-                              {reversed ? 'Gold to Item' : 'Item to Gold'}
-                            </option>
-                          </Form.Select>
+                            readOnly
+                          />
                           <Button
                             variant="outline-secondary"
                             onClick={reverseTxHandler}
@@ -432,11 +256,10 @@ function EditTransaction() {
                       </Form.Group>
                       <TransactionItemsCarousel
                         transactionItems={transactionItems}
-                        txType={type}
+                        txType={values.type}
                         key="transaction-carousel"
                         readOnly={false}
                         setNewTxItems={setTransactionItems}
-                        values={values}
                         touched={touched}
                         errors={errors}
                       />
