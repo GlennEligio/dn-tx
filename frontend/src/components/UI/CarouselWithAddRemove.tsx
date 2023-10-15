@@ -24,7 +24,7 @@ function CarouselWithAddRemove({
 }: PropsWithChildren<CarouselWithAddRemoveProps>) {
   return (
     <>
-      <Row>
+      <Row className="gx-0">
         <Col className="d-flex justify-content-center align-items-center">
           {totalItems > 1 && currentIdx !== 0 && (
             <ChevronLeft onClick={onSwipeLeft} />

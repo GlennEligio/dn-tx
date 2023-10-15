@@ -53,5 +53,11 @@ DNTX-006: Use OAuth for Gdrive
 		1. Transaction details
 		2. Create/Edit/Delete Transaction page
 		3. Transaction Card, specify the number of Transaction items
+		
+DNTX-016: Modify the page where TransactionItems is rendered to not break on any device width
+ > as of now, in some device screen width, the arrows used to navigate Transaction items breaks
+ 
+DNTX-017: Add favicon in the page
+ > no favicon set for DNTX
 	
  
