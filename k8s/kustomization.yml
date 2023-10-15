@@ -13,3 +13,4 @@ resources:
   - database.yml
   - frontend.yml
   - backend.yml
+  - okteto-ingress.yml
