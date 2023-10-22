@@ -66,9 +66,10 @@ DNTX-019: Add option to create new Transaction after just creating a new one
  > as of now, when the user just finished creating a Transaction, the only thing that will change in the Create Transaction page is the prompt as to whether the creation is a success or not
  > because of this, we want to have the user an option to clear all the fields, and reset transaction items after they successfully finished creating a transaction
  
-DNTX-020: Put the "/transactions/:transactionId" route path OUTSIDE the loggedIn route guard
+DNTX-020: Refractor the FileAttachment form inputs to use CarouselWithAddRemove component
+
+DNTX-021: Put the "/transactions/:transactionId" route path OUTSIDE the loggedIn route guard
  > The transactions details page is supposed to be exposed in the public in case the users wants to provide the transaction details to the other party
  > Currently, the Transaction details page is inside the route guard where the user must be logged in
  > We need to remove the said route outside of it
  
-DNTX-020: Refractor the FileAttachment form inputs to use CarouselWithAddRemove component

@@ -1,16 +1,8 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import {
-  Form,
-  Col,
-  Container,
-  Row,
-  Button,
-  Stack,
-  InputGroup,
-} from 'react-bootstrap';
+import { useState } from 'react';
+import { Form, Col, Container, Row, Button, InputGroup } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { FieldArray, Formik, FormikHelpers, getIn } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import { ArrowLeftRight } from 'react-bootstrap-icons';
 import TransactionApi, {
   Transaction,
@@ -94,6 +86,14 @@ function CreateTransaction() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setDateFinished(e.target.value);
+  };
+
+  const resetFormInputs = () => {
+    setUsername('');
+    setDateFinished('');
+    setTransactionItems([]);
+    setType(TransactionType.ITEM2GOLD);
+    setFileAttachments([]);
   };
 
   return (
@@ -220,7 +220,15 @@ function CreateTransaction() {
                     </div>
                   </div>
                   <div className="d-flex justify-content-end">
-                    <Button variant="primary" type="submit">
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      className="me-3"
+                      onClick={resetFormInputs}
+                    >
+                      Reset
+                    </Button>
+                    <Button variant="success" type="submit">
                       Save
                     </Button>
                   </div>

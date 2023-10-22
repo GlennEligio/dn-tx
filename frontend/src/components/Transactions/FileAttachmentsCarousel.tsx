@@ -116,7 +116,7 @@ function FileAttachmentsCarousel<T>({
   return (
     <>
       {fileAttachments.length === 0 && (
-        <div className="mt-5 d-flex justify-content-center">
+        <div className="mt-2 d-flex justify-content-center">
           <Button onClick={addAttachmentHandler}>
             Add file attachment item
           </Button>
