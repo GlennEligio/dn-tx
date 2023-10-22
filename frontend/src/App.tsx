@@ -31,13 +31,13 @@ export function App() {
         <Route path="/search" element={<SearchTransaction />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/reset" element={<ResetPassword />} />
+        <Route
+          path="/transactions/:transactionId"
+          element={<TransactionDetails />}
+        />
         {loggedIn && (
           <>
             <Route path="/transactions" element={<Transactions />} />
-            <Route
-              path="/transactions/:transactionId"
-              element={<TransactionDetails />}
-            />
             <Route
               path="/transactions/delete/success"
               element={<DeleteTransactionSuccess />}
