@@ -41,3 +41,8 @@ BE: ./mvnw spring-boot:build-image -DskipTests
 For handling dates in database
 1. Prefer using Instant/LocalDateTime with timezone UTC
 2. Default timezone of docker containers is UTC
+
+
+favicon.ico
+ > image file that is only 16 x 16 pixel
+ > to create one, you can use the website favicon.cc

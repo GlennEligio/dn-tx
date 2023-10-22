@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import {
   Form,
   Col,
@@ -18,6 +18,7 @@ import TransactionApi, {
   CreateEditTxFormInput,
   CreateEditTxFormInputSchema,
   TransactionItem,
+  FileAttachment,
 } from '../api/transaction-api';
 import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
@@ -27,6 +28,7 @@ import {
   transformTxItems,
 } from '../util/utils';
 import TransactionItemsCarousel from '../components/Transactions/TransactionItemsCarousel';
+import FileAttachmentsCarousel from '../components/Transactions/FileAttachmentsCarousel';
 
 function CreateTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -34,14 +36,17 @@ function CreateTransaction() {
   const [transactionItems, setTransactionItems] = useState<TransactionItem[]>(
     []
   );
+  const [username, setUsername] = useState('');
+  const [dateFinished, setDateFinished] = useState('');
+  const [fileAttachments, setFileAttachments] = useState<FileAttachment[]>([]);
   const [type, setType] = useState<TransactionType>(TransactionType.ITEM2GOLD);
 
   // initial form input values
   const createTxFormInitialValues: CreateEditTxFormInput = {
-    username: '',
+    username,
     type,
-    fileAttachments: [],
-    dateFinished: '',
+    fileAttachments,
+    dateFinished,
     transactionItems,
   };
 
@@ -81,6 +86,16 @@ function CreateTransaction() {
     setReversed((prevState) => !prevState);
   };
 
+  const usernameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  const dateFinishedChangeHandler = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setDateFinished(e.target.value);
+  };
+
   return (
     <Container>
       <Row>
@@ -96,14 +111,7 @@ function CreateTransaction() {
               initialValues={createTxFormInitialValues}
               enableReinitialize
             >
-              {({
-                handleSubmit,
-                handleChange,
-                handleBlur,
-                values,
-                touched,
-                errors,
-              }) => (
+              {({ handleSubmit, handleBlur, values, touched, errors }) => (
                 <Form onSubmit={handleSubmit}>
                   <div className="mb-5">
                     <RequestStatusMessage
@@ -127,7 +135,7 @@ function CreateTransaction() {
                         value={values.username}
                         isValid={touched.username && !errors.username}
                         isInvalid={touched.username && !!errors.username}
-                        onChange={handleChange}
+                        onChange={usernameChangeHandler}
                         onBlur={handleBlur}
                       />
                       <Form.Control.Feedback type="invalid">
@@ -147,7 +155,7 @@ function CreateTransaction() {
                         isInvalid={
                           touched.dateFinished && !!errors.dateFinished
                         }
-                        onChange={handleChange}
+                        onChange={dateFinishedChangeHandler}
                         onBlur={handleBlur}
                       />
                       <Form.Control.Feedback type="invalid">
@@ -202,106 +210,12 @@ function CreateTransaction() {
                   <div className="mb-3">
                     <h5>File attachments</h5>
                     <div>
-                      <FieldArray
-                        name="fileAttachments"
-                        render={(arrayHelpers) => (
-                          <>
-                            {values.fileAttachments &&
-                              values.fileAttachments.length > 0 &&
-                              values.fileAttachments.map((fileInput, index) => {
-                                const nameInput = `fileAttachments[${index}].fileName`;
-                                const urlInput = `fileAttachments[${index}].fileUrl`;
-                                const nameError = getIn(errors, nameInput);
-                                const nameTouch = getIn(touched, nameInput);
-                                const urlError = getIn(errors, urlInput);
-                                const urlTouch = getIn(touched, urlInput);
-
-                                return (
-                                  <div key={`File input ${index}`}>
-                                    <div>
-                                      <b>File #{index + 1}</b>
-                                    </div>
-                                    <Row>
-                                      <Col>
-                                        <Form.Group
-                                          className="mb-3"
-                                          controlId={`createTxFormFile${index}Name`}
-                                        >
-                                          <Form.Control
-                                            type="text"
-                                            placeholder={`File #${
-                                              index + 1
-                                            } name`}
-                                            name={nameInput}
-                                            value={fileInput.fileName}
-                                            isValid={nameTouch && !nameError}
-                                            isInvalid={nameTouch && !!nameError}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                          />
-                                          <Form.Control.Feedback type="invalid">
-                                            {nameError}
-                                          </Form.Control.Feedback>
-                                        </Form.Group>
-                                      </Col>
-                                      <Col>
-                                        <Form.Group
-                                          className="mb-3"
-                                          controlId={`createTxFormFile${index}Url`}
-                                        >
-                                          <Form.Control
-                                            type="text"
-                                            placeholder={`File #${
-                                              index + 1
-                                            } url`}
-                                            name={urlInput}
-                                            value={fileInput.fileUrl}
-                                            isValid={urlTouch && !urlError}
-                                            isInvalid={urlTouch && !!urlError}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                          />
-                                          <Form.Control.Feedback type="invalid">
-                                            {urlError}
-                                          </Form.Control.Feedback>
-                                        </Form.Group>
-                                      </Col>
-                                    </Row>
-                                  </div>
-                                );
-                              })}
-                            <div className="d-flex justify-content-center">
-                              <Stack direction="horizontal" gap={2}>
-                                <Button
-                                  variant="secondary"
-                                  type="button"
-                                  onClick={() => {
-                                    arrayHelpers.push({
-                                      fileName: '',
-                                      fileUrl: '',
-                                    });
-                                  }}
-                                >
-                                  Add
-                                </Button>
-                                {values.fileAttachments.length > 0 && (
-                                  <>
-                                    <div className="vr" />
-                                    <Button
-                                      variant="secondary"
-                                      type="button"
-                                      onClick={() => {
-                                        arrayHelpers.pop();
-                                      }}
-                                    >
-                                      Remove
-                                    </Button>
-                                  </>
-                                )}
-                              </Stack>
-                            </div>
-                          </>
-                        )}
+                      <FileAttachmentsCarousel
+                        fileAttachments={fileAttachments}
+                        readOnly={false}
+                        errors={errors}
+                        touched={touched}
+                        setNewFileAttachments={setFileAttachments}
                       />
                     </div>
                   </div>

@@ -54,10 +54,21 @@ DNTX-006: Use OAuth for Gdrive
 		2. Create/Edit/Delete Transaction page
 		3. Transaction Card, specify the number of Transaction items
 		
-DNTX-016: Modify the page where TransactionItems is rendered to not break on any device width
+(DONE) DNTX-016: Modify the page where TransactionItems is rendered to not break on any device width
  > as of now, in some device screen width, the arrows used to navigate Transaction items breaks
  
-DNTX-017: Add favicon in the page
+(DONE) DNTX-017: Add favicon in the page
  > no favicon set for DNTX
 	
+DNTX-018: Fix issue related to Transaction level info (username, date finished, fileAttachments) being reset when adding or removing transaction item
+
+DNTX-019: Add option to create new Transaction after just creating a new one
+ > as of now, when the user just finished creating a Transaction, the only thing that will change in the Create Transaction page is the prompt as to whether the creation is a success or not
+ > because of this, we want to have the user an option to clear all the fields, and reset transaction items after they successfully finished creating a transaction
  
+DNTX-020: Put the "/transactions/:transactionId" route path OUTSIDE the loggedIn route guard
+ > The transactions details page is supposed to be exposed in the public in case the users wants to provide the transaction details to the other party
+ > Currently, the Transaction details page is inside the route guard where the user must be logged in
+ > We need to remove the said route outside of it
+ 
+DNTX-020: Refractor the FileAttachment form inputs to use CarouselWithAddRemove component

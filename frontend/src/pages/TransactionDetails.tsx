@@ -16,6 +16,7 @@ import useHttp from '../hooks/useHttp';
 import { IRootState } from '../store';
 import { getDateFromZonedDateTimeString, txTypeText } from '../util/utils';
 import TransactionItemsCarousel from '../components/Transactions/TransactionItemsCarousel';
+import FileAttachmentsCarousel from '../components/Transactions/FileAttachmentsCarousel';
 
 function TransactionDetails() {
   const auth = useSelector((state: IRootState) => state.auth);
@@ -111,47 +112,10 @@ function TransactionDetails() {
                   <div className="mb-3">
                     <h5>File attachments</h5>
                     <div>
-                      {transactionData.fileAttachments &&
-                        transactionData.fileAttachments.length > 0 &&
-                        transactionData.fileAttachments.map(
-                          (fileInput, index) => {
-                            return (
-                              <div key={`file-attachment-${index}`}>
-                                <div>
-                                  <b>File #{index + 1}</b>
-                                </div>
-                                <Row>
-                                  <Col>
-                                    <Form.Group
-                                      className="mb-3"
-                                      controlId={`createTxFormFile${index}Name`}
-                                    >
-                                      <Form.Control
-                                        type="text"
-                                        value={fileInput.fileName}
-                                        placeholder={`File #${index + 1} name`}
-                                        readOnly
-                                      />
-                                    </Form.Group>
-                                  </Col>
-                                  <Col>
-                                    <Form.Group
-                                      className="mb-3"
-                                      controlId={`createTxFormFile${index}Url`}
-                                    >
-                                      <Form.Control
-                                        type="text"
-                                        placeholder={`File #${index + 1} url`}
-                                        readOnly
-                                        value={fileInput.fileUrl}
-                                      />
-                                    </Form.Group>
-                                  </Col>
-                                </Row>
-                              </div>
-                            );
-                          }
-                        )}
+                      <FileAttachmentsCarousel
+                        fileAttachments={transactionData.fileAttachments}
+                        readOnly
+                      />
                     </div>
                   </div>
                   {auth.accessToken && (

@@ -15,7 +15,7 @@ import {
 } from '../../api/transaction-api';
 import CarouselWithAddRemove from '../UI/CarouselWithAddRemove';
 
-// values, errors, touched is from Formik
+// errors, touched is from Formik
 interface TransactionItemsCarouselProps<T> {
   txType: TransactionType;
   transactionItems: TransactionItem[];
