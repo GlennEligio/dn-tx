@@ -43,24 +43,24 @@ function TransactionItemsCarousel<T>({
     switch (type) {
       case TransactionType.CC2GOLD:
         newTx = {
-          ccAmount: 1,
-          goldPaid: 1,
-          goldPerCC: 1,
+          ccAmount: 0,
+          goldPaid: 0,
+          goldPerCC: 0,
         } as CcToGoldTransactionItem;
         break;
       case TransactionType.GOLD2PHP:
         newTx = {
-          goldPerPhp: 1,
+          goldPerPhp: 0,
           methodOfPayment: '',
           name: '',
-          phpPaid: 1,
+          phpPaid: 0,
         } as GoldToPhpTransactionItem;
         break;
       case TransactionType.ITEM2GOLD:
         newTx = {
           itemName: '',
-          itemPriceInGold: 1,
-          itemQuantity: 1,
+          itemPriceInGold: 0,
+          itemQuantity: 0,
         } as ItemToGoldTransactionItem;
         break;
       default:
@@ -211,7 +211,7 @@ function TransactionItemsCarousel<T>({
                   name="phpPaid"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as GoldToPhpTransactionItem).phpPaid || 1
+                    (currentTxItem as GoldToPhpTransactionItem).phpPaid || 0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -241,7 +241,7 @@ function TransactionItemsCarousel<T>({
                   name="goldPerPhp"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as GoldToPhpTransactionItem).goldPerPhp || 1
+                    (currentTxItem as GoldToPhpTransactionItem).goldPerPhp || 0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -309,7 +309,7 @@ function TransactionItemsCarousel<T>({
                   name="ccAmount"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as CcToGoldTransactionItem).ccAmount || 1
+                    (currentTxItem as CcToGoldTransactionItem).ccAmount || 0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -339,7 +339,7 @@ function TransactionItemsCarousel<T>({
                   name="goldPerCC"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as CcToGoldTransactionItem).goldPerCC || 1
+                    (currentTxItem as CcToGoldTransactionItem).goldPerCC || 0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -369,7 +369,7 @@ function TransactionItemsCarousel<T>({
                   name="goldPaid"
                   onChange={changeTxItemValue}
                   value={
-                    (currentTxItem as CcToGoldTransactionItem).goldPaid || 1
+                    (currentTxItem as CcToGoldTransactionItem).goldPaid || 0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -436,7 +436,7 @@ function TransactionItemsCarousel<T>({
                   onChange={changeTxItemValue}
                   value={
                     (currentTxItem as ItemToGoldTransactionItem).itemQuantity ||
-                    1
+                    0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
@@ -470,7 +470,7 @@ function TransactionItemsCarousel<T>({
                   onChange={changeTxItemValue}
                   value={
                     (currentTxItem as ItemToGoldTransactionItem)
-                      .itemPriceInGold || 1
+                      .itemPriceInGold || 0
                   }
                   isValid={getArrayItemFieldIsValid(
                     'transactionItems',
