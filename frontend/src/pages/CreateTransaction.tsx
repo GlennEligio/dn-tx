@@ -47,6 +47,7 @@ function CreateTransaction() {
     error: createTxError,
     sendRequest: createTxRequest,
     status: createTxStatus,
+    resetHttpState: resetCreateTxReq,
   } = useHttp<Transaction>(false);
 
   const createTransactionSubmitHandler = (
@@ -94,6 +95,7 @@ function CreateTransaction() {
     setTransactionItems([]);
     setType(TransactionType.ITEM2GOLD);
     setFileAttachments([]);
+    resetCreateTxReq();
   };
 
   return (

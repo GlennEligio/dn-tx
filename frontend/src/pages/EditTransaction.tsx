@@ -73,6 +73,7 @@ function EditTransaction() {
     error: editTxError,
     sendRequest: editTxRequest,
     status: editTxStatus,
+    resetHttpState: resetEditTxState,
   } = useHttp<Transaction>(false);
 
   // Fetch the current Transaction data on component mount
@@ -278,7 +279,15 @@ function EditTransaction() {
                       </div>
                     </div>
                     <div className="d-flex justify-content-end">
-                      <Button variant="primary" type="submit">
+                      <Button
+                        variant="secondary"
+                        type="button"
+                        className="me-3"
+                        onClick={resetEditTxState}
+                      >
+                        Reset
+                      </Button>
+                      <Button variant="success" type="submit">
                         Save
                       </Button>
                     </div>
