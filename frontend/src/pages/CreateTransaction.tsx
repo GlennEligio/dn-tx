@@ -22,6 +22,10 @@ import {
 import TransactionItemsCarousel from '../components/Transactions/TransactionItemsCarousel';
 import FileAttachmentsCarousel from '../components/Transactions/FileAttachmentsCarousel';
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+};
+
 function CreateTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
   const [reversed, setReversed] = useState(false);
@@ -54,6 +58,7 @@ function CreateTransaction() {
     values: CreateEditTxFormInput,
     actions: FormikHelpers<CreateEditTxFormInput>
   ) => {
+    scrollToTop();
     actions.setSubmitting(false);
     const transaction: Transaction = {
       username: values.username,
