@@ -73,3 +73,28 @@ DNTX-006: Use OAuth for Gdrive
  > Currently, the Transaction details page is inside the route guard where the user must be logged in
  > We need to remove the said route outside of it
  
+ 
+(DONE) DNTX-022: Allow decimals to be added as value in some fields of TransactionItems
+ > as of now, some fields (ex: ITEM2GOLD item price in gold) only allows whole number
+ 
+(DONE) DNTX-023: Change the default value for number fields in TransactionItem to 0
+
+(DONE) DNTX-024: Reset the status of create/edit transaction in CreateTransaction and EditTransaction pages after resetting the form
+
+DNTX-025: CreateTransaction page blanks out whenever someone adds a TransactionItem
+ > happens only after resetting the form
+ > error:
+	TypeError: Cannot read properties of undefined (reading 'itemName')
+ > cant replicate in local dev env
+ 
+(DONE) DNTX-026: Change the TransactionItem carousel wherein whenever we add a TransactionItem, it will go to the newly created one. Also whenever we remove an item, it will go to the previous one
+
+DNTX-027: Fix bug in EditTransaction page wherein whenever the TransactionItems data is not being populated properly
+ > cant replicate in local dev env, will investigate further
+
+(DONE) DNTX-028: Scroll the page back to the top whenever we are saving Transactions in CreateTransaction and EditTransaction page
+ > allows user to see the status of the request, without the need to scroll up
+ 
+(DONE) DNTX-029: Add timer or cooldown before the user can do a create or edit action in the Transaction again
+ > we can disable the 'Save' or 'Update' button for a moment to avoid duplicate transactions
+ > used to prevent multiple update or create transactions

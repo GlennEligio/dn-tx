@@ -25,7 +25,7 @@ spec:
         app: dntx-backend-spring
     spec:
       containers:
-        - image: shuntjg/dntx-backend:0.0.2.8-PROD
+        - image: shuntjg/dntx-backend:0.0.2.9-PROD
           imagePullPolicy: IfNotPresent
           name: dntx-backend-spring
           readinessProbe:
