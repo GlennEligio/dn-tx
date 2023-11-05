@@ -82,12 +82,13 @@ function TransactionItemsCarousel<T>({
   const addTransactionItem = () => {
     const newTx = createNewTransaction(txType);
     setNewTxItems([...transactionItems, newTx]);
+    setCurrIdx((prevCurr) => prevCurr + 1);
   };
 
   const removeTransactionItem = (idx: number) => {
     const newTxItems = [...transactionItems];
     newTxItems.splice(idx, 1);
-    setCurrIdx(0);
+    setCurrIdx((prevCurr) => prevCurr - 1);
     setNewTxItems(newTxItems);
   };
 
