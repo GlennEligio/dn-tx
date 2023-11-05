@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Form, Col, Container, Row, Button, InputGroup } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -28,6 +28,7 @@ const scrollToTop = () => {
 
 function CreateTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
+  const [isSaveBtnDisabled, setSaveBtnDisabled] = useState(false);
   const [reversed, setReversed] = useState(false);
   const [transactionItems, setTransactionItems] = useState<TransactionItem[]>(
     []
@@ -36,6 +37,15 @@ function CreateTransaction() {
   const [dateFinished, setDateFinished] = useState('');
   const [fileAttachments, setFileAttachments] = useState<FileAttachment[]>([]);
   const [type, setType] = useState<TransactionType>(TransactionType.ITEM2GOLD);
+
+  // for handling save button disable
+  useEffect(() => {
+    if (isSaveBtnDisabled) {
+      setTimeout(() => {
+        setSaveBtnDisabled(false);
+      }, 2000);
+    }
+  }, [isSaveBtnDisabled]);
 
   // initial form input values
   const createTxFormInitialValues: CreateEditTxFormInput = {
@@ -59,6 +69,7 @@ function CreateTransaction() {
     actions: FormikHelpers<CreateEditTxFormInput>
   ) => {
     scrollToTop();
+    setSaveBtnDisabled(true);
     actions.setSubmitting(false);
     const transaction: Transaction = {
       username: values.username,
@@ -235,8 +246,12 @@ function CreateTransaction() {
                     >
                       Reset
                     </Button>
-                    <Button variant="success" type="submit">
-                      Save
+                    <Button
+                      variant="success"
+                      type="submit"
+                      disabled={isSaveBtnDisabled}
+                    >
+                      {isSaveBtnDisabled ? 'Saving...' : 'Save'}
                     </Button>
                   </div>
                 </Form>

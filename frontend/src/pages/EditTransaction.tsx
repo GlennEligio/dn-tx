@@ -41,6 +41,7 @@ const scrollToTop = () => {
 function EditTransaction() {
   const auth = useSelector((state: IRootState) => state.auth);
   const { transactionId } = useParams();
+  const [isEditBtnDisabled, setEditBtnDisabled] = useState(false);
 
   // General Transaction inputs
   const [username, setUsername] = useState('');
@@ -79,6 +80,15 @@ function EditTransaction() {
     status: editTxStatus,
     resetHttpState: resetEditTxState,
   } = useHttp<Transaction>(false);
+
+  // for handling edit button disable
+  useEffect(() => {
+    if (isEditBtnDisabled) {
+      setTimeout(() => {
+        setEditBtnDisabled(false);
+      }, 2000);
+    }
+  }, [isEditBtnDisabled]);
 
   // Fetch the current Transaction data on component mount
   useEffect(() => {
@@ -129,6 +139,7 @@ function EditTransaction() {
     actions: FormikHelpers<CreateEditTxFormInput>
   ) => {
     scrollToTop();
+    setEditBtnDisabled(true);
     if (transactionId) {
       const transaction: Transaction = {
         username: values.username,
@@ -292,8 +303,12 @@ function EditTransaction() {
                       >
                         Reset
                       </Button>
-                      <Button variant="success" type="submit">
-                        Save
+                      <Button
+                        variant="success"
+                        type="submit"
+                        disabled={isEditBtnDisabled}
+                      >
+                        {isEditBtnDisabled ? 'Updating...' : 'Update'}
                       </Button>
                     </div>
                   </Form>
