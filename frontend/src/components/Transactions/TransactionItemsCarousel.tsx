@@ -205,7 +205,7 @@ function TransactionItemsCarousel<T>({
               <Form.Group className="mb-3" controlId="createTxFormPhpPaid">
                 <Form.Label>PHP paid</Form.Label>
                 <Form.Control
-                  type="number"
+                  type="text"
                   placeholder="Enter php amount"
                   readOnly={readOnly}
                   name="phpPaid"
@@ -304,7 +304,6 @@ function TransactionItemsCarousel<T>({
                 <Form.Label>CC Amount</Form.Label>
                 <Form.Control
                   type="number"
-                  min={1}
                   placeholder="Enter CC amount"
                   readOnly={readOnly}
                   name="ccAmount"
@@ -365,7 +364,6 @@ function TransactionItemsCarousel<T>({
                 <Form.Label>Gold paid</Form.Label>
                 <Form.Control
                   type="number"
-                  min={1}
                   placeholder="Enter gold paid"
                   readOnly={readOnly}
                   name="goldPaid"
@@ -432,6 +430,8 @@ function TransactionItemsCarousel<T>({
                   type="number"
                   placeholder="Enter item quantity"
                   readOnly={readOnly}
+                  step={1}
+                  min={1}
                   name="itemQuantity"
                   onChange={changeTxItemValue}
                   value={
@@ -464,7 +464,6 @@ function TransactionItemsCarousel<T>({
                 <Form.Label>Item price in gold</Form.Label>
                 <Form.Control
                   type="number"
-                  min={1}
                   placeholder="Enter item price in gold"
                   readOnly={readOnly}
                   name="itemPriceInGold"
