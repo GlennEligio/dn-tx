@@ -86,6 +86,7 @@ DNTX-025: CreateTransaction page blanks out whenever someone adds a TransactionI
  > error:
 	TypeError: Cannot read properties of undefined (reading 'itemName')
  > cant replicate in local dev env
+ > in order to fix this, when resetting, we will not reset the TransactionItem to empty array, instead we will reinitialize it to a array with single item
  
 (DONE) DNTX-026: Change the TransactionItem carousel wherein whenever we add a TransactionItem, it will go to the newly created one. Also whenever we remove an item, it will go to the previous one
 
