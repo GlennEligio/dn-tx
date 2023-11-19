@@ -81,7 +81,7 @@ DNTX-006: Use OAuth for Gdrive
 
 (DONE) DNTX-024: Reset the status of create/edit transaction in CreateTransaction and EditTransaction pages after resetting the form
 
-DNTX-025: CreateTransaction page blanks out whenever someone adds a TransactionItem
+(DONE) DNTX-025: CreateTransaction page blanks out whenever someone adds a TransactionItem
  > happens only after resetting the form
  > error:
 	TypeError: Cannot read properties of undefined (reading 'itemName')
