@@ -82,13 +82,25 @@ function TransactionItemsCarousel<T>({
   const addTransactionItem = () => {
     const newTx = createNewTransaction(txType);
     setNewTxItems([...transactionItems, newTx]);
-    setCurrIdx((prevCurr) => prevCurr + 1);
+    // check if transaction items is non-empty
+    // if non-empty, allowed to increase the curr pointer
+    setCurrIdx((prevCurr) => {
+      let newCurr = 0;
+      if (transactionItems.length > 0) newCurr = prevCurr + 1;
+      return newCurr;
+    });
   };
 
   const removeTransactionItem = (idx: number) => {
     const newTxItems = [...transactionItems];
     newTxItems.splice(idx, 1);
-    setCurrIdx((prevCurr) => prevCurr - 1);
+    // check if transaction items is empty
+    // if empty, do not reduce the curr pointer
+    setCurrIdx((prevCurr) => {
+      let newCurr = 0;
+      if (transactionItems.length > 1) newCurr = prevCurr - 1;
+      return newCurr;
+    });
     setNewTxItems(newTxItems);
   };
 
@@ -159,7 +171,8 @@ function TransactionItemsCarousel<T>({
   };
 
   const currentTxItem = transactionItems.at(currIdx);
-
+  console.log('Current tx item: ', currentTxItem);
+  console.log('Current idx: ', currIdx);
   return (
     <>
       {transactionItems.length === 0 && (
@@ -177,343 +190,321 @@ function TransactionItemsCarousel<T>({
           onSwipeLeft={swipeLeft}
           readOnly={readOnly}
         >
-          {transactionItems && transactionItems.length > 0 && (
+          {txType === TransactionType.GOLD2PHP && (
             <>
-              {txType === TransactionType.GOLD2PHP && (
-                <>
-                  <Form.Group className="mb-3" controlId="createTxFormName">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="name"
-                      placeholder="Enter name"
-                      readOnly={readOnly}
-                      onChange={changeTxItemValue}
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'name',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'name',
-                        currIdx
-                      )}
-                      value={
-                        (currentTxItem as GoldToPhpTransactionItem).name || ''
-                      }
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'name',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="createTxFormPhpPaid">
-                    <Form.Label>PHP paid</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter php amount"
-                      readOnly={readOnly}
-                      name="phpPaid"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as GoldToPhpTransactionItem).phpPaid || 0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'phpPaid',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'phpPaid',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'phpPaid',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="createTxFormGoldPerPhp"
-                  >
-                    <Form.Label>Gold per PHP</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter gold to php ratio"
-                      readOnly={readOnly}
-                      name="goldPerPhp"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as GoldToPhpTransactionItem)
-                          .goldPerPhp || 0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'goldPerPhp',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'goldPerPhp',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'goldPerPhp',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="createTxFormMethodOfPayment"
-                  >
-                    <Form.Label>Method of payment</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter method of payment"
-                      readOnly={readOnly}
-                      name="methodOfPayment"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as GoldToPhpTransactionItem)
-                          .methodOfPayment || ''
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'methodOfPayment',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'methodOfPayment',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'methodOfPayment',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </>
-              )}
-              {txType === TransactionType.CC2GOLD && (
-                <>
-                  <Form.Group className="mb-3" controlId="createTxFormCcAmount">
-                    <Form.Label>CC Amount</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter CC amount"
-                      readOnly={readOnly}
-                      name="ccAmount"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as CcToGoldTransactionItem).ccAmount || 0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'ccAmount',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'ccAmount',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'ccAmount',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="createTxFormGoldPerCc"
-                  >
-                    <Form.Label>Gold per CC</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter gold to cc ratio"
-                      readOnly={readOnly}
-                      name="goldPerCC"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as CcToGoldTransactionItem).goldPerCC ||
-                        0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'goldPerCC',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'goldPerCC',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'goldPerCC',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="createTxFormGoldPaid">
-                    <Form.Label>Gold paid</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter gold paid"
-                      readOnly={readOnly}
-                      name="goldPaid"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as CcToGoldTransactionItem).goldPaid || 0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'goldPaid',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'goldPaid',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'goldPaid',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </>
-              )}
-              {txType === TransactionType.ITEM2GOLD && (
-                <>
-                  <Form.Group className="mb-3" controlId="createTxFormItemName">
-                    <Form.Label>Item name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter item name"
-                      readOnly={readOnly}
-                      name="itemName"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as ItemToGoldTransactionItem).itemName ||
-                        ''
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'itemName',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'itemName',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'itemName',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="createTxFormItemQuantity"
-                  >
-                    <Form.Label>Item quantity</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter item quantity"
-                      readOnly={readOnly}
-                      step={1}
-                      min={1}
-                      name="itemQuantity"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as ItemToGoldTransactionItem)
-                          .itemQuantity || 0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'itemQuantity',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'itemQuantity',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'itemQuantity',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="createTxFormItemPriceInGold"
-                  >
-                    <Form.Label>Item price in gold</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter item price in gold"
-                      readOnly={readOnly}
-                      name="itemPriceInGold"
-                      onChange={changeTxItemValue}
-                      value={
-                        (currentTxItem as ItemToGoldTransactionItem)
-                          .itemPriceInGold || 0
-                      }
-                      isValid={getArrayItemFieldIsValid(
-                        'transactionItems',
-                        'itemPriceInGold',
-                        currIdx
-                      )}
-                      isInvalid={getArrayItemFieldIsInvalid(
-                        'transactionItems',
-                        'itemPriceInGold',
-                        currIdx
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {getArrayItemFieldError(
-                        'transactionItems',
-                        'itemPriceInGold',
-                        currIdx
-                      )}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </>
-              )}
+              <Form.Group className="mb-3" controlId="createTxFormName">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  placeholder="Enter name"
+                  readOnly={readOnly}
+                  onChange={changeTxItemValue}
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'name',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'name',
+                    currIdx
+                  )}
+                  value={(currentTxItem as GoldToPhpTransactionItem).name || ''}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError('transactionItems', 'name', currIdx)}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="createTxFormPhpPaid">
+                <Form.Label>PHP paid</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter php amount"
+                  readOnly={readOnly}
+                  name="phpPaid"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as GoldToPhpTransactionItem).phpPaid || 0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'phpPaid',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'phpPaid',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'phpPaid',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="createTxFormGoldPerPhp">
+                <Form.Label>Gold per PHP</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter gold to php ratio"
+                  readOnly={readOnly}
+                  name="goldPerPhp"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as GoldToPhpTransactionItem).goldPerPhp || 0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'goldPerPhp',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'goldPerPhp',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'goldPerPhp',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group
+                className="mb-3"
+                controlId="createTxFormMethodOfPayment"
+              >
+                <Form.Label>Method of payment</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter method of payment"
+                  readOnly={readOnly}
+                  name="methodOfPayment"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as GoldToPhpTransactionItem)
+                      .methodOfPayment || ''
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'methodOfPayment',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'methodOfPayment',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'methodOfPayment',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </>
+          )}
+          {txType === TransactionType.CC2GOLD && (
+            <>
+              <Form.Group className="mb-3" controlId="createTxFormCcAmount">
+                <Form.Label>CC Amount</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter CC amount"
+                  readOnly={readOnly}
+                  name="ccAmount"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as CcToGoldTransactionItem).ccAmount || 0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'ccAmount',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'ccAmount',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'ccAmount',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="createTxFormGoldPerCc">
+                <Form.Label>Gold per CC</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter gold to cc ratio"
+                  readOnly={readOnly}
+                  name="goldPerCC"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as CcToGoldTransactionItem).goldPerCC || 0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'goldPerCC',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'goldPerCC',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'goldPerCC',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="createTxFormGoldPaid">
+                <Form.Label>Gold paid</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter gold paid"
+                  readOnly={readOnly}
+                  name="goldPaid"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as CcToGoldTransactionItem).goldPaid || 0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'goldPaid',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'goldPaid',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'goldPaid',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </>
+          )}
+          {txType === TransactionType.ITEM2GOLD && (
+            <>
+              <Form.Group className="mb-3" controlId="createTxFormItemName">
+                <Form.Label>Item name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter item name"
+                  readOnly={readOnly}
+                  name="itemName"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as ItemToGoldTransactionItem).itemName || ''
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'itemName',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'itemName',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'itemName',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="createTxFormItemQuantity">
+                <Form.Label>Item quantity</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter item quantity"
+                  readOnly={readOnly}
+                  step={1}
+                  min={1}
+                  name="itemQuantity"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as ItemToGoldTransactionItem).itemQuantity ||
+                    0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'itemQuantity',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'itemQuantity',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'itemQuantity',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group
+                className="mb-3"
+                controlId="createTxFormItemPriceInGold"
+              >
+                <Form.Label>Item price in gold</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter item price in gold"
+                  readOnly={readOnly}
+                  name="itemPriceInGold"
+                  onChange={changeTxItemValue}
+                  value={
+                    (currentTxItem as ItemToGoldTransactionItem)
+                      .itemPriceInGold || 0
+                  }
+                  isValid={getArrayItemFieldIsValid(
+                    'transactionItems',
+                    'itemPriceInGold',
+                    currIdx
+                  )}
+                  isInvalid={getArrayItemFieldIsInvalid(
+                    'transactionItems',
+                    'itemPriceInGold',
+                    currIdx
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {getArrayItemFieldError(
+                    'transactionItems',
+                    'itemPriceInGold',
+                    currIdx
+                  )}
+                </Form.Control.Feedback>
+              </Form.Group>
             </>
           )}
         </CarouselWithAddRemove>
