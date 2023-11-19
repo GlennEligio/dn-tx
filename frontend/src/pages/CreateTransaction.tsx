@@ -186,7 +186,7 @@ function CreateTransaction() {
                         <Form.Select
                           aria-label="Transaction type"
                           name="type"
-                          value={type}
+                          value={values.type}
                           isValid={touched.type && !errors.type}
                           isInvalid={touched.type && !!errors.type}
                           onChange={(e) =>
