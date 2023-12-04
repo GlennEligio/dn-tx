@@ -18,6 +18,7 @@
 		<module.image.name>${project.artifactId}</module.image.name>
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 		<module.image.tag>${project.version}</module.image.tag>
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -110,11 +111,12 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
+						<builder>paketobuildpacks/builder-jammy-base:latest</builder>
 						<env>
 							<BP_SPRING_CLOUD_BINDINGS_DISABLED>true</BP_SPRING_CLOUD_BINDINGS_DISABLED>
 							<BPL_SPRING_CLOUD_BINDINGS_DISABLED>true</BPL_SPRING_CLOUD_BINDINGS_DISABLED>
 						</env>
-						<name>shuntjg/${module.image.name}:${module.image.tag}_${maven.build.timestamp}</name>
+						<name>shuntjg/${module.image.name}:${module.image.tag}_${build.timestamp}</name>
 					</image>
 					<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 					<excludes>
@@ -123,7 +125,6 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-
 				</configuration>
 			</plugin>
 		</plugins>
