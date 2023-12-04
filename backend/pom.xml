@@ -15,6 +15,9 @@
 	<description>DragonNest Transaction Logger</description>
 	<properties>
 		<java.version>17</java.version>
+		<module.image.name>${project.artifactId}</module.image.name>
+		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+		<module.image.tag>${project.version}</module.image.tag>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -111,7 +114,7 @@
 							<BP_SPRING_CLOUD_BINDINGS_DISABLED>true</BP_SPRING_CLOUD_BINDINGS_DISABLED>
 							<BPL_SPRING_CLOUD_BINDINGS_DISABLED>true</BPL_SPRING_CLOUD_BINDINGS_DISABLED>
 						</env>
-						<name>shuntjg/${project.artifactId}:${project.version}</name>
+						<name>shuntjg/${module.image.name}:${module.image.tag}_${maven.build.timestamp}</name>
 					</image>
 					<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 					<excludes>
