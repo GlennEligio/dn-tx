@@ -87,6 +87,7 @@ DNTX-006: Use OAuth for Gdrive
 	TypeError: Cannot read properties of undefined (reading 'itemName')
  > cant replicate in local dev env
  > in order to fix this, when resetting, we will not reset the TransactionItem to empty array, instead we will reinitialize it to a array with single item
+ > error is related to incorrect current index used to specify the current transaction item to display
  
 (DONE) DNTX-026: Change the TransactionItem carousel wherein whenever we add a TransactionItem, it will go to the newly created one. Also whenever we remove an item, it will go to the previous one
 
@@ -99,3 +100,32 @@ DNTX-027: Fix bug in EditTransaction page wherein whenever the TransactionItems 
 (DONE) DNTX-029: Add timer or cooldown before the user can do a create or edit action in the Transaction again
  > we can disable the 'Save' or 'Update' button for a moment to avoid duplicate transactions
  > used to prevent multiple update or create transactions
+ 
+DNTX-030: Remove unnecessary logs in FE
+ > TransactionItemsCarousel.tsx
+ 
+DNTX-031: Create Jenkins pipelines to automate the build and deployment to Okteto
+ > pipelines to create includes:
+	1. build FE (DONE)
+		- build Docker image, then push to dockerhub
+	2. build BE
+		- build Docker image, then push to dockerhub
+	3. deploy
+	4. test (no test cases written yet)
+ > for building Docker image, the image name should be in format
+	- shuntjg/${module.image.name}:${module.image.tag}_${maven.build.timestamp}
+	- module.image.name will be name of image, examples are below
+		= dntx-backend, dntx-frontend
+	- module.image.tag will be the branch that we used to create these components
+		= ex: 0.0.2.9, 0.0.2.10
+	- maven.build.timestamp will be any random character to append, in case of multiple builds in the same branch. in this case it will be a timestamp
+ > for BE, use the command
+	- mvn ./mvnw spring-boot:build-image -DskipTests "-Dmodule.image.name=dntx-backend-1" "-Dmodule.image.tag=0.0.2.10"
+ > for FE, use the command	
+	- docker build -f Dockerfile.prod -t shuntjg/dntx-frontend:0.0.2.10-PROD .  
+
+
+DNTX-032: Deploy the DNTX application in Cloud using AWS
+ > deployment will be done in an EC2 instance
+	- this EC2 instance will run a Docker engine inside
+ > all the services that we have right now (BE, FE, DB) will be deployed as a Docker container

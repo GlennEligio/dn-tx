@@ -10,11 +10,15 @@
 	</parent>
 	<groupId>com.glenneligio</groupId>
 	<artifactId>dntx-backend</artifactId>
-	<version>0.0.2.9-PROD</version>
+	<version>0.0.2.10-PROD</version>
 	<name>dntx</name>
 	<description>DragonNest Transaction Logger</description>
 	<properties>
 		<java.version>17</java.version>
+		<module.image.name>${project.artifactId}</module.image.name>
+		<maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
+		<module.image.tag>${project.version}</module.image.tag>
+		<module.build.timestamp>${maven.build.timestamp}</module.build.timestamp>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -107,11 +111,12 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
+						<builder>paketobuildpacks/builder-jammy-base:latest</builder>
 						<env>
 							<BP_SPRING_CLOUD_BINDINGS_DISABLED>true</BP_SPRING_CLOUD_BINDINGS_DISABLED>
 							<BPL_SPRING_CLOUD_BINDINGS_DISABLED>true</BPL_SPRING_CLOUD_BINDINGS_DISABLED>
 						</env>
-						<name>shuntjg/${project.artifactId}:${project.version}</name>
+						<name>shuntjg/${module.image.name}:${module.image.tag}_${module.build.timestamp}</name>
 					</image>
 					<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 					<excludes>
@@ -120,10 +125,8 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
