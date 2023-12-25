@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+    dntx-backend-spring:
+        container_name: dntx-backend-spring
+        image: shuntjg/dntx-backend:0.0.2.9-PROD
+        restart: always
+        environment:
+            DNTX_MONGODB_HOST: dntx-backend-mongodb
+            DNTX_MONGODB_PORT: 27017
+            DNTX_MONGODB_DATABASE: dntx
+            DNTX_MONGODB_USERNAME: sampleuserprod
+            DNTX_MONGODB_PASSWORD: samplepassprod
+            DNTX_JWT_SECRET_KEY: samplesecretkeyprod
+            DNTX_BE_PORT: 8080
+        networks:
+            - dntx-network
+        ports:
+            - "8090:8080"
+        attach: false
+        depends_on:
+            - dntx-backend-mongodb
+        env_file:
+            - dntx-config.env
+    dntx-backend-mongodb:
+        container_name: dntx-backend-mongodb
+        image: mongo:7.0.5-rc0
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: sampleuserprod
+            MONGO_INITDB_ROOT_PASSWORD: samplepassprod
+        volumes:
+            - type: volume
+              source: dntx-data
+              target: /data/db
+        ports:
+            - "27017:27017"
+        attach: false
+        networks:
+            - dntx-network
+        env_file:
+            - dntx-config.env
+    dntx-frontend-react:
+        container_name: dntx-frontend-react
+        image: shuntjg/dntx-frontend:0.0.2.9-PROD
+        environment:
+            DNTX_BE_SERVICE_NAME: dntx-backend-spring
+            DNTX_BE_PORT: 8080
+        networks:
+            - dntx-network
+        attach: false
+        depends_on:
+            - dntx-backend-spring
+        ports: 
+            - "80:80"
+        env_file:
+            - dntx-config.env
+       
+volumes:
+    dntx-data: 
+    
+networks:
+    dntx-network:
