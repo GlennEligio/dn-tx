@@ -46,3 +46,12 @@ For handling dates in database
 favicon.ico
  > image file that is only 16 x 16 pixel
  > to create one, you can use the website favicon.cc
+ 
+ 
+Commands
+docker run --name dntx-backend-spring -p 8090:8080 -d -e DNTX_MONGODB_HOST=dntx-backend-mongodb -e DNTX_MONGODB_PORT=27017 -e DNTX_MONGODB_DATABASE=dntx -e DNTX_MONGODB_USERNAME=sampleuserprod -e DNTX_MONGODB_PASSWORD=samplepassprod -e DNTX_JWT_SECRET_KEY=samplesecretkeyprod -e DNTX_BE_PORT=8080 --network dntx-network shuntjg/dntx-backend:0.0.2.9-PROD
+
+
+docker run --name dntx-backend-mongodb -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=sampleuserprod -e MONGO_INITDB_ROOT_PASSWORD=samplepassprod --mount type=volume,source=dntx-mongodb-data,target=/data/db -d mongo
+
+docker run --name dntx-frontend-react -p 80:80 -e DNTX_BE_SERVICE_NAME=dntx-backend-spring -e DNTX_BE_PORT=8080 -d --network dntx-network shuntjg/dntx-frontend:0.0.2.9-PROD
