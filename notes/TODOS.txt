@@ -128,9 +128,7 @@ DNTX-031: Create Jenkins pipelines to automate the build and deployment to Oktet
 DNTX-032: Deploy the DNTX application in Cloud using AWS
  > deployment will be done in an EC2 instance
 	- this EC2 instance will run a Docker engine inside
- > all the services that we have right now (BE, FE, DB) will be deployed as a Docker container in kubernetes cluster with minikube
- > installation of minikube:
-	= https://crishantha.medium.com/running-minikube-on-aws-ec2-e845337a956
+ > all the services that we have right now (BE, FE, DB) will be deployed as a Docker container using Docker compose
  
 DNTX-033: Changed mountPath of mongodb database
  > from /data/dntx to /etc/mongo
