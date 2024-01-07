@@ -102,7 +102,10 @@ export const transformTxItems = (
       case TransactionType.ITEM2GOLD:
         finalItem = {
           itemName: (i as ItemToGoldTransactionItem).itemName,
-          itemPriceInGold: (i as ItemToGoldTransactionItem).itemPriceInGold,
+          itemPriceInGold: (i as ItemToGoldTransactionItem).isTotal
+            ? (i as ItemToGoldTransactionItem).itemPriceInGold /
+              (i as ItemToGoldTransactionItem).itemQuantity
+            : (i as ItemToGoldTransactionItem).itemPriceInGold,
           itemQuantity: (i as ItemToGoldTransactionItem).itemQuantity,
         } as ItemToGoldTransactionItem;
         break;

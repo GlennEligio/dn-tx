@@ -5,7 +5,7 @@ import React, {
   useCallback,
 } from 'react';
 import { FormikErrors, FormikTouched, getIn } from 'formik';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, FormCheck } from 'react-bootstrap';
 import {
   CcToGoldTransactionItem,
   GoldToPhpTransactionItem,
@@ -61,6 +61,7 @@ function TransactionItemsCarousel<T>({
           itemName: '',
           itemPriceInGold: 0,
           itemQuantity: 0,
+          isTotal: false,
         } as ItemToGoldTransactionItem;
         break;
       default:
@@ -68,6 +69,7 @@ function TransactionItemsCarousel<T>({
           itemName: '',
           itemPriceInGold: 0,
           itemQuantity: 0,
+          isTotal: false,
         } as ItemToGoldTransactionItem;
         break;
     }
@@ -129,6 +131,14 @@ function TransactionItemsCarousel<T>({
     const fieldName = e.target.name;
     const updatedTxItems = [...transactionItems];
     updatedTxItems[currIdx][fieldName] = fieldValue;
+    setNewTxItems(updatedTxItems);
+  };
+
+  const changeTxItemBool: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const fieldName = e.target.name;
+    const fieldBoolVal = e.target.checked;
+    const updatedTxItems = [...transactionItems];
+    updatedTxItems[currIdx][fieldName] = fieldBoolVal;
     setNewTxItems(updatedTxItems);
   };
 
@@ -475,7 +485,31 @@ function TransactionItemsCarousel<T>({
                 className="mb-3"
                 controlId="createTxFormItemPriceInGold"
               >
-                <Form.Label>Item price in gold</Form.Label>
+                {readOnly && <Form.Label>Item price in gold</Form.Label>}
+                {!readOnly && (
+                  <div className="d-flex justify-content-between align-items-center">
+                    <Form.Label>
+                      {(currentTxItem as ItemToGoldTransactionItem).isTotal
+                        ? 'Total price in gold'
+                        : 'Item price in gold'}
+                    </Form.Label>
+                    <FormCheck
+                      reverse
+                      label={
+                        !(currentTxItem as ItemToGoldTransactionItem).isTotal
+                          ? 'Total?'
+                          : 'Per item?'
+                      }
+                      type="switch"
+                      id="itemPriceIsTotal"
+                      name="isTotal"
+                      checked={
+                        (currentTxItem as ItemToGoldTransactionItem).isTotal
+                      }
+                      onChange={changeTxItemBool}
+                    />
+                  </div>
+                )}
                 <Form.Control
                   type="number"
                   placeholder="Enter item price in gold"
