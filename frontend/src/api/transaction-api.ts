@@ -39,6 +39,7 @@ export interface ItemToGoldTransactionItem extends TransactionItem {
   itemName: string;
   itemQuantity: number;
   itemPriceInGold: number;
+  isTotal: boolean;
 }
 
 export interface GoldToPhpTransactionItem extends TransactionItem {
